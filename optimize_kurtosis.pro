@@ -25,10 +25,10 @@ npoint= foo[0]
 ndimen= foo[1]
 north= n_elements(orth)/ndimen
 if (north GT 0) then orth= reform(orth,ndimen,north)
-ntrial= 1000*3^(ndimen-north)
+ntrial= 1000L*3L^long(ndimen-north)
 splog, 'starting',ntrial,' trials'
 for tt=0L,ntrial-1L do begin
-    thiskhat= randomn(seed,3)
+    thiskhat= randomn(seed,ndimen)
     for oo=0L,north-1L do begin
         thisorth= reform(orth[*,oo],ndimen)
         thiskhat= thiskhat-thisorth*((transpose(thisorth)#thiskhat)[0])

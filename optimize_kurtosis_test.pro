@@ -9,8 +9,8 @@
 pro optimize_kurtosis_test
 seed= -1L
 prefix= 'optimize_kurtosis_test'
-readcol, '../../data/archetypes/3PCs.dat',x1,x2,x3, $
-  format='D,D,D'
+readcol, '../../data/archetypes/10PCs.dat',x1,x2,x3,x4,x5, $
+  format='D,D,D,D'
 set_plot, 'ps'
 xsize= 7.5 & ysize= 7.5
 device, file=prefix+'.ps',/inches,xsize=xsize,ysize=ysize, $
@@ -23,6 +23,8 @@ hogg_plothist, x2, $
   xtitle='PC2'
 hogg_plothist, x3, $
   xtitle='PC3'
+hogg_plothist, x4, $
+  xtitle='PC3'
 plot, x1,x2,psym=psym, $
   xtitle='PC1', $
   ytitle='PC2'
@@ -32,13 +34,12 @@ plot, x2,x3,psym=psym, $
 plot, x3,x1,psym=psym, $
   xtitle='PC3', $
   ytitle='PC1'
-data= [[x1],[x2],[x3]]
+data= [[x1],[x2],[x3],[x4],[x5]]
 khat1= optimize_kurtosis(data,comp=comp1,seed=seed)
 orth= khat1
 khat2= optimize_kurtosis(data,comp=comp2,seed=seed,orth=orth)
-khat3= [khat1[1]*khat2[2]-khat1[2]*khat2[1], $
-        khat1[2]*khat2[0]-khat1[0]*khat2[2], $
-        khat1[0]*khat2[1]-khat1[1]*khat2[0]]
+orth= [[orth],[khat2]]
+khat3= optimize_kurtosis(data,comp=comp3,seed=seed,orth=orth)
 splog, transpose(khat1)#khat1
 splog, transpose(khat2)#khat2
 splog, transpose(khat3)#khat3
