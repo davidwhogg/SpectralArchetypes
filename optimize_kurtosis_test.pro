@@ -7,9 +7,10 @@
 ;  Copyright 2008 David W. Hogg (NYU).  All rights reserved.
 ;-
 pro optimize_kurtosis_test
+seed= -1L
 prefix= 'optimize_kurtosis_test'
-read_ascii, '../../data/archetypes/3PC.dat',x1,x2,x3, $
-            format='D,D,D'
+readcol, '../../data/archetypes/3PCs.dat',x1,x2,x3, $
+  format='D,D,D'
 set_plot, 'ps'
 xsize= 7.5 & ysize= 7.5
 device, file=prefix+'.ps',/inches,xsize=xsize,ysize=ysize, $
@@ -17,21 +18,52 @@ device, file=prefix+'.ps',/inches,xsize=xsize,ysize=ysize, $
 hogg_plot_defaults
 psym=6
 hogg_plothist, x1, $
-               xlabel='x_1'
+  xtitle='PC1'
 hogg_plothist, x2, $
-               xlabel='x_2'
+  xtitle='PC2'
 hogg_plothist, x3, $
-               xlabel='x_3'
+  xtitle='PC3'
 plot, x1,x2,psym=psym, $
-      xlabel='x_1', $
-      ylabel='x_2'
+  xtitle='PC1', $
+  ytitle='PC2'
 plot, x2,x3,psym=psym, $
-      xlabel='x_2', $
-      ylabel='x_3'
+  xtitle='PC2', $
+  ytitle='PC3'
 plot, x3,x1,psym=psym, $
-      xlabel='x_3', $
-      ylabel='x_1'
+  xtitle='PC3', $
+  ytitle='PC1'
 data= [[x1],[x2],[x3]]
+khat1= optimize_kurtosis(data,comp=comp1,seed=seed)
+orth= khat1
+khat2= optimize_kurtosis(data,comp=comp2,seed=seed,orth=orth)
+khat3= [khat1[1]*khat2[2]-khat1[2]*khat2[1], $
+        khat1[2]*khat2[0]-khat1[0]*khat2[2], $
+        khat1[0]*khat2[1]-khat1[1]*khat2[0]]
+splog, transpose(khat1)#khat1
+splog, transpose(khat2)#khat2
+splog, transpose(khat3)#khat3
+splog, transpose(khat1)#khat2
+splog, transpose(khat2)#khat3
+splog, transpose(khat3)#khat1
+comp3= data # khat3
+hogg_plothist, comp1, $
+  xtitle='K1'
+hogg_plothist, comp2, $
+  xtitle='K2'
+hogg_plothist, comp3, $
+  xtitle='K3'
+plot, comp1,comp2,psym=psym, $
+  xtitle='K1', $
+  ytitle='K2'
+plot, comp2,comp3,psym=psym, $
+  xtitle='K2', $
+  ytitle='K3'
+plot, comp3,comp1,psym=psym, $
+  xtitle='K3', $
+  ytitle='K1'
 device, /close
+splog, khat1
+splog, khat2
+splog, khat3
 return
 end
