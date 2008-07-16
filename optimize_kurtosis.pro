@@ -25,27 +25,41 @@ npoint= foo[0]
 ndimen= foo[1]
 north= n_elements(orth)/ndimen
 if (north GT 0) then orth= reform(orth,ndimen,north)
-ntrial= 1000L*3L^long(ndimen-north)
-splog, 'starting',ntrial,' trials'
-for tt=0L,ntrial-1L do begin
-    thiskhat= randomn(seed,ndimen)
-    for oo=0L,north-1L do begin
-        thisorth= reform(orth[*,oo],ndimen)
-        thiskhat= thiskhat-thisorth*((transpose(thisorth)#thiskhat)[0])
+for ii=0,1 do begin
+    if (ii EQ 0) then begin
+        ntrial= 1000L*3L^long(ndimen-north)
+        amp= 1.0
+        desc=''
+    endif else begin
+        ntrial= 10L*3L^long(ndimen-north)
+        amp= 0.01
+        desc=' refinement'
+    endelse
+    splog, 'starting',ntrial,desc+' trials'
+    for tt=0L,ntrial-1L do begin
+        if (ii EQ 0) then begin
+            thiskhat= amp*randomn(seed,ndimen)
+        endif else begin
+            thiskhat= khat+amp*randomn(seed,ndimen)
+        endelse
+        for oo=0L,north-1L do begin
+            thisorth= reform(orth[*,oo],ndimen)
+            thiskhat= thiskhat-thisorth*((transpose(thisorth)#thiskhat)[0])
+        endfor
+        norm= sqrt((transpose(thiskhat)#thiskhat)[0])
+        thiskhat= thiskhat / norm
+        thiscomp= data#thiskhat
+        tmp= thiscomp-mean(thiscomp)
+        tmp= tmp^2/mean(tmp^2)
+        kurtosis= mean(tmp^4)
+        if (tt EQ 0) then bestkurtosis= kurtosis+1.0
+        if (kurtosis LT bestkurtosis) then begin
+            bestkurtosis= kurtosis
+            khat= thiskhat
+            comp= thiscomp
+            splog, tt, khat, bestkurtosis
+        endif
     endfor
-    norm= sqrt((transpose(thiskhat)#thiskhat)[0])
-    thiskhat= thiskhat / norm
-    thiscomp= data#thiskhat
-    tmp= thiscomp-mean(thiscomp)
-    tmp= tmp^2/mean(tmp^2)
-    kurtosis= mean(tmp^4)
-    if (tt EQ 0) then bestkurtosis= kurtosis+1.0
-    if (kurtosis LT bestkurtosis) then begin
-        bestkurtosis= kurtosis
-        khat= thiskhat
-        comp= thiscomp
-        splog, tt, khat, bestkurtosis
-    endif
 endfor
 help, comp
 return, khat
