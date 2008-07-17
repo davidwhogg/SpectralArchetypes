@@ -25,17 +25,10 @@ npoint= foo[0]
 ndimen= foo[1]
 north= n_elements(orth)/ndimen
 if (north GT 0) then orth= reform(orth,ndimen,north)
-for ii=0,1 do begin
-    if (ii EQ 0) then begin
-        ntrial= 1000L*3L^long(ndimen-north)
-        amp= 1.0
-        desc=''
-    endif else begin
-        ntrial= 10L*3L^long(ndimen-north)
-        amp= 0.01
-        desc=' refinement'
-    endelse
-    splog, 'starting',ntrial,desc+' trials'
+ntrial= 1L*3L^long(ndimen-north)
+for ii=0,4 do begin
+    amp= 10.0^(1.0-float(ii))
+    splog, 'starting',ntrial,' trials with amp=',amp
     for tt=0L,ntrial-1L do begin
         if (ii EQ 0) then begin
             thiskhat= amp*randomn(seed,ndimen)
@@ -61,6 +54,10 @@ for ii=0,1 do begin
         endif
     endfor
 endfor
-help, comp
+; reverse on skew if necessary
+if (bimodality_skew(comp) LT 0.0) then begin
+    khat= -1.0*khat
+    comp= -1.0*comp
+endif
 return, khat
 end

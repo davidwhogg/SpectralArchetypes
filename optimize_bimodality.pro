@@ -24,25 +24,6 @@ var= mean(td^2)
 return, mean(td^3)/var^(1.5)
 end
 
-function bimodality_scalar, data,kindx=kindx
-td= data-mean(data)
-var= mean(td^2)
-kmean= dblarr(2)
-kmean[0]= mean(td[where(td LE 0.0)])
-kmean[1]= mean(td[where(td GE 0.0)])
-nzero= 0
-repeat begin
-    dd2= [[(td-kmean[0])^2],[(td-kmean[1])^2]]
-    kindx= fix(dd2[*,1] LT dd2[*,0])
-    kvar= mean(dd2[*,0] < dd2[*,1])
-    oldkmean= kmean
-    oldnzero= nzero
-    kmean[0]= mean(td[where(kindx EQ 0,nzero)])
-    kmean[1]= mean(td[where(kindx EQ 1,none)])
-endrep until (total(abs(oldkmean-kmean)) EQ 0.0)
-return, (kvar/var)
-end
-
 function optimize_bimodality, data,comp=comp,seed=seed, $
                               orth=orth
 foo= size(data,/dimens)
@@ -50,23 +31,13 @@ npoint= foo[0]
 ndimen= foo[1]
 north= n_elements(orth)/ndimen
 if (north GT 0) then orth= reform(orth,ndimen,north)
-for ii=0,1 do begin
-    if (ii EQ 0) then begin
-        ntrial= 1000L*3L^long(ndimen-north)
-        amp= 1.0
-        desc=''
-    endif else begin
-        ntrial= 10L*3L^long(ndimen-north)
-        amp= 0.01
-        desc=' refinement'
-    endelse
-    splog, 'starting',ntrial,desc+' trials'
+ntrial= 1L*3L^long(ndimen-north)
+khat= dblarr(ndimen)
+for ii=0,5 do begin
+    amp= 3.0^(1.0-float(ii))
+    splog, 'starting',ntrial,' trials with amp=',amp
     for tt=0L,ntrial-1L do begin
-        if (ii EQ 0) then begin
-            thiskhat= amp*randomn(seed,ndimen)
-        endif else begin
-            thiskhat= khat+amp*randomn(seed,ndimen)
-        endelse
+        thiskhat= khat+amp*randomn(seed,ndimen)
         for oo=0L,north-1L do begin
             thisorth= reform(orth[*,oo],ndimen)
             thiskhat= thiskhat-thisorth*((transpose(thisorth)#thiskhat)[0])
@@ -75,7 +46,7 @@ for ii=0,1 do begin
         thiskhat= thiskhat / norm
         thiscomp= data#thiskhat
         scalar= bimodality_scalar(thiscomp)
-        if (tt EQ 0) then bestscalar= scalar+1.0
+        if (not keyword_set(bestscalar)) then bestscalar= scalar+1.0
         if (scalar LT bestscalar) then begin
             bestscalar= scalar
             khat= thiskhat
