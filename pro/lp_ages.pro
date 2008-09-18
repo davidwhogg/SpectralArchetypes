@@ -56,6 +56,10 @@ repeat begin
     jj= jj+1
 endrep until ((cover EQ nspectra) or (jj GE nmodel))
 useindx= where(use,nuse)
+hogg= {ages_id: 0L, responsibility: 0L}
+hogg= replicate(hogg,nuse)
+hogg.ages_id= wong.ages_id[useindx]
+hogg.responsibility= round(total(yesnogrid[*,useindx],1))
 
 ; check
 help, yesnogrid[*,useindx]
@@ -66,6 +70,6 @@ splog, wong.ages_id[useindx]
 
 ; output
 fitsfile= 'agesId.'+chistr+'.fits'
-mwrfits, wong.ages_id[useindx],fitsfile,/create
+mwrfits, hogg,fitsfile,/create
 return
 end
