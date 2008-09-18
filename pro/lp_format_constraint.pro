@@ -1,3 +1,9 @@
+;+
+; BUGS:
+;  - No proper comment header.
+; LICENSE:
+;  Copyright 2008 David W. Hogg (NYU) all rights reserved.
+;-
 pro lp_format_constraint, cnumber,aindex,wlun=wlun,cost=cost
 if NOT keyword_set(wlun) then wlun= -1
 term= ' + 1 a'+lp_format_index(aindex)
