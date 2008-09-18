@@ -1,0 +1,5 @@
+echo "lp_ages,5.0" | idl > idl.5.log
+echo "lp_ages,4.0" | idl > idl.4.log
+echo "lp_ages,3.0" | idl > idl.3.log
+echo "lp_ages,2.0" | idl > idl.2.log
+echo "lp_ages,1.0" | idl > idl.1.log
