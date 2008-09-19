@@ -9,12 +9,15 @@
 ;              non-zero entries where the model represents the
 ;              spectrum
 ;  filename  - for output, default to ./idl.lp
+; KEYWORDS:
+;  binary    - make a binary programming .lp file instead of the
+;              linear programming default
 ; OUTPUTS:
 ;  [cplex lp file]
 ; LICENSE:
 ;  Copyright 2008 David W. Hogg (NYU) all rights reserved.
 ;-
-pro lp_format, matrix,filename
+pro lp_format, matrix,filename,binary=binary
 if (NOT keyword_set(filename)) then filename= './idl.lp'
 if (NOT keyword_set(matrix)) then begin
     seed= -1L
@@ -37,8 +40,13 @@ for cc=0L,nspectra-1L do begin
     endif
 endfor
 printf, wlun,''
-printf, wlun,'Bounds'
-lp_format_bounds, lindgen(nmodel),wlun=wlun
+if keyword_set(binary) then begin
+    printf, wlun,'Binary'
+    for ii=0L,nmodel-1L do printf, wlun,'  a'+lp_format_index(ii)
+endif else begin
+    printf, wlun,'Bounds'
+    lp_format_bounds, lindgen(nmodel),wlun=wlun
+endelse
 printf, wlun,''
 printf, wlun,'End'
 close, wlun
