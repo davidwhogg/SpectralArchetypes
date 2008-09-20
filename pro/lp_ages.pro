@@ -8,28 +8,41 @@
 ; LICENSE:
 ;  Copyright 2008 David W. Hogg (NYU) all rights reserved.
 ;-
-pro lp_ages, chisqlim,binary=binary
-if (NOT keyword_set(chisqlim)) then chisqlim= 3.0
-chistr= string(chisqlim,format='(F3.1)')
+pro lp_ages, chisqlim,ioannis=ioannis
+if (NOT keyword_set(chisqlim)) then chisqlim= 1.0
+chistr= strtrim(string(chisqlim,format='(F9.1)'),2)
 chisqlim= float(chistr)
-wong= mrdfits('~/astrometry/data/archetypes/ages_*.fits.gz',1)
+if keyword_set(ioannis) then begin
+    prefix= 'ages_ioannis.'+chistr
+    ages= mrdfits('/mount/moon1/ioannis/home/research/projects/ages/projects/archetype/ages_archetype_chi2grid.fits',1)
+; transpose in the next line because John's structure has structure
+; elements one for each datum and a row of models in each structure
+; element, and when you do john.chi2, you get an array with the models
+; in the first index, and we need it the other way.
+    yesnogrid= (transpose(ages.chi2) LT chisqlim)
+endif else begin
+    prefix= 'ages_wong.'+chistr
+    ages= mrdfits('~/astrometry/data/archetypes/ages_*.fits.gz',1)
+; transpose in the next line because Wong's structure has first index
+; looping over models and second over data, and we need the other way.
+    yesnogrid= (transpose(ages.chisqgrid) LT chisqlim)
+endelse
 
 ; make CPLEX LP file
-yesnogrid= (transpose(wong.chisqgrid) LT chisqlim)
 foo= size(yesnogrid,/dimens)
 nspectra= foo[0]
 nmodel= foo[1]
-infilename= 'ages.lp'
+infilename= prefix+'.lp'
 lp_format, yesnogrid,infilename,/binary
 
 ; run glpsol
-outfilename= 'ages.output'
+outfilename= infilename+'.output'
 cmd= 'glpsol --cpxlp '+infilename+' -o '+outfilename+' --mipgap 0.01'
 splog, cmd
 spawn, cmd
 
 ; trim output from glpsol
-grepfilename= 'ages.output.grep'
+grepfilename= outfilename+'.grep'
 cmd= 'grep "[0-9].a[0-9][0-9][0-9][0-9][0-9][0-9]" '+outfilename $
   +' > '+grepfilename
 splog, cmd
@@ -86,7 +99,7 @@ endelse
 useindx= where(use,nuse)
 hogg= {ages_id: 0L, responsibility: 0L}
 hogg= replicate(hogg,nuse)
-hogg.ages_id= wong.ages_id[useindx]
+hogg.ages_id= (reform((ages.ages_id),nmodel))[useindx]
 hogg.responsibility= round(total(yesnogrid[*,useindx],1))
 
 ; check
@@ -94,10 +107,11 @@ help, yesnogrid[*,useindx]
 help, total(yesnogrid[*,useindx],2)
 print, minmax(total(yesnogrid[*,useindx],2))
 splog, nuse,' templates for delta-chisq < '+chistr+':'
-splog, wong.ages_id[useindx]
+splog, hogg.ages_id
 
 ; output
-fitsfile= 'ages_binary_program.'+chistr+'.fits'
+fitsfile= prefix+'.hogg.fits'
+if keyword_set(ioannis) then fitsfile='ioannis_'+fitsfile
 mwrfits, hogg,fitsfile,/create
 return
 end
