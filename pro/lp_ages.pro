@@ -114,6 +114,7 @@ fitsfile= prefix+'.hogg.fits'
 mwrfits, hogg,fitsfile,/create
 hdr= headfits(fitsfile)
 sxaddpar, hdr,'DCHI2LIM',chisqlim
+sxaddpar, hdr,'NTEMPLAT',nuse
 djs_modfits, fitsfile,0,hdr
 return
 end
