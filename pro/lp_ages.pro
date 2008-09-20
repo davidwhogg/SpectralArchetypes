@@ -10,7 +10,7 @@
 ;-
 pro lp_ages, chisqlim,ioannis=ioannis
 if (NOT keyword_set(chisqlim)) then chisqlim= 1.0
-chistr= strtrim(string(chisqlim,format='(F9.1)'),2)
+chistr= strtrim(string(round(chisqlim)),2)
 chisqlim= float(chistr)
 if keyword_set(ioannis) then begin
     prefix= 'ages_ioannis.'+chistr
@@ -111,7 +111,9 @@ splog, hogg.ages_id
 
 ; output
 fitsfile= prefix+'.hogg.fits'
-if keyword_set(ioannis) then fitsfile='ioannis_'+fitsfile
 mwrfits, hogg,fitsfile,/create
+hdr= headfits(fitsfile)
+sxaddpar, hdr,'DCHI2LIM',chisqlim
+djs_modfits, fitsfile,0,hdr
 return
 end

@@ -1,13 +1,4 @@
 #echo "lp_ages,1.0" | idl > idl.w.log
-#echo "lp_ages,1.0,/ioannis" | idl > idl.1.log
-#echo "lp_ages,2.0,/ioannis" | idl > idl.2.log
-#echo "lp_ages,5.0,/ioannis" | idl > idl.5.log
-#echo "lp_ages,10.0,/ioannis" | idl > idl.10.log
-#echo "lp_ages,20.0,/ioannis" | idl > idl.20.log
-#echo "lp_ages,50.0,/ioannis" | idl > idl.50.log
-#echo "lp_ages,100.0,/ioannis" | idl > idl.100.log
-#echo "lp_ages,200.0,/ioannis" | idl > idl.200.log
-#echo "lp_ages,500.0,/ioannis" | idl > idl.500.log
-echo "lp_ages,1000.0,/ioannis" | idl > idl.1000.log
-echo "lp_ages,2000.0,/ioannis" | idl > idl.2000.log
-echo "lp_ages,5000.0,/ioannis" | idl > idl.5000.log
+for ((i=1;i<=100000;i*=2)); do
+    echo "lp_ages,$i.,/ioannis" | idl > "ages_ioannis.$i.log"
+done
