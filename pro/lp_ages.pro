@@ -10,7 +10,11 @@
 ;-
 pro lp_ages, chisqlim,ioannis=ioannis
 if (NOT keyword_set(chisqlim)) then chisqlim= 1.0
-chistr= strtrim(string(round(chisqlim)),2)
+if (chisqlim GT 0.99) then begin
+    chistr= strtrim(string(round(chisqlim)),2)
+endif else begin
+    chistr= strtrim(string(chisqlim,format='(F4.2)'),2)
+endelse
 chisqlim= float(chistr)
 if keyword_set(ioannis) then begin
     prefix= 'ages_ioannis.'+chistr
