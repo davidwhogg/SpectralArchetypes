@@ -2,3 +2,4 @@
 for ((i=1;i<=100000;i*=2)); do
     echo "lp_ages,$i.,/ioannis" | idl > "ages_ioannis.$i.log"
 done
+echo lp_ages_plot | idl

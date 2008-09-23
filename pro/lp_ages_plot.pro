@@ -22,10 +22,10 @@ hogg_plot_defaults
 hogg_usersym, 16,/fill
 plot, alog10(dchi2lim),ntemplate,psym=8, $
   xrange=[-0.2,5.0],xtitle='log!d10!n( delta-chi-squared )', $
-  yrange=[0,200],ytitle='number of archetypes required', $
+  yrange=[0,1461],ytitle='number of archetypes required', $
   title= 'Moustakas AGES sample'
-xyouts, alog10(dchi2lim),ntemplate,strtrim(string(ntemplate),2)
+xyouts, alog10(dchi2lim),ntemplate,' '+strtrim(string(ntemplate),2), $
+  orientation=45.0
 device,/close
 return
 end
-
