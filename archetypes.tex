@@ -41,6 +41,8 @@ where the $\ampj$ are a set of amplitudes that sum to unity
 \begin{equation}
 1 = \sum_{j=1}^{k} \ampj \quad .
 \end{equation}
+(The above is not quite right because we allow an amplitude $\ampij$
+to vary in what follows below.)
 
 If the noise is gaussian, the correct measure of ``distance'' between
 a spectrum $\spectrumi$ and an archetype $\archetypej$ is $\chisqij$
@@ -49,16 +51,16 @@ a spectrum $\spectrumi$ and an archetype $\archetypej$ is $\chisqij$
            \cdot\invcovari\cdot(\spectrumi-\archetypej) \quad ,
 \end{equation}
 where we have assumed that the spectra and the archetypes are all
-normalized in some clever way.  Probably better is to normalize the
-archetypes in some clever way, and then use
+normalized in some clever way.  Probably better is to renormalize
+spectrum-by-spectrum
 \begin{equation}
-\chisqij = \minover{\ampij}\transpose{(\spectrumi-\ampij\,\archetypej)}
+\chisqij = \transpose{(\spectrumi-\ampij\,\archetypej)}
            \cdot\invcovari\cdot(\spectrumi-\ampij\,\archetypej) \quad ,
 \end{equation}
-by which we mean the value found by minimizing $\chisqij$ as a
-function of $\ampij$.  The ``best fit'' archetype $\archetypej$ for
-spectrum $\spectrumi$ is the archetype that minimizes $\chisqij$.  We
-denote the best-fit archetype index $j=J_i$.
+where the amplitude $\ampij$ is the best-fit ($\chisqij$-minimizing)
+value for each spectrum--archetype pair.  The ``best fit'' archetype
+$\archetypej$ for spectrum $\spectrumi$ is the archetype that
+minimizes $\chisqij$.  We denote the best-fit archetype index $j=J_i$.
 
 The overall log likelihood of the $N$ spectra $\spectrumi$ given the
 $k$ archetypes $\archetypej$ is proportional to the negative of the
@@ -81,7 +83,8 @@ $\archetypej$.
 $\spectrumi$ for which $\archetypej$ is the best-fit model of
 $\spectrumi$, and replace the archetype $\archetypej$ with the
 inverse-covariance-weighted mean (see below) of that subset.
-\item Re-compute the best-fit relations $J_i$.
+\item Re-compute the best-fit amplitudes $\ampij$ and
+spectrum--archetype relations $J_i$.
 \item Iterate to convergence (that is, no more changes in $J_i$ for any $i$).
 \end{itemize}
 In case you were wondering, the inverse-covariance-weighed mean is
@@ -91,7 +94,8 @@ given by (I think---it is late---I am guessing):
 \end{equation}
 where
 \begin{equation}
-\covarj = \inverse{\left[\sum_{i=0}^N \delta(j-J_i)\,\invcovari\right]} \quad ,
+\covarj = \inverse{\left[\sum_{i=0}^N
+                         \delta(j-J_i)\,\ampij\,\invcovari\right]} \quad ,
 \end{equation}
 \begin{equation}
 \xxj = \sum_{i=0}^N \delta(j-J_i)\,\invcovari\cdot\spectrumi \quad ,
