@@ -1,14 +1,20 @@
 \documentclass[12pt]{article}
 \usepackage{amssymb,amsmath}
 
+\newcommand{\Mvector}[1]{\boldsymbol{#1}}
+\newcommand{\measurement}{\Mvector{r}}
+\newcommand{\truepoint}{\Mvector{\rho}}
+\newcommand{\noise}{\Mvector{\Delta}}
+\newcommand{\measurementi}{\measurement_i}
+\newcommand{\truepointi}{\truepoint_i}
+\newcommand{\noisei}{\noise_i}
+\newcommand{\archetypej}{\Mvector{a}_j}
+\newcommand{\truedist}{f}
+\newcommand{\noisedisti}{g_i}
 \newcommand{\ampj}{p_j}
 \newcommand{\ampij}{q_{ij}}
 \newcommand{\chisq}{\chi^2}
 \newcommand{\chisqij}{\chisq_{ij}}
-\newcommand{\Mvector}[1]{\mathbf{#1}}
-\newcommand{\point}{\Mvector{s}}
-\newcommand{\spectrumi}{\point_i}
-\newcommand{\archetypej}{\Mvector{a}_j}
 \newcommand{\xxj}{\Mvector{x}_j}
 \newcommand{\Mmatrix}[1]{\mathbb{#1}}
 \newcommand{\covari}{\Mmatrix{C}_i}
@@ -22,7 +28,7 @@
 
 \paragraph{Introductory remarks:}
 Typically, in a high-dimensionality data space, a sample of data
-consists of points $\spectrumi$, each of which is a measurement of an
+consists of points $\measurementi$, each of which is a measurement of an
 object drawn from a distribution of objects, plus noise drawn from a
 distribution of noise.  For example, in the case of galaxy spectra,
 each spectrum is a measurement of a galaxy, which is drawn from the
@@ -41,13 +47,13 @@ each data point has a different noise distribution function, in
 general, and is therefore drawn from a \emph{different} (convolved)
 distribution function.
 
-Furthermore, if the data set is large enough and the dimensionality of
-the space is large enough, it becomes exceedingly unlikely that every
-data point will have a valid measurement of every dimension.  This
-problem of ``missing data'' is not a special case; it is generic to
-large data sets.  In the case of galaxy spectra, missing data arise
-when pixels have been corrupted by cosmic rays or detector artifacts,
-among other things.
+If the data set is large enough and the dimensionality of the space is
+large enough, it becomes exceedingly unlikely that every data point
+will have a valid measurement of every dimension.  This problem of
+``missing data'' is not a special case; it is generic to large data
+sets.  In the case of galaxy spectra, missing data arise when pixels
+have been corrupted by cosmic rays or detector artifacts, among other
+things.
 
 Some literature has been written on modeling distribution functions in
 the face of missing data (cite refs).  These schemes are
@@ -78,42 +84,49 @@ function from a set of noisy measurements?''  The answer is ``yes'' of
 course, but it depends on some simplifying assumptions.
 
 \paragraph{The general problem:}
-Imagine a set of $N$ measurements $\spectrumi$ (think of them as
+Imagine a set of $N$ measurements $\measurementi$ (think of them as
 galaxy spectra if you are an astronomer), where $1<i<N$, and where
 each measurement is a $d$-dimensional column vector (meaning, in this
 case, ordered list formatted as a single-column matrix) of $d$ values
 (think of them as pixel values on some standard wavelength grid, the
 same for every spectrum).  Assume that for each measurement
-$\spectrumi$ we also know that the measurement is contaminated by
+$\measurementi$ we also know that the measurement is contaminated by
 noise, and we understand well the distribution function for that
 noise, which is permitted to be different for every measurement $i$.
 
 At the risk of making some severe philosophical mistake, the
-assumption is that for each measurement $\spectrumi$ there is a ``true
-value'' $\truthi$ and a displacement due to noise $\noisei$ such that
+assumption is that for each measurement $\measurementi$ there is a
+``true value'' $\truepointi$ and a displacement due to noise $\noisei$
+such that
 \begin{equation}
-\spectrumi=\truthi+\noisei
+\measurementi=\truepointi+\noisei
 \quad ,
 \end{equation}
 where all three vectors are $d$-dimensional, the true value is drawn
-from a distribution $\truedist(\point)$ and the noise displacement is
-drawn from a distribution $\noisedisti(\point)$.  The measurement
-$\spectrumi$ is therefore drawn from the convolved distribution
-$(\truedist * \noisedisti)(\point)$.
+from a distribution $\truedist(\truepoint)$ and the noise displacement is
+drawn from a distribution $\noisedisti(\noise)$.  The measurement
+$\measurementi$ is therefore drawn from the convolved distribution
+$(\truedist * \noisedisti)(\measurement)$.
 
-%%%%%%%%%
+For simplicity in what follows, I am going to assume that the noise
+distribution functions $\noisedisti$ are accurately described by
+Gaussians, and that the noise variances and covariances are given by
+known $M\times M$ inverse covariance matrices $\invcovari$.  These
+covariance matrices are different for each measurement in general.
+This is a significant restriction or approximation, but what follows
+can be straightforwardly generalized for the case in which the
+functions $\noisedisti$ are described not by single Gaussians, but
+rather by mixtures of Gaussians, and these have the power to represent
+any conceivable noise distribution function.
 
-purely gaussian noise, and that the noise variances and covariances
-are described accurately by a $M\times M$ inverse covariance matrix
-$\invcovari$.  These covariance matrices are different for each
-measurement in general.
+\end{document}
 
 
 We want to ``model'' these $N$ spectra as being generated by a
-distribution $f(\point)$ in the $M$-dimensional data space that is a
+distribution $f(\truepoint)$ in the $M$-dimensional data space that is a
 sum of $k$ delta functions located at positions $\archetypej$, or
 \begin{equation}
-f(\point) = \sum_{j=1}^{k} \ampj\,\delta(\point-\archetypej) \quad ,
+f(\truepoint) = \sum_{j=1}^{k} \ampj\,\delta(\truepoint-\archetypej) \quad ,
 \end{equation}
 where the $\ampj$ are a set of amplitudes that sum to unity
 \begin{equation}
@@ -123,24 +136,24 @@ where the $\ampj$ are a set of amplitudes that sum to unity
 to vary in what follows below.)
 
 If the noise is gaussian, the correct measure of ``distance'' between
-a spectrum $\spectrumi$ and an archetype $\archetypej$ is $\chisqij$
+a spectrum $\measurementi$ and an archetype $\archetypej$ is $\chisqij$
 \begin{equation}
-\chisqij = \transpose{(\spectrumi-\archetypej)}
-           \cdot\invcovari\cdot(\spectrumi-\archetypej) \quad ,
+\chisqij = \transpose{(\measurementi-\archetypej)}
+           \cdot\invcovari\cdot(\measurementi-\archetypej) \quad ,
 \end{equation}
 where we have assumed that the spectra and the archetypes are all
 normalized in some clever way.  Probably better is to renormalize
 spectrum-by-spectrum
 \begin{equation}
-\chisqij = \transpose{(\spectrumi-\ampij\,\archetypej)}
-           \cdot\invcovari\cdot(\spectrumi-\ampij\,\archetypej) \quad ,
+\chisqij = \transpose{(\measurementi-\ampij\,\archetypej)}
+           \cdot\invcovari\cdot(\measurementi-\ampij\,\archetypej) \quad ,
 \end{equation}
 where the amplitude $\ampij$ is the best-fit ($\chisqij$-minimizing)
 value for each spectrum--archetype pair.  The ``best fit'' archetype
-$\archetypej$ for spectrum $\spectrumi$ is the archetype that
+$\archetypej$ for spectrum $\measurementi$ is the archetype that
 minimizes $\chisqij$.  We denote the best-fit archetype index $j=J_i$.
 
-The overall log likelihood of the $N$ spectra $\spectrumi$ given the
+The overall log likelihood of the $N$ spectra $\measurementi$ given the
 $k$ archetypes $\archetypej$ is proportional to the negative of the
 total chi-squared sum for all the spectra under each spectrum's
 best-fit archetype, or
@@ -158,8 +171,8 @@ follows.  Imagine that you have a first-guess set of archetypes
 $\archetypej$.
 \begin{itemize}
 \item For each archetype $\archetypej$, take the subset of spectra
-$\spectrumi$ for which $\archetypej$ is the best-fit model of
-$\spectrumi$, and replace the archetype $\archetypej$ with the
+$\measurementi$ for which $\archetypej$ is the best-fit model of
+$\measurementi$, and replace the archetype $\archetypej$ with the
 inverse-covariance-weighted mean (see below) of that subset.
 \item Re-compute the best-fit amplitudes $\ampij$ and
 spectrum--archetype relations $J_i$.
@@ -176,7 +189,7 @@ where
                          \delta(j-J_i)\,\ampij\,\invcovari\right]} \quad ,
 \end{equation}
 \begin{equation}
-\xxj = \sum_{i=0}^N \delta(j-J_i)\,\invcovari\cdot\spectrumi \quad ,
+\xxj = \sum_{i=0}^N \delta(j-J_i)\,\invcovari\cdot\measurementi \quad ,
 \end{equation}
 and the delta-functions select the set of spectra for which the
 best-fit archetype is $\archetypej$.  If replacement by this weighted
@@ -184,4 +197,3 @@ mean reduces the chi-squared contribution for the spectra that are
 best-fit by $\archetypej$, then I think we can prove that the full
 update always leads to convergence to a local minimum.
 
-\end{document}
