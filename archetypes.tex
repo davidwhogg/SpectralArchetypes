@@ -20,16 +20,94 @@
 
 \begin{document}
 
-Assume that the data consist of $N$ galaxy spectra $\spectrumi$, where
-$i$ indexes the galaxy, and where each spectrum is a column vector
-(meaning, in this case, ordered list formatted as a single-column
-matrix) of $M$ pixel values on some standard wavelength grid (the same
-wavelength grid for every spectrum).  Assume that for each spectrum
+\paragraph{Introductory remarks:}
+Typically, in a high-dimensionality data space, a sample of data
+consists of points $\spectrumi$, each of which is a measurement of an
+object drawn from a distribution of objects, plus noise drawn from a
+distribution of noise.  For example, in the case of galaxy spectra,
+each spectrum is a measurement of a galaxy, which is drawn from the
+distribution of galaxies, plus noise, which is drawn from something
+like a gaussian distribution with a different variance for each
+dimension (plus some covariances).
+
+As scientific investigators, we almost always want to know about the
+underlying distribution of objects, and not the distribution
+\emph{convolved} with the noise distribution, which is what we would
+get if we treated the sample of measurements as an estimate of the
+sample of objects.  In most cases of interest, some of the noise
+variances are large enough that we can't ignore the noise when we try
+to understand the underlying distribution of objects.  Furthermore,
+each data point has a different noise distribution function, in
+general, and is therefore drawn from a \emph{different} (convolved)
+distribution function.
+
+Furthermore, if the data set is large enough and the dimensionality of
+the space is large enough, it becomes exceedingly unlikely that every
+data point will have a valid measurement of every dimension.  This
+problem of ``missing data'' is not a special case; it is generic to
+large data sets.  In the case of galaxy spectra, missing data arise
+when pixels have been corrupted by cosmic rays or detector artifacts,
+among other things.
+
+Some literature has been written on modeling distribution functions in
+the face of missing data (cite refs).  These schemes are
+``binary'' in some sense: They treat each dimension of each data point
+as either being measured very well, or not measured at all.  In real
+data sets, there is a continuum of measurement qualities, and these
+qualities can be encoded in each data point's particular noise
+distribution function.  In the case of Gaussian noise, the quality of
+the measurements is encoded by each data point's inverse covariance
+matrix $\invcovari$.
+
+The inverse covariance matrix $\invcovari$ encodes missing data as
+eigenvectors (or directions in data space) for which it has zero
+eigenvalues, so it is capable of encoding not just missing data values
+in particular dimensions, but any linear direction in the
+high-dimensionality data space in which the measurement is bad or
+invalid.  In the case of accurately Gaussian noise, the inverse
+covariance matrix contains \emph{all} of the information about the
+measurement quality.  In short, a data analysis scheme---such as some
+of those that follow---that properly uses the inverse covariance
+matrices \emph{also} properly ignores missing data.
+
+The question I discuss below is ``Can we infer the distribution of
+objects, even when each of our measurements is really a sample of that
+distribution convolved with that measurement's noise distribution?''.
+Or, in other words ``Can we infer a noise-deconvolved distribution
+function from a set of noisy measurements?''  The answer is ``yes'' of
+course, but it depends on some simplifying assumptions.
+
+\paragraph{The general problem:}
+Imagine a set of $N$ measurements $\spectrumi$ (think of them as
+galaxy spectra if you are an astronomer), where $1<i<N$, and where
+each measurement is a $d$-dimensional column vector (meaning, in this
+case, ordered list formatted as a single-column matrix) of $d$ values
+(think of them as pixel values on some standard wavelength grid, the
+same for every spectrum).  Assume that for each measurement
 $\spectrumi$ we also know that the measurement is contaminated by
+noise, and we understand well the distribution function for that
+noise, which is permitted to be different for every measurement $i$.
+
+At the risk of making some severe philosophical mistake, the
+assumption is that for each measurement $\spectrumi$ there is a ``true
+value'' $\truthi$ and a displacement due to noise $\noisei$ such that
+\begin{equation}
+\spectrumi=\truthi+\noisei
+\quad ,
+\end{equation}
+where all three vectors are $d$-dimensional, the true value is drawn
+from a distribution $\truedist(\point)$ and the noise displacement is
+drawn from a distribution $\noisedisti(\point)$.  The measurement
+$\spectrumi$ is therefore drawn from the convolved distribution
+$(\truedist * \noisedisti)(\point)$.
+
+%%%%%%%%%
+
 purely gaussian noise, and that the noise variances and covariances
-are described accurately by a $M\times M$ covariance matrix $\covari$
-(or, equivalently, its inverse $\invcovari$).  These covariance
-matrices are different for each spectrum in general.
+are described accurately by a $M\times M$ inverse covariance matrix
+$\invcovari$.  These covariance matrices are different for each
+measurement in general.
+
 
 We want to ``model'' these $N$ spectra as being generated by a
 distribution $f(\point)$ in the $M$-dimensional data space that is a
