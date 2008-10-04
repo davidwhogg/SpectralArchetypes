@@ -112,7 +112,7 @@ $\truepointi$ and a displacement due to noise $\noisei$ such that
 \quad ,
 \end{equation}
 where all three vectors are $d$-dimensional, the true value is drawn
-from a distribution $\truedist(\truepoint)$ and the noise displacement is
+from a distribution $\truedist(\truepoint)$, and the noise displacement is
 drawn from a distribution $\noisedisti(\noise)$.  The measurement
 $\measurementi$ is therefore drawn from the convolved distribution
 $(\truedist * \noisedisti)(\measurement)$.
@@ -145,7 +145,7 @@ sufficiently large.
 As I mentioned in the introduction, I am going to assume that the
 noise distribution functions $\noisedisti$ are accurately described by
 Gaussians, and that the noise variances and covariances are given by
-known $M\times M$ inverse covariance matrices $\invcovari$.  These
+known $d\times d$ inverse covariance matrices $\invcovari$.  These
 covariance matrices are different for each measurement in general.
 This is a significant restriction or approximation, but what follows
 can be straightforwardly generalized for the case in which the
