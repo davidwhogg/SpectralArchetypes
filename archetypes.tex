@@ -1,6 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage{amssymb,amsmath}
 
+\newcommand{\etal}{\emph{et\,al.}}
+\newcommand{\ApJ}{\emph{Astrophys.\,J.}}
 \newcommand{\Mvector}[1]{\boldsymbol{#1}}
 \newcommand{\measurement}{\Mvector{r}}
 \newcommand{\truepoint}{\Mvector{\rho}}
@@ -8,21 +10,29 @@
 \newcommand{\measurementi}{\measurement_i}
 \newcommand{\truepointi}{\truepoint_i}
 \newcommand{\noisei}{\noise_i}
+\newcommand{\mean}{\Mvector{m}}
+\newcommand{\meanj}{\mean_j}
 \newcommand{\archetypej}{\Mvector{a}_j}
 \newcommand{\truedist}{f}
 \newcommand{\noisedisti}{g_i}
+\newcommand{\gaussian}{\mathcal{N}\!}
+\newcommand{\lnlike}{\ln\mathcal{L}}
 \newcommand{\ampj}{p_j}
 \newcommand{\ampij}{q_{ij}}
+\newcommand{\normampij}{p_{ij}}
 \newcommand{\chisq}{\chi^2}
 \newcommand{\chisqij}{\chisq_{ij}}
-\newcommand{\xxj}{\Mvector{x}_j}
 \newcommand{\Mmatrix}[1]{\mathbb{#1}}
+\newcommand{\varj}{\Mmatrix{V}_j}
 \newcommand{\covari}{\Mmatrix{C}_i}
-\newcommand{\covarj}{\Mmatrix{Q}_i}
+\newcommand{\covarj}{\Mmatrix{Q}_j}
+\newcommand{\zero}{\Mmatrix{O}}
+\newcommand{\identity}{\Mmatrix{I}}
 \newcommand{\inverse}[1]{{#1}^{-1}}
+\newcommand{\invvarj}{\inverse{\varj}}
 \newcommand{\invcovari}{\inverse{\covari}}
 \newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
-\newcommand{\minover}[1]{\min_{#1}\,}
+\newcommand{\minover}[1]{\min_{#1}}
 
 \begin{document}
 
@@ -94,10 +104,9 @@ $\measurementi$ we also know that the measurement is contaminated by
 noise, and we understand well the distribution function for that
 noise, which is permitted to be different for every measurement $i$.
 
-At the risk of making some severe philosophical mistake, the
-assumption is that for each measurement $\measurementi$ there is a
-``true value'' $\truepointi$ and a displacement due to noise $\noisei$
-such that
+At the risk of making some severe philosophical mistake, I am assuming
+that for each measurement $\measurementi$ there is a ``true value''
+$\truepointi$ and a displacement due to noise $\noisei$ such that
 \begin{equation}
 \measurementi=\truepointi+\noisei
 \quad ,
@@ -108,92 +117,137 @@ drawn from a distribution $\noisedisti(\noise)$.  The measurement
 $\measurementi$ is therefore drawn from the convolved distribution
 $(\truedist * \noisedisti)(\measurement)$.
 
-For simplicity in what follows, I am going to assume that the noise
-distribution functions $\noisedisti$ are accurately described by
+The goal, of course, is to infer the distribution
+$\truedist(\truepoint)$ of objects, the distribution of ``true
+values'' or the ``error-deconvolved'' distribution.  In what follows I
+parameterize the distribution as a mixture of $k$ $d$-dimensional
+Gaussians
+\begin{equation}
+\truedist(\truepoint) =
+  \sum_{j=1}^k\ampj\,\gaussian(\truepoint|\meanj,\varj)
+\quad \mbox{, where}
+\end{equation}
+\begin{equation}
+1 = \sum_{j=1}^k\ampj
+\quad \mbox{, and}
+\end{equation}
+\begin{equation}
+\gaussian(\truepoint|\meanj,\varj) \equiv
+  \,\left[(2\pi)^d\,\det(\varj)\right]^{-1/2}
+  \,\exp\left(-\frac{1}{2}\,\transpose{[\truepoint-\meanj]}
+              \cdot\invvarj\cdot[\truepoint-\meanj]\right)
+\quad .
+\end{equation}
+This parameterization is general, because any continuous distribution
+function can be represented as a mixture of Gaussians if $k$ is made
+sufficiently large.
+
+As I mentioned in the introduction, I am going to assume that the
+noise distribution functions $\noisedisti$ are accurately described by
 Gaussians, and that the noise variances and covariances are given by
 known $M\times M$ inverse covariance matrices $\invcovari$.  These
 covariance matrices are different for each measurement in general.
 This is a significant restriction or approximation, but what follows
 can be straightforwardly generalized for the case in which the
 functions $\noisedisti$ are described not by single Gaussians, but
-rather by mixtures of Gaussians, and these have the power to represent
-any conceivable noise distribution function.
+rather by mixtures of Gaussians, and---as mentioned above---these have
+the power to represent any conceivable noise distribution function.
+
+The inference problem now reduces to the optimization problem of
+finding the parameters $(\ampj,\meanj,\varj)$ that maximize the (log)
+likelihood $\lnlike$ of the noise-convolved distribution functions
+$(\truedist * \noisedisti)(\measurement)$ evaluated at the
+measurements $\measurementi$.  In the mixture-of-Gaussian framework,
+the noise-convolved distribution function for measurement $i$ is
+\begin{equation}
+(\truedist * \noisedisti)(\measurement) =
+  \sum_{j=1}^k\ampj\,\gaussian(\measurement|\meanj,\varj+\covari)
+\quad .
+\end{equation}
+We seek to maximize
+\begin{equation}
+\lnlike = \sum_{i=1}^N
+  \ln\left( \sum_{j=1}^k\ampij \right)
+\quad \mbox{, where}
+\end{equation}
+\begin{equation}
+\ampij\equiv \ampj\,\gaussian(\measurementi|\meanj,\varj+\covari)
+\quad .
+\end{equation}
+
+This choice of scalar for optimization is made independently of any
+choice of \emph{methodology} for optimization, but for all cases of
+interest, there is some expectation-maximization-like algorithm
+possible.
+
+\paragraph{Standard algorithms as limits of the general problem:}
+Some of the standard data analysis or machine-learning algorithms in
+wide use at the present day are solutions to \emph{limits} of the
+problem stated generally above.  Here are a few:
+
+Take the limit in which the measurements have negligible noise;
+that is, set the measurement covariance matrices $\covari$ to zero
+\begin{equation}
+\covari = \zero \quad \mbox{, where}
+\end{equation}
+\begin{equation}
+\zero \equiv \lim_{\epsilon \rightarrow 0} [\epsilon\,\identity]
+\quad ,
+\end{equation}
+and $\identity$ is the $d$-dimensional identity matrix.  This is
+equivalent to working in the limit in which the variance of the
+distribution $\truedist(\truepoint)$ is much larger in every direction
+than the variance of any measurement's noise distribution
+$\noisedisti(\noise)$.  In the limit $\covari=\zero$ and $k=1$, the
+problem is solved exactly by \emph{principal components analysis}.
+
+In the limit $\covari=\zero$ and $\varj=\zero$, the problem is solved
+exactly by \emph{K-means}.  K-means involves hard assignment.  When
+the variances become very small, the factors $\ampij$ become
+exceedingly small but also exceedingly differentiated, such that all
+of the weight $\sum_j\ampij$ comes, for each measurement $i$, from the
+closest of the $k$ gaussian means $\meanj$.
+
+In the limit $\covari=\zero$, the problem is solved by the usual,
+straightforward methodology known as \emph{mixture-of-Gaussians
+expectation-maximization}, the workhorse of machine learning.
+
+In the limit $\varj=\zero$ and $k=1$, the problem is solved by
+\emph{taking the inverse-covariance-weighted mean} of the
+measurements, or
+\begin{equation}
+\mean_1 = \inverse{\left[
+  \sum_{i=0}^N \invcovari
+\right]}\cdot\left[
+  \sum_{i=0}^N \invcovari\cdot\measurementi
+\right]
+\quad .
+\end{equation}
+
+\paragraph{The archetypes problem:}
+The fully general problem is being worked on by Bovy, and perhaps has
+a complete solution already (Hogg \etal, 2005, \ApJ, 629, 268).  I am
+currently interested in the limit $\varj=\zero$, where the
+distribution of ``true values'' is being approximated as a set of
+delta-functions.  In this case, I \emph{conjecture} that the problem
+is solved by iterating this procedure:
+\begin{equation}
+\ampij \leftarrow \ampj\,\gaussian(\measurementi|\meanj,\covari)
+\end{equation}
+\begin{equation}
+\normampij \leftarrow \inverse{\left[
+  \sum_{j=1}^k\ampij
+\right]}\,\ampij
+\end{equation}
+\begin{equation}
+\ampj \leftarrow \sum_{i=1}^N\normampij
+\end{equation}
+\begin{equation}
+\meanj \leftarrow \inverse{\left[
+  \sum_{i=1}^N\normampij\,\invcovari
+\right]}\,\left[
+  \sum_{i=1}^N\normampij\,\invcovari\cdot\measurementi
+\right]
+\end{equation}
 
 \end{document}
-
-
-We want to ``model'' these $N$ spectra as being generated by a
-distribution $f(\truepoint)$ in the $M$-dimensional data space that is a
-sum of $k$ delta functions located at positions $\archetypej$, or
-\begin{equation}
-f(\truepoint) = \sum_{j=1}^{k} \ampj\,\delta(\truepoint-\archetypej) \quad ,
-\end{equation}
-where the $\ampj$ are a set of amplitudes that sum to unity
-\begin{equation}
-1 = \sum_{j=1}^{k} \ampj \quad .
-\end{equation}
-(The above is not quite right because we allow an amplitude $\ampij$
-to vary in what follows below.)
-
-If the noise is gaussian, the correct measure of ``distance'' between
-a spectrum $\measurementi$ and an archetype $\archetypej$ is $\chisqij$
-\begin{equation}
-\chisqij = \transpose{(\measurementi-\archetypej)}
-           \cdot\invcovari\cdot(\measurementi-\archetypej) \quad ,
-\end{equation}
-where we have assumed that the spectra and the archetypes are all
-normalized in some clever way.  Probably better is to renormalize
-spectrum-by-spectrum
-\begin{equation}
-\chisqij = \transpose{(\measurementi-\ampij\,\archetypej)}
-           \cdot\invcovari\cdot(\measurementi-\ampij\,\archetypej) \quad ,
-\end{equation}
-where the amplitude $\ampij$ is the best-fit ($\chisqij$-minimizing)
-value for each spectrum--archetype pair.  The ``best fit'' archetype
-$\archetypej$ for spectrum $\measurementi$ is the archetype that
-minimizes $\chisqij$.  We denote the best-fit archetype index $j=J_i$.
-
-The overall log likelihood of the $N$ spectra $\measurementi$ given the
-$k$ archetypes $\archetypej$ is proportional to the negative of the
-total chi-squared sum for all the spectra under each spectrum's
-best-fit archetype, or
-\begin{equation}
-\chisq = \sum_{i=1}^{N} \minover{j}\chisqij
-       = \sum_{i=1}^{N}\sum_{j=1}^{k} \delta(j-J_i)\,\chisqij \quad ,
-\end{equation}
-where the delta-function selects the best-fit archetype.  This
-($\chisq$) is the scalar objective we use to compare $k$-archetype
-models at fixed $k$ (in the absence of an informative prior).
-
-Now, how do we go about minimizing the scalar objective $\chisq$?
-There is a generalization of the $k$-means algorithm that proceeds as
-follows.  Imagine that you have a first-guess set of archetypes
-$\archetypej$.
-\begin{itemize}
-\item For each archetype $\archetypej$, take the subset of spectra
-$\measurementi$ for which $\archetypej$ is the best-fit model of
-$\measurementi$, and replace the archetype $\archetypej$ with the
-inverse-covariance-weighted mean (see below) of that subset.
-\item Re-compute the best-fit amplitudes $\ampij$ and
-spectrum--archetype relations $J_i$.
-\item Iterate to convergence (that is, no more changes in $J_i$ for any $i$).
-\end{itemize}
-In case you were wondering, the inverse-covariance-weighed mean is
-given by (I think---it is late---I am guessing):
-\begin{equation}
-\archetypej \leftarrow \covarj\cdot\xxj \quad ,
-\end{equation}
-where
-\begin{equation}
-\covarj = \inverse{\left[\sum_{i=0}^N
-                         \delta(j-J_i)\,\ampij\,\invcovari\right]} \quad ,
-\end{equation}
-\begin{equation}
-\xxj = \sum_{i=0}^N \delta(j-J_i)\,\invcovari\cdot\measurementi \quad ,
-\end{equation}
-and the delta-functions select the set of spectra for which the
-best-fit archetype is $\archetypej$.  If replacement by this weighted
-mean reduces the chi-squared contribution for the spectra that are
-best-fit by $\archetypej$, then I think we can prove that the full
-update always leads to convergence to a local minimum.
-
