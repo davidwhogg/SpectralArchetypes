@@ -35,19 +35,25 @@ model (in a chi-squared sense) for the fluxes $\vfj$.  That is, we
 create a model $\vfmodelij$ for fluxes $\vfj$ out of the fluxes $\vfj$
 of the form
 \begin{equation}
-\vfmodelij= \aij\,\left[\reddening^{\bij}\right]\cdot\vfi
+\vfmodelij= \aij\,\exp\left(\bij\,\reddening\right)\cdot\vfi
 \quad,
 \end{equation}
 where $\aij$ an $\bij$ are free parameters, $\reddening$ is the
-diagonal $M\times M$ matrix with a multiplicative reddening law
-(details below) evaluated at the $M$ wavelengths $\vlambda$ on the
-diagonal and exponentiated according to standard matrix rules (which
-are trivial in the diagonal case), and we have treated the fluxes
-$\vfi$ and $\vfmodelij$ as column vectors.  The parameter $\aij$ is an
-overall flux scale, and (if the matrix $\reddening$ is properly
-constructed) the parameter $\bij$ is a ratio of attenuation amplitudes
-or $A_V$ values for the two spectra $A_{Vj}/A_{Vi}$.  The model
-$\vfmodelij$ is considered a good model for $\vfj$ if
+diagonal $M\times M$ matrix containing the reddening law in the form
+of optical depths of a ``unit'' attenuation (details below) evaluated
+at the $M$ wavelengths $\vlambda$ on the diagonal and exponentiated
+according to standard matrix rules (which are trivial in the diagonal
+case), and we have treated the fluxes $\vfi$ and $\vfmodelij$ as
+column vectors.  The parameter $\aij$ is an overall flux scale, and
+(if the matrix $\reddening$ is properly constructed) the parameter
+$\bij$ is a difference of optical depths $\Delta\tau_{ij}$ for the two
+spectra
+\begin{equation}
+\bij = \Delta\tau_{ij} = \tau_{i}-\tau_{j} \quad,
+\end{equation}
+where the optical depths are evaluated at some fiducial wavelength
+(perhaps the $V$ band).  The model $\vfmodelij$ is considered a good
+model for $\vfj$ if
 \begin{equation}
 \chisqij\equiv \left[\vfj-\vfmodelij\right]\transpose
   \cdot\invcovarj
@@ -70,19 +76,17 @@ quantitative likelihood).  The second is that the representation
 function is \emph{asymmetric}: If $i$ represents $j$, it is not
 necessary that $j$ represent $i$.  The asymmetry enters at the point
 at which the inverse covariance matrix $\invcovarj$ is used.  In
-general, higher signal-to-noise spectra will represented by a smaller
-fraction of other spectra, and lower signal-to-noise spectra will be
-represented by a larger fraction of other spectra.  High
-signal-to-noise spectra will therefore be favored in the construction
-of the archetype or minimal representing set.  A third desirable
-property for this problem is that reddening or attenuation by dust has
-been removed (at least approximately), so we obtain representation
-when the emission line properties are \emph{intrinsically} similar,
-not just similar in appearance.  Finally, each spectrum represents
-\emph{itself} (with possible exceptions given below); this is
-reasonable, and ensures that we can generate a subset of spectra at
-least one member of which is capable of representing each spectrum in
-the original set of $N$.
+general, higher (lower) signal-to-noise spectra will be represented by
+a smaller (larger) fraction of other spectra.  Higher signal-to-noise
+spectra will therefore be favored in the construction of the minimal
+representing subset.  A third desirable property for this problem is
+that reddening or attenuation by dust has been removed (at least
+approximately), so we obtain representation when the emission line
+properties are \emph{intrinsically} similar, not just similar in
+appearance.  Finally, each spectrum represents \emph{itself} (with
+possible exceptions given below); this is reasonable, and ensures that
+we can generate a subset of spectra at least one member of which is
+capable of representing each spectrum in the original set of $N$.
 
 All that said, we do perform some heuristic modifications to the most
 simple or natural procedure to improve performance.  The first is that
@@ -92,7 +96,7 @@ non-linear optimization problems would be exceedingly time-consuming.
 We linearize the problem around $\bij=0$ to make the appoximate model
 $\vfapproxij$:
 \begin{equation}
-\vfapproxij= \left[\aij\,\identity + \bij\,\ln\reddening\right]\cdot\vfi
+\vfapproxij= \left[\aij\,\identity + \bij\,\reddening\right]\cdot\vfi
 \quad,
 \end{equation}
 where $\identity$ is the $M\times M$ identity matrix.  We then use the
@@ -114,6 +118,6 @@ error model or interesting physically.  With this addition, the method
 has two free parameters, $\chisqmax$ and $\epsilon$, both related to
 the precision we require for representation.
 
-[what do we use for the reddening law?]
+% what do we use for the reddening law?
 
 \end{document}
