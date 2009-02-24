@@ -79,10 +79,12 @@ at which the inverse covariance matrix $\invcovarj$ is used.  In
 general, higher (lower) signal-to-noise spectra will be represented by
 a smaller (larger) fraction of other spectra.  Higher signal-to-noise
 spectra will therefore be favored in the construction of the minimal
-representing subset.  A third desirable property for this problem is
-that reddening or attenuation by dust has been removed (at least
-approximately), so we obtain representation when the emission line
-properties are \emph{intrinsically} similar, not just similar in
+representing subset.  This is generally desirable but of course it can
+lead to small biases if the brightest sources are physically distinct
+from the faintest sources.  A third desirable property for this
+problem is that reddening or attenuation by dust has been removed (at
+least approximately), so we obtain representation when the emission
+line properties are \emph{intrinsically} similar, not just similar in
 appearance.  Finally, each spectrum represents \emph{itself} (with
 possible exceptions given below); this is reasonable, and ensures that
 we can generate a subset of spectra at least one member of which is
@@ -93,8 +95,9 @@ simple or natural procedure to improve performance.  The first is that
 we \emph{don't} perform the full non-linear least-squares fit for
 every possible pairwise $\chisqij$.  This million-by-million set of
 non-linear optimization problems would be exceedingly time-consuming.
-We linearize the problem around $\bij=0$ to make the appoximate model
-$\vfapproxij$:
+We linearize the problem around $\bij=0$ (that is, around the
+assumption that spectra $i$ and $j$ are subject to identical dust
+attenuation) to make the appoximate model $\vfapproxij$:
 \begin{equation}
 \vfapproxij= \left[\aij\,\identity + \bij\,\reddening\right]\cdot\vfi
 \quad,
@@ -103,8 +106,9 @@ where $\identity$ is the $M\times M$ identity matrix.  We then use the
 parameters found by least-square fitting the linearized model in the
 correct, non-linear computation of $\chisqij$.  This method is
 approximate, but tends to penalize large values of $\bij$ (that is,
-large differences in reddening or large ratios of $A_V$), where we don't
-trust any reddening or attenuation law anyway.
+large differences in optical depth between galaxy $i$ and galaxy $j$),
+where the variation among reasonable assumptions about the extinction
+law is larger than the error incurred by the linearization.
 
 The second heuristic modification is that we add to the measurement
 uncertainties on fluxes $\vfj$ in quadrature an artificial error set
@@ -114,10 +118,16 @@ to be precise.  This permits representation of high signal-to-noise
 spectra by other high signal-to-noise spectra, and implicitly
 represents our concern that there may be systematic errors or precise
 spectrum-to-spectrum variations that are not either represented by the
-error model or interesting physically.  With this addition, the method
-has two free parameters, $\chisqmax$ and $\epsilon$, both related to
-the precision we require for representation.
+error model or interesting physically.  Examples of significant
+systematic errors for the problem at hand include errors in continuum
+subtraction and errors in spectrograph calibration, both of which are
+expected to enter at the few-percent level at least.
 
-% what do we use for the reddening law?
+The method has several freedoms.  There are two free parameters,
+$\chisqmax$ and $\epsilon$, both related to the precision we require
+for representation.  There is a freedom as to which lines to include
+in the vector of line data, and there is a freedom to choose the
+reddening or attenuation law.  In what follows, we use the lines given
+in Table~[DWH].  We use the attenuation model of [DWH].
 
 \end{document}
