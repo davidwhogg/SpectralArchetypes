@@ -83,7 +83,7 @@ for ii=0L,ndata-1L do begin
     thisivar= reform(emivar[dd,*],nline)
     okay= where(lp_emline_chisq(thisflux,thisivar,model,attenscale) $
                 LT chisqmax,nokay)
-;    splog, dd,nokay
+    if ((ii MOD 100) EQ 0) then splog, ii,dd,nokay
     if (nokay GT 0) then begin
         lp_format_constraint, dd,candindx[okay],wlun=wlun
     endif
