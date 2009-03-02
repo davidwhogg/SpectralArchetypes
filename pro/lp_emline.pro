@@ -5,7 +5,8 @@
 ;  - No proper comment header.
 ;  - Brittle reading of emline file.
 ;  - Brittle reading of glpsol output.
-;  - What does "--mipgap" do?
+;  - "--mipgap" may be the fractional excess in the MIP objective
+;    over the LP objective.
 ; LICENSE:
 ;  Copyright 2009 David W. Hogg (NYU) all rights reserved.
 ;-
@@ -14,6 +15,7 @@ if (NOT keyword_set(prefix)) then prefix= 'lp_emline'
 if (NOT keyword_set(chisqmax)) then chisqmax= 8.0+2.0*sqrt(2.0*8.0)
 if (NOT keyword_set(noisefloor)) then noisefloor= 0.05
 if (NOT keyword_set(attenscale)) then attenscale= 0.05
+if (NOT keyword_set(num_sub)) then num_sub= 1000
 binary= 1
 chistr= strtrim(string(chisqmax,format='(F5.2)'),2)
 chisqmax= float(chistr)
@@ -31,75 +33,62 @@ emivar= 1.0/(emlerr^2+noisefloor^2*emline^2)
 emivar[where(emlerr LE 0.0)]= 0.0
 emlerr= 0
 
-; trim data to manageable size
+; choose only good data
 halphaindx= nline-1L
 halphasn= emline[*,halphaindx]*sqrt(emivar[*,halphaindx])
-dindx= (where(halphasn GT 19.5))[0:2999]
-emline= emline[dindx,*]
-emivar= emivar[dindx,*]
-ndata= n_elements(emline[*,halphaindx])
-splog, 'got',ndata,' spectra'
+seed= -1L
+dataindx= (where(halphasn LT 30.0))[0:9999]
+dataindx= lindgen(10000)
+ndata= n_elements(dataindx)
+splog, 'trimmed down to',ndata,' spectra'
+
+; choose only good candidate archetypes
+candindx= (where((total((emivar LE 0.0),2) LT 0.5) AND $
+                (halphasn GT 19.5)))[0:9999]
+ncand= n_elements(candindx)
+splog, 'trimmed down to',ncand,' candidate archetypes'
 
 ; read attenuation and wavelength information
 attenu= (mrdfits(filename,2))
 wavelength= reform(attenu[*,0],nline)
 attenuation= reform(attenu[*,1],nline)
 
-; choose only good candidate archetypes
-badindx= where(total((emivar LE 0.0),2) GT 0.5,nbad)
-splog, 'threw away',nbad,' candidate archetypes'
-
 ; set up matrices for fitting
-component0= emline
-ones= replicate(1.0,ndata)
-component1= emline*(ones#attenuation)
+component0= emline[candindx,*]
+ones= replicate(1.0,ncand)
+component1= emline[candindx,*]*(ones#attenuation)
+model= [[[component0]],[[component1]]]
 
 ; open file
 infilename= prefix+'.lp'
 openw, wlun,infilename,/get_lun
 printf, wlun,'Minimize'
-lp_format_constraint, 0,lindgen(ndata),wlun=wlun,/cost
+lp_format_constraint, 0,candindx,wlun=wlun,/cost
 printf, wlun,''
 printf, wlun,'Subject To'
 
 ; loop over spectra, finding all candidate archetypes that are okay
 ;   to represent each spectrum
-for dd=0L,ndata-1L do begin
-
-; do all matrix stuff by hand
-;   Think x = inv(at w a).(at w).b
-   atwb0= (component0*(ones#emivar[dd,*]))#transpose(emline[dd,*])
-   atwb1= (component1*(ones#emivar[dd,*]))#transpose(emline[dd,*])
-   atwa00= total(component0*(ones#emivar[dd,*])*component0,2)
-   atwa01= total(component0*(ones#emivar[dd,*])*component1,2)
-   atwa11= total(component1*(ones#emivar[dd,*])*component1,2)
-   det= atwa00*atwa11-atwa01*atwa01
-   atwainv00= atwa11/det
-   atwainv01=-atwa01/det
-   atwainv11= atwa00/det
-   amp0= atwainv00*atwb0+atwainv01*atwb1
-   amp1= atwainv01*atwb0+atwainv11*atwb1
-   resid= emline-((amp0#replicate(1.0,nline))*component0+ $
-                  (amp1#replicate(1.0,nline))*component1)
-   chisq= total(resid*emivar*resid,2)+(amp1/attenscale)^2
-
-; write line if possible
-   chisq[badindx]= 2.0*chisqmax
-   okay= where(chisq LT chisqmax,nokay)
-;   splog, 'spectrum',dd,' nokay',nokay
-   if (nokay GT 0) then begin
-      lp_format_constraint, dd,okay,wlun=wlun,cost=cost
-   endif
+for ii=0L,ndata-1L do begin
+    dd= dataindx[ii]
+    thisflux= reform(emline[dd,*],nline)
+    thisivar= reform(emivar[dd,*],nline)
+    okay= where(lp_emline_chisq(thisflux,thisivar,model,attenscale) $
+                LT chisqmax,nokay)
+;    splog, dd,nokay
+    if (nokay GT 0) then begin
+        lp_format_constraint, dd,candindx[okay],wlun=wlun
+    endif
 endfor
 
 ; close file
 printf, wlun,''
 if keyword_set(binary) then begin
    printf, wlun,'Binary'
-   for dd=0L,ndata-1L do printf, wlun,'  a'+lp_format_index(dd)
+   for jj=0L,ncand-1L do printf, wlun,'  a'+lp_format_index(candindx[jj])
 endif else begin
    printf, wlun,'Bounds'
-   lp_format_bounds, lindgen(ndata),wlun=wlun
+   lp_format_bounds, candindx,wlun=wlun
 endelse
 printf, wlun,''
 printf, wlun,'End'
@@ -107,13 +96,15 @@ close, wlun
 free_lun, wlun
 
 ; run glpsol
+splog, 'running glpsol'
 outfilename= infilename+'.output'
 glpsol= '~/astrometry/projects/archetypes/glpk-4.31/examples/glpsol'
-cmd= glpsol+' --cpxlp '+infilename+' -o '+outfilename+' --mipgap 20'
+cmd= glpsol+' --cpxlp '+infilename+' -o '+outfilename+' --mipgap 0.05'
 splog, cmd
 spawn, cmd
 
 ; trim output from glpsol
+splog, 'trimming glpsol output'
 grepfilename= outfilename+'.grep'
 cmd= 'grep "[0-9].a[0-9][0-9][0-9][0-9][0-9][0-9]" '+outfilename $
   +' > '+grepfilename
@@ -121,13 +112,16 @@ splog, cmd
 spawn, cmd
 
 ; read glpsol output
+splog, 'reading trimmed output'
 readcol, grepfilename,foo,name,st,activity,format='I,A,A,F'
 indx= long(strmid(name,1))
 amplitude= fltarr(max(indx)+1)
 amplitude[indx]= activity
 
 ; write file of indices
-use= where(amplitude GT 0.5)
+use= candindx[where(amplitude GT 0.5,nuse)]
+archfilename= prefix+'_archetypes.fits'
+splog, 'writing file of',nuse,' archetype indices to '+archfilename
 mwrfits, use,prefix+'_archetypes.fits',/create
 
 return
