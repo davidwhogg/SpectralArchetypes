@@ -33,20 +33,25 @@ emivar= 1.0/(emlerr^2+noisefloor^2*emline^2)
 emivar[where(emlerr LE 0.0)]= 0.0
 emlerr= 0
 
-; choose only good data
-halphaindx= nline-1L
-halphasn= emline[*,halphaindx]*sqrt(emivar[*,halphaindx])
-seed= -1L
-dataindx= (where(halphasn LT 30.0))[0:9999]
-dataindx= lindgen(10000)
-ndata= n_elements(dataindx)
-splog, 'trimmed down to',ndata,' spectra'
+; put in bad data for unmeasured lines
+;   (this permits spectra with unmeasured lines to represent themselves
+;   only)
+badvalue= -10.0*max(emline)
+emline[where(emivar LE 0.0)]= badvalue
 
-; choose only good candidate archetypes
-candindx= (where((total((emivar LE 0.0),2) LT 0.5) AND $
-                (halphasn GT 19.5)))[0:9999]
+; choose subset to use as candidate archetypes
+halphaindx= nline-1L
+sindx= reverse(sort(emline[*,halphaindx]))
+candindx= sindx[0:4999]
 ncand= n_elements(candindx)
 splog, 'trimmed down to',ncand,' candidate archetypes'
+
+; choose subset to use as data
+seed= -1L
+rindx= shuffle_indx(n_elements(sindx),seed=seed)
+dataindx= rindx[0:4999]
+ndata= n_elements(dataindx)
+splog, 'trimmed down to',ndata,' spectra'
 
 ; read attenuation and wavelength information
 attenu= (mrdfits(filename,2))
@@ -61,6 +66,8 @@ model= [[[component0]],[[component1]]]
 
 ; open file
 infilename= prefix+'.lp'
+splog, 'writing cplex file '+infilename
+spawn, 'date --iso=s'
 openw, wlun,infilename,/get_lun
 printf, wlun,'Minimize'
 lp_format_constraint, 0,candindx,wlun=wlun,/cost
@@ -97,11 +104,13 @@ free_lun, wlun
 
 ; run glpsol
 splog, 'running glpsol'
+spawn, 'date --iso=s'
 outfilename= infilename+'.output'
 glpsol= '~/astrometry/projects/archetypes/glpk-4.31/examples/glpsol'
 cmd= glpsol+' --cpxlp '+infilename+' -o '+outfilename+' --mipgap 0.05'
 splog, cmd
 spawn, cmd
+spawn, 'date --iso=s'
 
 ; trim output from glpsol
 splog, 'trimming glpsol output'
