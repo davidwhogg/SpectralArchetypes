@@ -1,6 +1,7 @@
 ;+
 ; INPUTS:
-;  chisqmax  - chi-squared limit (default 8+2*sqrt(2*8))
+; KEYWORDS:
+;  fileonly - if set, make the CPLEX LP file but don't run it.
 ; BUGS:
 ;  - No proper comment header.
 ;  - Brittle reading of emline file.
@@ -10,7 +11,7 @@
 ; LICENSE:
 ;  Copyright 2009 David W. Hogg (NYU) all rights reserved.
 ;-
-pro lp_emline, chisqmax
+pro lp_emline, chisqmax,fileonly=fileonly
 if (NOT keyword_set(prefix)) then prefix= 'lp_emline'
 if (NOT keyword_set(chisqmax)) then chisqmax= 8.0+2.0*sqrt(2.0*8.0)
 if (NOT keyword_set(noisefloor)) then noisefloor= 0.05
@@ -42,14 +43,14 @@ emline[where(emivar LE 0.0)]= badvalue
 ; choose subset to use as candidate archetypes
 halphaindx= nline-1L
 sindx= reverse(sort(emline[*,halphaindx]))
-candindx= sindx[0:4999]
+candindx= sindx[0:49999]
 ncand= n_elements(candindx)
 splog, 'trimmed down to',ncand,' candidate archetypes'
 
 ; choose subset to use as data
 seed= -1L
 rindx= shuffle_indx(n_elements(sindx),seed=seed)
-dataindx= rindx[0:4999]
+dataindx= rindx[0:49999]
 ndata= n_elements(dataindx)
 splog, 'trimmed down to',ndata,' spectra'
 
@@ -101,6 +102,15 @@ printf, wlun,''
 printf, wlun,'End'
 close, wlun
 free_lun, wlun
+
+if keyword_set(fileonly) then begin
+    spawn, 'date --iso=s'
+    splog, '/FILEONLY : compressing and then stopping'
+    cmd= 'gzip -v --best '+infilename
+    splog, cmd
+    spawn, cmd
+    stop
+endif
 
 ; run glpsol
 splog, 'running glpsol'
