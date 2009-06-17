@@ -1,8 +1,8 @@
 .SUFFIXES: .tex .dvi .ps .pdf
 
-all: archetypes.pdf emline.pdf
+all: gravitational-lens.pdf archetypes.pdf emline.pdf
 
 %.pdf: %.tex
 	pdflatex $<
-	pdflatex $<
-	pdflatex $<
+	- bash -c " ( grep Rerun $*.log && pdflatex $< ) || echo noRerun "
+	- bash -c " ( grep Rerun $*.log && pdflatex $< ) || echo noRerun "

@@ -1,0 +1,25 @@
+\documentclass[12pt]{article}
+\newcommand{\facility}[1]{\textsl{#1}}
+\newcommand{\fluxvec}{\vec{f}}
+\begin{document}
+
+For each spectrum, we generate $k+1$ mutually exclusive hypotheses:
+The null hypothesis $S$ that the spectrum only has significant flux
+coming from a single redshift $z_S$ determined by the \facility{SDSS}
+pipeline, and $k$ hypotheses $D_j$ that the spectrum has significant
+flux coming from two redshifts, $z_S$ and another redshift
+$z_j>z_S+\epsilon$.  In the context of this very restricted universe
+of hypotheses, the odds ratio for the null hypothesis is
+\begin{equation}
+O = \frac{\sum_{j=1}^k p(D_j|\fluxvec,I)}{p(S|\fluxvec,I)}
+  = \frac{\sum_{j=1}^k p(\fluxvec|D_j,I)}{p(\fluxvec|S,I)}
+  \,\frac{\sum_{j=1}^k p(D_j|I)}{p(S|I)} \quad,
+\end{equation}
+where the spectral flux data are represented by the vector $\fluxvec$,
+and the symbol $I$ represents all of the prior information in the
+problem, including but not limited to the hypothesis specification,
+the wavelengths and uncertainties associated with the spectral flux
+data, and any other knowledge that the investigator might have about
+the hypotheses prior to any data analysis.
+
+\end{document}
