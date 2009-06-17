@@ -1,25 +1,34 @@
 \documentclass[12pt]{article}
 \newcommand{\facility}[1]{\textsl{#1}}
+\newcommand{\equationname}[1]{equation~(\ref{#1})}
 \newcommand{\fluxvec}{\vec{f}}
 \begin{document}
 
-For each spectrum, we generate $k+1$ mutually exclusive hypotheses:
-The null hypothesis $S$ that the spectrum only has significant flux
-coming from a single redshift $z_S$ determined by the \facility{SDSS}
-pipeline, and $k$ hypotheses $D_j$ that the spectrum has significant
-flux coming from two redshifts, $z_S$ and another redshift
-$z_j>z_S+\epsilon$.  In the context of this very restricted universe
-of hypotheses, the odds ratio for the null hypothesis is
-\begin{equation}
-O = \frac{\sum_{j=1}^k p(D_j|\fluxvec,I)}{p(S|\fluxvec,I)}
-  = \frac{\sum_{j=1}^k p(\fluxvec|D_j,I)}{p(\fluxvec|S,I)}
-  \,\frac{\sum_{j=1}^k p(D_j|I)}{p(S|I)} \quad,
+For each spectrum $i$, we generate $K+1$ mutually exclusive hypotheses:
+The null hypothesis $S_i$ that spectrum $i$ only has significant flux
+coming from a single redshift $z_i$ determined by the \facility{SDSS}
+pipeline, and $K$ hypotheses $D_{ij}$ that spectrum $i$ has significant
+flux coming from two redshifts, $z_i$ and another redshift
+$z_j>z_i+\epsilon$.  In the context of this very restricted universe
+of hypotheses, the odds ratio $\Omega_i$ for the null hypothesis is
+\begin{equation}\label{eq:odds}
+\Omega_i = \frac{\sum_{j=1}^K p(D_{ij}|\fluxvec_i,I)}{p(S_i|\fluxvec_i,I)}
+ = \sum_{j=1}^K \left[\frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
+ \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] \quad,
 \end{equation}
-where the spectral flux data are represented by the vector $\fluxvec$,
-and the symbol $I$ represents all of the prior information in the
-problem, including but not limited to the hypothesis specification,
-the wavelengths and uncertainties associated with the spectral flux
-data, and any other knowledge that the investigator might have about
-the hypotheses prior to any data analysis.
+where the spectral flux data are represented by the vector
+$\fluxvec_i$, and the symbol $I$ represents all of the prior
+information in the problem, including but not limited to the
+hypothesis specification, the wavelengths and uncertainties associated
+with the spectral flux data, and any other knowledge that the
+investigator might have about the hypotheses prior to any data
+analysis.  On the right-hand side of \equationname{eq:odds}, we have
+pulled the summation off of the numerator, because, as we will see, we
+need to estimate the ratio for each $j$ individually; we can't just
+evaluate the numerator and denominator independently.
+
+The reason for this is the all-important \emph{spectral coverage}.
+Each setting of the pair $(z_i,z_j)$ limits differently the spectral
+range over which the eigenspectra are both well determined.
 
 \end{document}
