@@ -14,21 +14,34 @@ of hypotheses, the odds ratio $\Omega_i$ for the null hypothesis is
 \begin{equation}\label{eq:odds}
 \Omega_i = \frac{\sum_{j=1}^K p(D_{ij}|\fluxvec_i,I)}{p(S_i|\fluxvec_i,I)}
  = \sum_{j=1}^K \left[\frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
- \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] \quad,
+ \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] = \sum_{j=1}^K\Omega_{ij}\quad,
 \end{equation}
 where the spectral flux data are represented by the vector
-$\fluxvec_i$, and the symbol $I$ represents all of the prior
-information in the problem, including but not limited to the
-hypothesis specification, the wavelengths and uncertainties associated
-with the spectral flux data, and any other knowledge that the
-investigator might have about the hypotheses prior to any data
-analysis.  On the right-hand side of \equationname{eq:odds}, we have
-pulled the summation off of the numerator, because, as we will see, we
-need to estimate the ratio for each $j$ individually; we can't just
-evaluate the numerator and denominator independently.
+$\fluxvec_i$, the symbol $I$ represents all of the prior information
+in the problem, including but not limited to the hypothesis
+specification, the wavelengths and uncertainties associated with the
+spectral flux data, and any other knowledge that the investigator
+might have about the hypotheses prior to any data analysis.  We have
+implicitly defined an individual-hypothesis odds ratio
+\begin{equation}
+\Omega_{ij} = \frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
+  \,\frac{p(D_{ij}|I)}{p(S_i|I)}\quad.
+\end{equation}
 
-The reason for this is the all-important \emph{spectral coverage}.
-Each setting of the pair $(z_i,z_j)$ limits differently the spectral
-range over which the eigenspectra are both well determined.
+We have split the sum in the odds $\Omega_i$ into a sum of individual
+odds ratios $\Omega_{ij}$ because, as we will see, we need to estimate
+the ratio for each $j$ individually; we can't just evaluate the total
+numerator and denominator of $\Omega_i$ independently.  The reason for
+this is the all-important \emph{spectral coverage}.  Each setting of
+the pair $(z_i,z_j)$ limits differently the spectral range over which
+the eigenspectra are both well determined.  Imagine that one of the
+hypotheses $D_{ij}$ is only testable on some particular spectral range
+$[\lambda_{\min},\lambda_{\max}]$.  The data in this spectral range
+can be used to estimate the single-hypothesis odds ratio $\Omega_{ij}$
+of hypothesis $D_{ij}$ to the null hypothesis $S_i$.  Clearly
+hypotheses $D_{ij}$ that are testable with larger spectral ranges will
+be better tested, but the fact that different hypotheses are subject
+to tests of different strengths merely weakens---does not
+invalidate---the total hypothesis test.
 
 \end{document}
