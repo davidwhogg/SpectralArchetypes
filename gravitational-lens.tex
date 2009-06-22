@@ -1,5 +1,7 @@
 \documentclass[12pt]{article}
 \newcommand{\facility}[1]{\textsl{#1}}
+\newcommand{\foreign}[1]{\textsl{#1}}
+ \newcommand{\apriori}{\foreign{a priori}}
 \newcommand{\equationname}[1]{equation~(\ref{#1})}
 \newcommand{\fluxvec}{\vec{f}}
 \begin{document}
@@ -27,6 +29,13 @@ implicitly defined an individual-hypothesis odds ratio
 \Omega_{ij} = \frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
   \,\frac{p(D_{ij}|I)}{p(S_i|I)}\quad.
 \end{equation}
+Because an individual spectrum is unlikely \apriori\ to show two
+redshifts, the prior probabilities will have the asymmetry
+\begin{equation}
+\sum_{j=1}^K p(D_{ij}|I) \ll p(S_i|I) \quad,
+\end{equation}
+and it remains for us to decide how to set the relative prior
+probabilities among the $K$ hypotheses $D_{ij}$.
 
 We have split the sum in the odds $\Omega_i$ into a sum of individual
 odds ratios $\Omega_{ij}$ because, as we will see, we need to estimate
@@ -43,5 +52,29 @@ hypotheses $D_{ij}$ that are testable with larger spectral ranges will
 be better tested, but the fact that different hypotheses are subject
 to tests of different strengths merely weakens---does not
 invalidate---the total hypothesis test.
+
+The SDSS spectra have well-understood and near-gaussian uncertainties.
+Therefore, for each hypothesis $D_{ij}$ we can perform least-square
+fitting ($\chi^2$ minimization) on the subset of $N_{ij}$ pixels in
+the flux vector $\fluxvec_i$ that overlap the eigenspectra spectral
+ranges for both redshifts $z_i$ and $z_j$.  If we perform the
+least-square fit with $n$ eigenspectra at each redshift, then the odds
+ratio can be approximated by a modified difference in $\chi^2$:
+\begin{equation}
+\ln\Omega_{ij}= \frac{1}{2}\,\left[\chi^2_i-\chi^2_{ij}-n\right]
+ +\ln\frac{p(D_{ij}|I)}{p(S_i|I)} \quad,
+\end{equation}
+where we have taken the natural logarithm to simplify things,
+$\chi^2_i$ is the minimum $\chi^2$ under hypothesis $S_i$,
+$\chi^2_{ij}$ is the minimum $\chi^2$ under hypothesis $D_{ij}$, the
+adjustment of $-n$ accounts for the fact that the $S_i$ fit has $n$
+fewer parameters than the $D_{ij}$ fit, and the last term is the prior
+ratio.  Importantly, in this odds-ratio expression, the $\chi^2$ fits
+for hypotheses $S_i$ and $D_{ij}$ must have been performed \emph{over
+the same $N_{ij}$ pixels in both cases}.  Even then, the expression is
+something of an approximation, because it effectively assumes that the
+data are affected by perfectly known, perfectly gaussian noise and
+that one of the two hypotheses is capable of providing a good fit to
+the data.
 
 \end{document}
