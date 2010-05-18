@@ -6,17 +6,84 @@
 \newcommand{\fluxvec}{\vec{f}}
 \begin{document}
 
-For each spectrum $i$, we generate $K+1$ mutually exclusive hypotheses:
+\section{Data}
+
+Each spectrum $i$ can be thought of as an ordered list or column
+vector $\fluxvec_i$ of $M$ flux density (energy per area per time per
+wavelength) measurements $\fluxvec_{i\ell}$ on a grid of $M$
+wavelengths $\lambda_{\ell}$:
+\begin{equation}
+\fluxvec_i
+\equiv \left[\begin{array}{c} f_{i0} \\
+                              f_{i1} \\
+                              \cdots \\
+                              f_{iM} \end{array}\right]
+\equiv \left[\begin{array}{c} f_{\lambda,i}(\lambda_0) \\
+                              f_{\lambda,i}(\lambda_1) \\
+                                                \cdots \\
+                              f_{\lambda,i}(\lambda_M) \end{array}\right]
+\quad ,
+\end{equation}
+where the wavelength grid can be arbitrary but will be made uniform in
+the logarithm $\ln\lambda$ for simplicity of making redshift changes.
+Associated with each measurement $f_{i\ell}$ is an uncertainty
+variance $\sigma_{i\ell}$ and we will assume in what follows that
+these uncertainty variances are well measured and that the
+uncertainties are essentially Gaussian.  We will assume that
+off-diagonal terms (covariances) in the uncertainty variance tensor
+are small, or that the uncertainty variance tensor (covariance matrix)
+is approximately
+\begin{equation}
+C = \left[\begin{array}{cccc} \sigma_{i0}^2 & 0 & & 0 \\
+                              0 & \sigma_{i1}^2 & & 0 \\
+                              & & \cdots & \\
+                              0 & 0 & & \sigma_{iM}^2 \end{array}\right]
+\quad .
+\end{equation}
+
+\section{Spectral model}
+
+Each spectrum is modeled as the linear superposition of one or more
+objects at different redshifts.  We want to model the spectrum of each
+object (galaxy or quasar) with a sum of $K$ linear components:
+\begin{equation}
+f_{lambda}(\lambda) = \sum_{k=1}^{K} a_k\,g_k(\lambda)
+\quad ,
+\end{equation}
+where the modeling is done implicitly in the object rest frame, the
+$a_k$ are coefficients, and the $g_k(\lambda)$ are basis spectra.
+Given basis spectra, the best set of coefficients for any observed
+spectrum---under the assumption of known, Gaussian uncertainties---are
+found by least-square fitting.  The challenge is to find the
+best set of basis spectra.
+
+Often in astronomy, this basis is found by principal components
+analysis (or equivalent) and then selection of the largest-variance
+components or largest-eigenvalue eigenvectors.  However, this use of
+PCA naturally locates the $K$-dimensional linear basis that minimizes
+the mean-squared error in the space in which all pixels of all spectra
+are treated equally: They are weighted equally in the analysis, and
+residuals in them are minimized by the PCA with equal aggression.
+This is an inappropriate approach in the real situation in which
+different data points come with very different uncertainty variances,
+and it is absolutely inapplicable when there are missing data---as
+there \emph{always} are in real data sets.
+
+For these reasons, we seek to find the basis set that\ldots
+
+\section{Hypothesis test}
+
+For each spectrum $i$, we generate $Z+1$ mutually exclusive hypotheses:
 The null hypothesis $S_i$ that spectrum $i$ only has significant flux
 coming from a single redshift $z_i$ determined by the \facility{SDSS}
-pipeline, and $K$ hypotheses $D_{ij}$ that spectrum $i$ has significant
+pipeline, and $Z$ hypotheses $D_{ij}$ that spectrum $i$ has significant
 flux coming from two redshifts, $z_i$ and another redshift
 $z_j>z_i+\epsilon$.  In the context of this very restricted universe
 of hypotheses, the odds ratio $\Omega_i$ for the null hypothesis is
 \begin{equation}\label{eq:odds}
-\Omega_i = \frac{\sum_{j=1}^K p(D_{ij}|\fluxvec_i,I)}{p(S_i|\fluxvec_i,I)}
- = \sum_{j=1}^K \left[\frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
- \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] = \sum_{j=1}^K\Omega_{ij}\quad,
+\Omega_i = \frac{\sum_{j=1}^Z p(D_{ij}|\fluxvec_i,I)}{p(S_i|\fluxvec_i,I)}
+ = \sum_{j=1}^Z \left[\frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
+ \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] = \sum_{j=1}^Z\Omega_{ij}\quad,
 \end{equation}
 where the spectral flux data are represented by the vector
 $\fluxvec_i$, the symbol $I$ represents all of the prior information
@@ -32,10 +99,10 @@ implicitly defined an individual-hypothesis odds ratio
 Because an individual spectrum is unlikely \apriori\ to show two
 redshifts, the prior probabilities will have the asymmetry
 \begin{equation}
-\sum_{j=1}^K p(D_{ij}|I) \ll p(S_i|I) \quad,
+\sum_{j=1}^Z p(D_{ij}|I) \ll p(S_i|I) \quad,
 \end{equation}
 and it remains for us to decide how to set the relative prior
-probabilities among the $K$ hypotheses $D_{ij}$.
+probabilities among the $Z$ hypotheses $D_{ij}$.
 
 We have split the sum in the odds $\Omega_i$ into a sum of individual
 odds ratios $\Omega_{ij}$ because, as we will see, we need to estimate
@@ -53,7 +120,7 @@ be better tested, but the fact that different hypotheses are subject
 to tests of different strengths merely weakens---does not
 invalidate---the total hypothesis test.
 
-The SDSS spectra have well-understood and near-gaussian uncertainties.
+The SDSS spectra have near-Gaussian uncertainties.
 Therefore, for each hypothesis $D_{ij}$ we can perform least-square
 fitting ($\chi^2$ minimization) on the subset of $N_{ij}$ pixels in
 the flux vector $\fluxvec_i$ that overlap the eigenspectra spectral
@@ -73,7 +140,7 @@ ratio.  Importantly, in this odds-ratio expression, the $\chi^2$ fits
 for hypotheses $S_i$ and $D_{ij}$ must have been performed \emph{over
 the same $N_{ij}$ pixels in both cases}.  Even then, the expression is
 something of an approximation, because it effectively assumes that the
-data are affected by perfectly known, perfectly gaussian noise and
+data are affected by perfectly known, perfectly Gaussian noise and
 that one of the two hypotheses is capable of providing a good fit to
 the data.
 
