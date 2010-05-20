@@ -12,8 +12,8 @@
 
 Each spectrum $i$ can be thought of as an ordered list or column
 vector $\fluxvec_i$ of $M$ flux density (energy per area per time per
-wavelength) measurements $\fluxvec_{i\ell}$ on a grid of $M$
-wavelengths $\lambda_{\ell}$:
+wavelength) measurements $\fluxvec_{im}$ on a grid of $M$
+wavelengths $\lambda_m$:
 \begin{equation}
 \fluxvec_i
 \equiv \left[\begin{array}{c} f_{i0} \\
@@ -28,8 +28,8 @@ wavelengths $\lambda_{\ell}$:
 \end{equation}
 where the wavelength grid can be arbitrary but will be made uniform in
 the logarithm $\ln\lambda$ for simplicity of making redshift changes.
-Associated with each measurement $f_{i\ell}$ is an uncertainty
-variance $\sigma_{i\ell}$ and we will assume in what follows that
+Associated with each measurement $f_{im}$ is an uncertainty
+variance $\sigma_{im}$ and we will assume in what follows that
 these uncertainty variances are well measured and that the
 uncertainties are essentially Gaussian.  We will assume that
 off-diagonal terms (covariances) in the uncertainty variance tensor
@@ -80,10 +80,10 @@ seek to find the basis functions and coefficients that minimize a
 total chi-squared:
 \begin{eqnarray}\displaystyle
 \chi^2 & = & X - 2\,\ln\like \nonumber\\
- & = & \sum_{i=1}^N \sum_{\ell=1}^M
-\frac{\left[f_{i\ell}-\sum_{k=1}^K a_{ik}
-                      \,g_k(\lambda_{\ell}/[1+z_i])\right]^2}
-{\sigma^2_{i\ell}}
+ & = & \sum_{i=1}^N \sum_{m=1}^M
+\frac{\left[f_{im}-\sum_{k=1}^K a_{ik}
+                      \,g_k(\lambda_m/[1+z_i])\right]^2}
+{\sigma^2_{im}}
 \quad ,
 \end{eqnarray}
 where $X$ is some constant and we have implicitly assumed that each
@@ -96,19 +96,34 @@ scalar $\chi^2$.
 
 Precisely speaking, we make two adjustments to this goal.  The first
 is that we can't demand global optimization; this problem is not
-convex.  The second is that we impose a smoothness prior to improve
+convex.  Indeed, there are enormous numbers of local minima, in both
+the trivial sense that there are exact degeneracies (swap two basis
+functions and their corresponding coefficients, or re-scale a basis
+function and the corresponding coefficients, and so on) and in the
+non-trivial sense that there are qualitatively different solutions.
+All that our methods (described in detail below) guarantee is that we
+have, \emph{at fixed coefficients $a_{ik}$} the globally optimal basis
+functions $g_k(\lambda)$ and that we have, at fixed basis functions
+$g_k(\lambda)$ the globally optimal coefficients $a_{ik}$.
+
+The second adjustment is that we impose a smoothness prior to improve
 performance at (rest-frame) wavelengths at which we have very few
-data\ldots
+data.  In practice, we implement this prior by constructing the basis
+functions $g_k(\lambda)$ on a grid of $M_g>M$ rest wavelengths
+$\lambda_{\ell}$\ldots
+
+[Hogg: Now give pseudo-code explaining the iterative bilinear solution.]
 
 \section{Training and test data}
 
-How are the training data selected?
+[Vivi: How are the training data selected?]
 
-How do we know we have converged?
+[Vivi: How do we know we have converged?]
 
-How are the test data selected?
+[Vivi: How are the test data selected?]
 
-What is chi-squared on the test data as a function of $K$ and $\epsilon$?
+[Vivi: What is chi-squared on the test data as a function of $K$ and
+  $\epsilon$?]
 
 \section{Hypothesis test}
 
