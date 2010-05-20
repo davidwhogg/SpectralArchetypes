@@ -1,9 +1,11 @@
 \documentclass[12pt]{article}
+\usepackage{amssymb,amsmath,mathrsfs}
 \newcommand{\facility}[1]{\textsl{#1}}
 \newcommand{\foreign}[1]{\textsl{#1}}
  \newcommand{\apriori}{\foreign{a priori}}
 \newcommand{\equationname}[1]{equation~(\ref{#1})}
 \newcommand{\fluxvec}{\vec{f}}
+\newcommand{\like}{\mathscr{L}}
 \begin{document}
 
 \section{Data}
@@ -34,10 +36,10 @@ off-diagonal terms (covariances) in the uncertainty variance tensor
 are small, or that the uncertainty variance tensor (covariance matrix)
 is approximately
 \begin{equation}
-C = \left[\begin{array}{cccc} \sigma_{i0}^2 & 0 & & 0 \\
-                              0 & \sigma_{i1}^2 & & 0 \\
-                              & & \cdots & \\
-                              0 & 0 & & \sigma_{iM}^2 \end{array}\right]
+C_i = \left[\begin{array}{cccc} \sigma_{i0}^2 & 0 & & 0 \\
+                                0 & \sigma_{i1}^2 & & 0 \\
+                                & & \cdots & \\
+                                0 & 0 & & \sigma_{iM}^2 \end{array}\right]
 \quad .
 \end{equation}
 
@@ -47,7 +49,7 @@ Each spectrum is modeled as the linear superposition of one or more
 objects at different redshifts.  We want to model the spectrum of each
 object (galaxy or quasar) with a sum of $K$ linear components:
 \begin{equation}
-f_{lambda}(\lambda) = \sum_{k=1}^{K} a_k\,g_k(\lambda)
+f_{\lambda}(\lambda) = \sum_{k=1}^{K} a_k\,g_k(\lambda)
 \quad ,
 \end{equation}
 where the modeling is done implicitly in the object rest frame, the
@@ -69,7 +71,44 @@ different data points come with very different uncertainty variances,
 and it is absolutely inapplicable when there are missing data---as
 there \emph{always} are in real data sets.
 
-For these reasons, we seek to find the basis set that\ldots
+For these reasons, we seek to find the basis set that optimizes a
+justified scalar objective, one that is consistent with the individual
+spectral pixel uncertainty variances and with the fact that there are
+missing data.  When uncertainties are gaussian with known variances,
+the logarithm of the likelihood is proportional to chi-squared, so we
+seek to find the basis functions and coefficients that minimize a
+total chi-squared:
+\begin{eqnarray}\displaystyle
+\chi^2 & = & X - 2\,\ln\like \nonumber\\
+ & = & \sum_{i=1}^N \sum_{\ell=1}^M
+\frac{\left[f_{i\ell}-\sum_{k=1}^K a_{ik}
+                      \,g_k(\lambda_{\ell}/[1+z_i])\right]^2}
+{\sigma^2_{i\ell}}
+\quad ,
+\end{eqnarray}
+where $X$ is some constant and we have implicitly assumed that each
+spectrum $i$ under consideration at this stage is well explained by
+having all its flux come from a single object at a known redshift
+$z_i$.  The free parameters are the $N\,K$ coefficients $a_{ik}$ and
+the $K$ functions $g_k(\lambda)$.  Roughly speaking, we seek to find
+the coefficients and basis functions that globally minimize this
+scalar $\chi^2$.
+
+Precisely speaking, we make two adjustments to this goal.  The first
+is that we can't demand global optimization; this problem is not
+convex.  The second is that we impose a smoothness prior to improve
+performance at (rest-frame) wavelengths at which we have very few
+data\ldots
+
+\section{Training and test data}
+
+How are the training data selected?
+
+How do we know we have converged?
+
+How are the test data selected?
+
+What is chi-squared on the test data as a function of $K$ and $\epsilon$?
 
 \section{Hypothesis test}
 
