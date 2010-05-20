@@ -5,6 +5,7 @@
  \newcommand{\apriori}{\foreign{a priori}}
 \newcommand{\equationname}[1]{equation~(\ref{#1})}
 \newcommand{\fluxvec}{\vec{f}}
+\newcommand{\avec}{\vec{a}}
 \newcommand{\like}{\mathscr{L}}
 \begin{document}
 
@@ -110,7 +111,36 @@ The second adjustment is that we impose a smoothness prior to improve
 performance at (rest-frame) wavelengths at which we have very few
 data.  In practice, we implement this prior by constructing the basis
 functions $g_k(\lambda)$ on a grid of $M_g>M$ rest wavelengths
-$\lambda_{\ell}$\ldots
+$\lambda_{\ell}$ and penalizing quadratically large pixel-to-pixel
+variations.  That is, we optimize not the pure $\chi^2$ above but a
+modified scalar $\chi_{\epsilon}^2$
+\begin{equation}
+\chi_{\epsilon}^2 \equiv \chi^2
+ + \epsilon\,\sum_{k=1}^K \sum_{\ell=2}^{M_g}
+ \left[g_k(\lambda_{\ell})-g_k(\lambda_{\ell-1})\right]^2
+\quad ,
+\end{equation}
+where $\epsilon$ is a scalar that sets the strength of the smoothing.
+Optimization of this scalar $\chi_{\epsilon}^2$ is equivalent to
+optimization of the posterior probability distribution with a Gaussian
+prior applied to the pixel-to-pixel differences.  As with the observed
+spectra, we pixelize the basis functions $g_k(\lambda)$ on a grid that
+is uniform in logarithmic wavelength $\ln\lambda$ (with the same grid
+spacing as that used for the observed spectra).
+
+Given a set of basis spectra $g_k(\lambda)$, the optimal coefficients
+$a_{ik}$ are given by standard least-square fitting:
+\begin{equation}
+\avec_i \leftarrow \inverse{\left[\transpose{A_i} \inverse{C_i} A_i\right]}
+ \left[\transpose{A_i} \inverse{C_i} \fluxvec_i\right]
+\quad ,
+\end{equation}
+where the vectors and matrices are defined by
+\begin{eqnarray}
+\avec & \equiv & \nonumber\\
+A_i & \equiv & \nonumber\\
+C_i & \equiv &
+\end{enarray}
 
 [Hogg: Now give pseudo-code explaining the iterative bilinear solution.]
 
