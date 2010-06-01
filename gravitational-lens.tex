@@ -4,43 +4,55 @@
 \newcommand{\foreign}[1]{\textsl{#1}}
  \newcommand{\apriori}{\foreign{a priori}}
 \newcommand{\equationname}[1]{equation~(\ref{#1})}
-\newcommand{\fluxvec}{\vec{f}}
-\newcommand{\avec}{\vec{a}}
+\newcommand{\inverse}[1]{{#1}^{-1}}
+\newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\hoggvector}[1]{\boldsymbol{\vec{#1}}}
+ \newcommand{\avec}{\hoggvector{a}}
+ \newcommand{\Fvec}{\hoggvector{F}}
+ \newcommand{\fvec}{\hoggvector{f}}
+ \newcommand{\gvec}{\hoggvector{g}}
+\newcommand{\hoggmatrix}[1]{\boldsymbol{#1}}
+ \newcommand{\Amatrix}{\hoggmatrix{A}}
+ \newcommand{\Cmatrix}{\hoggmatrix{C}}
+ \newcommand{\Gmatrix}{\hoggmatrix{G}}
+ \newcommand{\Qmatrix}{\hoggmatrix{Q}}
+ \newcommand{\Sigmamatrix}{\hoggmatrix{\Sigma}}
 \newcommand{\like}{\mathscr{L}}
 \begin{document}
 
 \section{Data}
 
-Each spectrum $i$ can be thought of as an ordered list or column
-vector $\fluxvec_i$ of $M$ flux density (energy per area per time per
-wavelength) measurements $\fluxvec_{im}$ on a grid of $M$
-wavelengths $\lambda_m$:
+Each of the $N$ spectra $i$ can be thought of as an ordered list or
+column vector $\fvec_i$ of $M$ flux density (energy per area per time
+per wavelength) measurements $f_{im}$ on a grid of $M$ observer-frame
+wavelengths $\lambda^{\mathrm{obs}}_m$:
 \begin{equation}
-\fluxvec_i
-\equiv \left[\begin{array}{c} f_{i0} \\
-                              f_{i1} \\
+\fvec_i
+\equiv \left[\begin{array}{c} f_{i1} \\
+                              f_{i2} \\
                               \cdots \\
                               f_{iM} \end{array}\right]
-\equiv \left[\begin{array}{c} f_{\lambda,i}(\lambda_0) \\
-                              f_{\lambda,i}(\lambda_1) \\
+\equiv \left[\begin{array}{c} f_{\lambda,i}(\lambda^{\mathrm{obs}}_1) \\
+                              f_{\lambda,i}(\lambda^{\mathrm{obs}}_2) \\
                                                 \cdots \\
-                              f_{\lambda,i}(\lambda_M) \end{array}\right]
+                              f_{\lambda,i}(\lambda^{\mathrm{obs}}_M) \end{array}\right]
 \quad ,
 \end{equation}
-where the wavelength grid can be arbitrary but will be made uniform in
-the logarithm $\ln\lambda$ for simplicity of making redshift changes.
-Associated with each measurement $f_{im}$ is an uncertainty
-variance $\sigma_{im}$ and we will assume in what follows that
-these uncertainty variances are well measured and that the
+where the wavelength grid can be arbitrary but has been made uniform in
+the logarithm $\ln\lambda^{\mathrm{obs}}$ for simplicity of making
+redshift changes.  Associated with each measurement $f_{im}$ is an
+uncertainty variance $\sigma_{im}$ and we will assume in what follows
+that these uncertainty variances are well measured and that the
 uncertainties are essentially Gaussian.  We will assume that
 off-diagonal terms (covariances) in the uncertainty variance tensor
 are small, or that the uncertainty variance tensor (covariance matrix)
-is approximately
+$\Cmatrix_i$ is approximately
 \begin{equation}
-C_i = \left[\begin{array}{cccc} \sigma_{i0}^2 & 0 & & 0 \\
-                                0 & \sigma_{i1}^2 & & 0 \\
-                                & & \cdots & \\
-                                0 & 0 & & \sigma_{iM}^2 \end{array}\right]
+\Cmatrix_i =
+ \left[\begin{array}{cccc} \sigma_{i1}^2 & 0 & & 0 \\
+                           0 & \sigma_{i2}^2 & & 0 \\
+                           & & \cdots & \\
+                           0 & 0 & & \sigma_{iM}^2 \end{array}\right]
 \quad .
 \end{equation}
 
@@ -131,18 +143,105 @@ spacing as that used for the observed spectra).
 Given a set of basis spectra $g_k(\lambda)$, the optimal coefficients
 $a_{ik}$ are given by standard least-square fitting:
 \begin{equation}
-\avec_i \leftarrow \inverse{\left[\transpose{A_i} \inverse{C_i} A_i\right]}
- \left[\transpose{A_i} \inverse{C_i} \fluxvec_i\right]
+\avec_i \leftarrow \inverse{\left[\transpose{\Amatrix_i} \inverse{\Cmatrix_i} \Amatrix_i\right]}
+ \left[\transpose{\Amatrix_i} \inverse{\Cmatrix_i} \fvec_i\right]
 \quad ,
 \end{equation}
-where the vectors and matrices are defined by
+where the new vector $\avec_i$ and matrix $\Amatrix_i$ are defined by
 \begin{eqnarray}
-\avec & \equiv & \nonumber\\
-A_i & \equiv & \nonumber\\
-C_i & \equiv &
-\end{enarray}
+\avec_i & \equiv &
+ \left[\begin{array}{c} a_{i1} \\
+                        a_{i2} \\
+                        \cdots \\
+                        a_{iK} \end{array}\right] \nonumber\\
+\Amatrix_i & \equiv &
+ \left[\begin{array}{cccc}
+  g_1(\lambda_1/[1+z_i]) & g_2(\lambda_1/[1+z_i]) & \cdots & g_K(\lambda_1/[1+z_i]) \\
+  g_1(\lambda_2/[1+z_i]) & g_2(\lambda_2/[1+z_i]) & \cdots & g_K(\lambda_2/[1+z_i]) \\
+  \cdots & \cdots & & \cdots \\
+  g_1(\lambda_M/[1+z_i]) & g_2(\lambda_M/[1+z_i]) & \cdots & g_K(\lambda_M/[1+z_i])
+ \end{array}\right]
+\quad .
+\end{eqnarray}
+This step (determining the coefficients $a_{ik}$ or components of the
+vectors $\avec_i$) consists of $N$ operations of $K$-parameter
+least-square fitting, or one operation of $[N\,K]$-parameter
+least-square fitting.
 
-[Hogg: Now give pseudo-code explaining the iterative bilinear solution.]
+Given a set of coefficients $a_{ik}$, the optimal basis functions are
+given by slightly modified least-square fitting:
+\begin{equation}
+\gvec \leftarrow \inverse{\left[\transpose{\Gmatrix} \inverse{\Sigmamatrix} \Gmatrix
+                                + \epsilon\,\Qmatrix \right]}
+ \left[\transpose{\Gmatrix} \inverse{\Sigmamatrix} \Fvec\right]
+\quad ,
+\end{equation}
+where the new vectors $\gvec$ and $\Fvec$ and the matrices $\Gmatrix$,
+$\Sigmamatrix$, and $\Qmatrix$ are defined by
+\begin{eqnarray}
+\gvec & \equiv &
+ \left[\begin{array}{c}
+  g_1(\lambda_1) \\
+  g_1(\lambda_2) \\
+  \cdots \\
+  g_1(\lambda_{M_g}) \\
+  g_2(\lambda_1) \\
+  g_2(\lambda_2) \\
+  \cdots \\
+  g_2(\lambda_{M_g}) \\
+  \cdots \\
+  g_K(\lambda_{M_g}) \\
+ \end{array}\right]
+ \nonumber\\
+\Gmatrix & \equiv &
+ \left[\begin{array}{c}
+ \mbox{TO BE DONE}
+ \end{array}\right]
+ \nonumber\\
+\Sigmamatrix & \equiv &
+ \left[\begin{array}{cccc}
+  \Cmatrix_1 & 0 & \cdots & 0 \\
+  0 & \Cmatrix_2 & \cdots & 0 \\
+  \cdots & \cdots & & \cdots  \\
+  0 & 0 & \cdots & \Cmatrix_N
+ \end{array}\right]
+ \nonumber\\
+\Qmatrix & \equiv &
+ \left[\begin{array}{cccc}
+  \Qmatrix_1 & 0 & \cdots & 0 \\
+  0 & \Qmatrix_1 & \cdots & 0 \\
+  \cdots & \cdots & & \cdots  \\
+  0 & 0 & \cdots & \Qmatrix_1
+ \end{array}\right]
+ \nonumber\\
+\Qmatrix_1 & \equiv &
+ \left[\begin{array}{ccccccc}
+   1 & -1 &  0 &  0 & \cdots &  0 &  0 \\
+  -1 &  2 & -1 &  0 & \cdots &  0 &  0 \\
+   0 & -1 &  2 & -1 & \cdots &  0 &  0 \\
+   0 &  0 & -1 &  2 & \cdots &  0 &  0 \\
+  \cdots & \cdots & \cdots & \cdots & & \cdots & \cdots \\
+   0 &  0 &  0 &  0 & \cdots &  2 & -1 \\
+   0 &  0 &  0 &  0 & \cdots & -1 &  1
+ \end{array}\right]
+ \nonumber\\
+\Fvec & \equiv &
+ \left[\begin{array}{c} \fvec_1 \\
+                        \fvec_2 \\
+                        \cdots \\
+                        \fvec_N \end{array}\right]
+\quad .
+\end{eqnarray}
+That is, $\gvec$ is a column vector with $[M_g\,K]$ elements,
+$\Gmatrix$ is a sparse $[N_g\,K]\times[N\,M]$ matrix, $\Sigmamatrix$
+is the $[N\,M]\times[N\,M]$ diagonal covariance matrix for the entire
+data set, $\Qmatrix$ is a tridiagonal $[M_g\,K]\times[M_g\,K]$ matrix
+(because each of the $\Qmatrix_1$ matrices is $M_g\times M_g$ and
+there are $K$ of them in $\Qmatrix$), and $\Fvec$ is a column vector
+with $[N\,M]$ elements.  This step (determining the $\gvec$) is one
+operation of $[M_g\,K]$-parameter $\chi_{\epsilon}^2$ minimization.
+
+[Hogg: describe iteration and what it does and does not guarantee for us.]
 
 \section{Training and test data}
 
@@ -165,19 +264,19 @@ flux coming from two redshifts, $z_i$ and another redshift
 $z_j>z_i+\epsilon$.  In the context of this very restricted universe
 of hypotheses, the odds ratio $\Omega_i$ for the null hypothesis is
 \begin{equation}\label{eq:odds}
-\Omega_i = \frac{\sum_{j=1}^Z p(D_{ij}|\fluxvec_i,I)}{p(S_i|\fluxvec_i,I)}
- = \sum_{j=1}^Z \left[\frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
+\Omega_i = \frac{\sum_{j=1}^Z p(D_{ij}|\fvec_i,I)}{p(S_i|\fvec_i,I)}
+ = \sum_{j=1}^Z \left[\frac{p(\fvec_i|D_{ij},I)}{p(\fvec_i|S_i,I)}
  \,\frac{p(D_{ij}|I)}{p(S_i|I)}\right] = \sum_{j=1}^Z\Omega_{ij}\quad,
 \end{equation}
 where the spectral flux data are represented by the vector
-$\fluxvec_i$, the symbol $I$ represents all of the prior information
+$\fvec_i$, the symbol $I$ represents all of the prior information
 in the problem, including but not limited to the hypothesis
 specification, the wavelengths and uncertainties associated with the
 spectral flux data, and any other knowledge that the investigator
 might have about the hypotheses prior to any data analysis.  We have
 implicitly defined an individual-hypothesis odds ratio
 \begin{equation}
-\Omega_{ij} = \frac{p(\fluxvec_i|D_{ij},I)}{p(\fluxvec_i|S_i,I)}
+\Omega_{ij} = \frac{p(\fvec_i|D_{ij},I)}{p(\fvec_i|S_i,I)}
   \,\frac{p(D_{ij}|I)}{p(S_i|I)}\quad.
 \end{equation}
 Because an individual spectrum is unlikely \apriori\ to show two
@@ -207,7 +306,7 @@ invalidate---the total hypothesis test.
 The SDSS spectra have near-Gaussian uncertainties.
 Therefore, for each hypothesis $D_{ij}$ we can perform least-square
 fitting ($\chi^2$ minimization) on the subset of $N_{ij}$ pixels in
-the flux vector $\fluxvec_i$ that overlap the eigenspectra spectral
+the flux vector $\fvec_i$ that overlap the eigenspectra spectral
 ranges for both redshifts $z_i$ and $z_j$.  If we perform the
 least-square fit with $n$ eigenspectra at each redshift, then the odds
 ratio can be approximated by a modified difference in $\chi^2$:
