@@ -1,6 +1,6 @@
 .SUFFIXES: .tex .dvi .ps .pdf
 
-all: gravitational-lens.pdf archetypes.pdf emline.pdf
+all: quasar-redshift.pdf
 
 %.pdf: %.tex
 	pdflatex $<

@@ -1,0 +1,138 @@
+% to-do items:
+% ------------
+% - write text
+% - deal with all items marked "TBD"
+
+\documentclass[preprint]{aastex}
+\usepackage{amssymb,amsmath,mathrsfs}
+\newcounter{address}
+\newcommand{\foreign}[1]{\textit{#1}}
+\newcommand{\forbidden}[1]{{[}{\mathrm{#1}}{]}}
+\newcommand{\OIII}{\forbidden{OIII}}
+\newcommand{\mmatrix}[1]{\boldsymbol{#1}}
+\newcommand{\inverse}[1]{{#1}^{-1}}
+\newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\covar}{\mmatrix{C}}
+\newcommand{\evec}{\mmatrix{e}}
+\newcommand{\fvec}{\mmatrix{f}}
+\newcommand{\gvec}{\mmatrix{g}}
+\newcommand{\invvar}{\inverse{\covar}}
+\newcommand{\documentname}{\textsl{Note}}
+
+\begin{document}
+\title{Quasar redshift determination:\ A data-driven model approach}
+\author{Paraskevi~Tsalmantza\altaffilmark{\ref{MPIA}},
+        Michael~V.~Maseda\altaffilmark{\ref{MPIA},\ref{Caltech}},
+        Joe~Hennawi\altaffilmark{\ref{MPIA},\ref{email}},
+        David~W.~Hogg\altaffilmark{\ref{MPIA},\ref{CCPP}}}
+\setcounter{address}{1}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
+Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
+D-69117 Heidelberg, Germany}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{Caltech}
+Caltech}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{email} To whom
+correspondence should be addressed: \texttt{joe@mpia.de}}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{CCPP} Center
+for Cosmology and Particle Physics, Department of Physics, New York
+University, 4 Washington Place, New York, NY 10003}
+
+\begin{abstract}
+We present a method for measuring the redshifts of quasars by fitting
+them with a data-driven model.  This is a a model of the space of
+possible quasar spectra derived from a collection of quasars observed
+by the Sloan Digital Sky Survey.  We show that the measurements
+obtained with the model fits are better than those obtained by
+cross-correlation with a fixed quasar template, and that they perform
+well even when the narrow $\OIII$ lines are outside the spectroscopic
+window.  TBD: results here.
+\end{abstract}
+
+\section{Introduction}
+
+TBD: What is the problem and why is it important?
+
+The standard data-driven models for quasars---or any other kind of
+spectroscopic object in astronomy---is the highest-ranked principal
+components from a principal components analysis (PCA) or equivalent.
+The PCA has one advantage and a number of drawbacks.  The advantage is
+that it is entirely data-driven: The construction of the PCA requires
+no theoretical or external knowledge about the spectra being modeled;
+it is a dimensionality reduction in the space of the observed spectra.
+
+There are many drawbacks to PCA but the most important is that the PCA
+returns the principal directions---the eigenvectors with maximum
+eigenvalues---of the variance tensor of the data; this variance tensor
+has contributions from intrinsic variation among spectra, and
+contributions from observational noise.  That is, a direction in
+spectrum space can enter into the top principal components because it
+is a direction of great astrophysical variation, or because there is a
+lot of noise in the observations along that direction, or both.  PCA
+is agnostic about the \emph{source} of the variance, while astronomers
+are not; astronomers want to know about the astrophysical processes
+that generate the data \emph{prior} to the addition of observational
+noise.
+
+Other drawbacks to PCA include the following: It treats the data as
+drawn from a linear subspace of the full spectral space.  This
+assumption is unlikely to be true in any application.  It also has
+trouble separating the spectral variation that comes from amplitude
+changes (overall flux or luminosity changes) as distinct from
+variations that come from shape changes in the spectra.  Various hacks
+have been employed to deal with this, but many of them make the linear
+subspace assumption even less valid than it was \foreign{a priori}.
+Finally, PCA has no idea about prior information; it is just as happy
+creating components with negative amplitudes as positive amplitudes
+and the linear subspace therefore contains many quadrants, in general,
+that represent spectra with completely unphysical properties (such as
+negative emission lines and the like).
+
+In this \documentname, we use a data-driven model for quasar spectra
+that overcomes most---though not all---of the problems with PCA.
+
+\section{Method}
+
+The data---training or test set---will be a set of $N$ spectra $i$,
+each of which is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$
+wavelengths $\lambda_j$.  Associated with each flux $f_{ij}$ is an
+inverse uncertainty variance $1/\sigma^2_{ij}$, which we will imagine
+are the elements of a $M\times M$ diagonal inverse covariance matrix
+$\invvar_{i}$.
+
+The model is that any spectrum $\fvec_i$ can be written as a linear
+sum of $K$ components $\gvec_k$ (each of which also has $M$ components
+$g_{kj}$)
+\begin{eqnarray}\displaystyle
+\fvec_i &=& \sum_{k=1}^K a_{ik}\,\gvec_k + \evec_i \nonumber\\
+f_{ij} &=& \sum_{k=1}^K a_{ik}\,g_{kj} + e_{ij}
+\quad ,
+\end{eqnarray}
+where the $a_{ik}$ are coefficients, and the vector $\evec_i$ (with
+$M$ components $e_{ij}$) is a noise vector, imagined to be a random
+variable drawn from a $M$-dimensional Gaussian with zero mean and
+variance tensor $\covar_i$.
+
+We determine the components $\gvec_k$ by bi-linear least-square
+fitting to a \emph{training set}.  The goal is to find the set of
+coefficients $a_{ik}$ and spectral components $g_{kj}$ that jointly
+minimize a total $\chi^2$ over all the $N$ training data:
+\begin{eqnarray}\displaystyle
+\chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma^2_{ij}}
+ \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
+\quad .
+\end{eqnarray}
+
+TBD: describe optimization methodology.
+
+TBD: describe prior.
+
+\section{Training and test data}
+
+\section{Results}
+
+\section{Discussion}
+
+\acknowledgements
+Thanks to people.  Thanks to SDSS.  Thanks to R.  Thanks to grants.
+
+\end{document}
