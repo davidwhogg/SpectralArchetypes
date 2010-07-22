@@ -25,7 +25,7 @@
 \newcommand{\like}{\mathscr{L}}
 
 \begin{document}
-\title{Quasar redshift determination:\ A data-driven model approach}
+\title{Quasar redshift determination with a data-driven model}
 \author{Paraskevi~Tsalmantza\altaffilmark{\ref{MPIA}},
         Michael~V.~Maseda\altaffilmark{\ref{MPIA},\ref{Caltech}},
         Joe~Hennawi\altaffilmark{\ref{MPIA},\ref{email}},
@@ -186,8 +186,7 @@ and coefficients $a_{\ell k}$ there is a goodness-of-fit scalar
 $\chi^2_\ell$
 \begin{eqnarray}\displaystyle
 \chi^2_\ell &=& \sum_{j=1}^M \frac{1}{\sigma^2_{\ell m}}
- \,\left[f_{\ell m} - \sum_{k=1}^K a_{\ell k}\,g_{kJ(m)}\right]^2 \nonumber \\
-J(m) &=& j - n
+ \,\left[f_{\ell m} - \sum_{k=1}^K a_{\ell k}\,g_{k[m-n]}\right]^2
 \quad,
 \end{eqnarray}
 where $n$ is the redshift index.  The goal is probabilistic inference,
@@ -195,7 +194,7 @@ which requires computed likelihoods.  Under the assumptions laid out
 in this section, the scalar $\chi^2_\ell$ is related to the likelihood
 $\like_\ell$ by
 \begin{eqnarray}\displaystyle
-\chi^2_\ell &\equiv& Q + 2\,\ln\like_\ell \nonumber\\
+\chi^2_\ell &\equiv& Q - 2\,\ln\like_\ell \nonumber\\
 \like_\ell &\equiv& p(\fvec_\ell|z_n,\avec_\ell)
 \quad ,
 \end{eqnarray}
