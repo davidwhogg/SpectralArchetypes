@@ -13,11 +13,16 @@
 \newcommand{\inverse}[1]{{#1}^{-1}}
 \newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
 \newcommand{\covar}{\mmatrix{C}}
+\newcommand{\avec}{\mmatrix{a}}
 \newcommand{\evec}{\mmatrix{e}}
 \newcommand{\fvec}{\mmatrix{f}}
 \newcommand{\gvec}{\mmatrix{g}}
 \newcommand{\invvar}{\inverse{\covar}}
+\newcommand{\all}[1]{\{{#1}\}}
 \newcommand{\documentname}{\textsl{Note}}
+\newcommand{\obs}{\mathrm{obs}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\like}{\mathscr{L}}
 
 \begin{document}
 \title{Quasar redshift determination:\ A data-driven model approach}
@@ -92,11 +97,11 @@ that overcomes most---though not all---of the problems with PCA.
 
 \section{Method}
 
-The data---training or test set---will be a set of $N$ spectra $i$,
-each of which is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$
-wavelengths $\lambda_j$.  Associated with each flux $f_{ij}$ is an
-inverse uncertainty variance $1/\sigma^2_{ij}$, which we will imagine
-are the elements of a $M\times M$ diagonal inverse covariance matrix
+The training data set will be a set of $N$ spectra $i$, each of which
+is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$ wavelengths
+$\lambda_j$.  Associated with each flux $f_{ij}$ is an inverse
+uncertainty variance $1/\sigma^2_{ij}$, which we will imagine are the
+elements of a $M\times M$ diagonal inverse covariance matrix
 $\invvar_{i}$.
 
 The model is that any spectrum $\fvec_i$ can be written as a linear
@@ -115,22 +120,126 @@ variance tensor $\covar_i$.
 We determine the components $\gvec_k$ by bi-linear least-square
 fitting to a \emph{training set}.  The goal is to find the set of
 coefficients $a_{ik}$ and spectral components $g_{kj}$ that jointly
-minimize a total $\chi^2$ over all the $N$ training data:
+minimize a total goodness-of-fit scalar $\chi^2$ over all the $N$
+training data:
 \begin{eqnarray}\displaystyle
 \chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma^2_{ij}}
  \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
 \quad .
 \end{eqnarray}
+This problem is not convex, and there are multiple minima, including
+degenerate solutions.  We optimize to a local minimum using iterated
+least squares.  In each step, we fix the $g_{kj}$ and find the optimal
+$a_{ik}$ by weighted least squares, and then hold the $a_{ik}$ fixed
+and find the optimal $g_{kj}$ by weighted least squares.  Each
+iteration step is guaranteed to reduce the total $\chi^2$ and
+converges in practice in ten or so iterations.  We initialize the
+fitting with the output of a PCA on the spectra after the each
+spectrum has been projected into the subspace orthogonal to the mean
+spectrum of the data set; the first guesses for the $\gvec_k$ are set
+to the mean spectrum and the first $K-1$ principal components.  We
+find that performance is not worse if we initialize with a randomly
+chosen set of spectra.
 
-TBD: describe optimization methodology.
+Importantly in the training, the wavelengths $\lambda_j$ are
+rest-frame wavelengths, and because different training-set spectra
+were taken at different redshifts, not all spectra have coverage at
+all rest-frame wavelengths.  (There are also gaps from bad sky
+subtraction, cosmic rays, and other data issues.)  Missing data in
+spectrum $i$ at wavelength $j$ is handled naturally by setting
+$1/\sigma^2_{ij}=0$; when a data point has vanishing inverse
+variance, it does not contribute to $\chi^2$ or the fitting.  In
+general, weighted least squares---because it uses the error variances
+correctly---is unperturbed by missing data.
 
-TBD: describe prior.
+At test time, we fit a previously unmodeled spectrum $\ell$ from the
+\emph{test set}, each of which is a vector $\fvec_\ell$ of $M_\obs$
+rest-frame fluxes $f_{\ell m}$ on a grid of $M_\obs$ observed-frame
+wavelengths $\lambda_m$.  Associated with each flux $f_{\ell m}$ is an
+inverse uncertainty variances $1/\sigma^2_{\ell m}$.  Again, where
+there are missing data, these inverse variances are set to zero.
+
+In order to simplify redshift correction and fitting, we choose
+rest-frame wavelength grid $\lambda_j$ and observed-frame wavelength
+grid $\lambda_m$ to be logarithmic with common spacing:
+\begin{eqnarray}\displaystyle
+\ln\lambda_j &=& A + j\,B \nonumber\\
+\ln\lambda_m &=& C + b\,B
+\quad ,
+\end{eqnarray}
+where the logarithmic wavelength interval $B$ is common to both, and
+set small enough that the spectroscopic wavelength element is well
+sampled.  This permits trivial redshift analysis on a fine grid, with
+redshift spacing $\Delta\ln(1+z)=\Delta z/[1+z]=B$.  The permitted
+redshifts $z_n$ are therefore
+\begin{eqnarray}\displaystyle
+\ln(1+z_n) &=& [C - A] + n\,B
+\quad ,
+\end{eqnarray}
+where $n$ can have a wide range of positive and negative values in
+principle.  Specifically, for the experiments to follow, we set the
+rest-frame wavelength grid to have $M=$TBD, $A=$TBD, and $B=$TBD, and
+the observed-frame wavlength grid to have $M_\obs=$TBD and $C=$TBD.
+
+For any test spectrum $\lambda_\ell$, at any setting of redshift $z_n$
+and coefficients $a_{\ell k}$ there is a goodness-of-fit scalar
+$\chi^2_\ell$
+\begin{eqnarray}\displaystyle
+\chi^2_\ell &=& \sum_{j=1}^M \frac{1}{\sigma^2_{\ell m}}
+ \,\left[f_{\ell m} - \sum_{k=1}^K a_{\ell k}\,g_{kJ(m)}\right]^2 \nonumber \\
+J(m) &=& j - n
+\quad,
+\end{eqnarray}
+where $n$ is the redshift index.  The goal is probabilistic inference,
+which requires computed likelihoods.  Under the assumptions laid out
+in this section, the scalar $\chi^2_\ell$ is related to the likelihood
+$\like_\ell$ by
+\begin{eqnarray}\displaystyle
+\chi^2_\ell &\equiv& Q + 2\,\ln\like_\ell \nonumber\\
+\like_\ell &\equiv& p(\fvec_\ell|z_n,\avec_\ell)
+\quad ,
+\end{eqnarray}
+where $Q$ is some constant, and the vector $\avec_\ell$ contains the
+$K$ coefficients $a_{\ell k}$ for test spectrum $\ell$.
+
+In the end we want probabilistic information about the redshift $z_n$,
+not the coefficients $\avec_\ell$.  If we have a prior PDF on the
+coefficients $\avec_\ell$, we can marginalize out the coefficients to
+get a likelihood for the redshift alone
+\begin{eqnarray}\displaystyle
+p(\fvec_\ell|z_n) &=& \int \dd\avec_\ell\,p(\avec_\ell)\,p(\fvec_\ell|z_n,\avec_\ell)
+\quad ,
+\end{eqnarray}
+where the integral is over the $K$-dimensional space of coefficients
+$a_{\ell k}$ and the integration measure is the prior PDF $p(\avec)$.
+
+Because we construct a training set that is statistically identical to
+the test set (this is not always or not usually possible), we can take
+a hierarchical approach in which the prior is set by the instances in
+the training set; indeed the coefficient vectors $\avec_i$ for the
+training set spectra $i$ can be thought of as making up a
+mixture-of-delta-functions approximation to the prior PDF.  The one
+modification we make to this is that we permit overall amplitude (flux
+or luminosity variations), so in $K$ dimensions, each training-set
+instance $\avec_i$ defines a line $r\,\avec_i$ in coefficient space,
+where $r$ is a scalar.  We set the prior on $r$ to be constant in $r$;
+without bounds this prior is improper, but in practice the posterior
+PDFs are always normalizable.  The prior PDF is thus a
+training-set-based mixture-of-lines in coefficient space.
+
+TBD:  Marginalization integral turns into exactly what sum?
 
 \section{Training and test data}
 
+TBD:  Michael, explain data selection and redshift determination, etc.
+
 \section{Results}
 
+TBD:  Vivi make figures.
+
 \section{Discussion}
+
+TBD:  Joe, Hogg go crazy.
 
 \acknowledgements
 Thanks to people.  Thanks to SDSS.  Thanks to R.  Thanks to grants.
