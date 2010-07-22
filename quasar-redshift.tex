@@ -185,13 +185,15 @@ For any test spectrum $\lambda_\ell$, at any setting of redshift $z_n$
 and coefficients $a_{\ell k}$ there is a goodness-of-fit scalar
 $\chi^2_\ell$
 \begin{eqnarray}\displaystyle
-\chi^2_\ell &=& \sum_{j=1}^M \frac{1}{\sigma^2_{\ell m}}
+\chi^2_\ell &=& \sum_{m=1}^{M_\obs} \frac{1}{\sigma^2_{\ell m}}
  \,\left[f_{\ell m} - \sum_{k=1}^K a_{\ell k}\,g_{k[m-n]}\right]^2
 \quad,
 \end{eqnarray}
-where $n$ is the redshift index.  The goal is probabilistic inference,
-which requires computed likelihoods.  Under the assumptions laid out
-in this section, the scalar $\chi^2_\ell$ is related to the likelihood
+where $n$ is the redshift index, and implicitly the $1/\sigma^2_{\ell
+  m}$ are set to vanish at any wavelengths for which the model and
+data don't overlap.  The goal is probabilistic inference, which
+requires computed likelihoods.  Under the assumptions laid out in this
+section, the scalar $\chi^2_\ell$ is related to the likelihood
 $\like_\ell$ by
 \begin{eqnarray}\displaystyle
 \chi^2_\ell &\equiv& Q - 2\,\ln\like_\ell \nonumber\\
