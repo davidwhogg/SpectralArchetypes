@@ -16,9 +16,9 @@
 \newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
 \newcommand{\covar}{\mmatrix{C}}
 \newcommand{\avec}{\mmatrix{a}}
+\newcommand{\bvec}{\mmatrix{b}}
 \newcommand{\evec}{\mmatrix{e}}
 \newcommand{\fvec}{\mmatrix{f}}
-\newcommand{\Fvec}{\mmatrix{F}}
 \newcommand{\gvec}{\mmatrix{g}}
 \newcommand{\invvar}{\inverse{\covar}}
 \newcommand{\all}[1]{\{{#1}\}}
@@ -163,10 +163,10 @@ coefficients $a_k$ for the quasar spectrum at the \SDSS\ redshift, and
 any vector $\bvec$ of $K$ coefficients $b_k$ for the second quasar
 spectrum shifted relative to the \SDSS\ redshift by velocity
 $n\,\delta v$, there is a goodness-of-fit scalar
-$\chi^2(n,\avec,\bvec)$
+$\chi^2_i(n,\avec,\bvec)$
 \begin{eqnarray}\displaystyle
-\chi^2(n,\avec,\bvec) &=& \sum_{j=1}^{M} \frac{1}{\sigma^2_{ij}}
- \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj} - \sum_{k=1}^K b_{ik}\,g{k[j-n]}right]^2
+\chi^2_i(n,\avec,\bvec) &=& \sum_{j=1}^{M} \frac{1}{\sigma^2_{ij}}
+ \,\left[f_{ij} - \sum_{k=1}^K a_k\,g_{kj} - \sum_{k=1}^K b_k\,g_{k[j-n]}\right]^2
 \quad,
 \end{eqnarray}
 where implicitly the $1/\sigma^2_{ij}$ are set to vanish at any
@@ -175,10 +175,10 @@ overlap.
 
 The goal is probabilistic inference, which requires computed
 likelihoods.  Under the assumptions laid out in this section, the
-scalar $\chi^2$ is related to the likelihood $\like$ by
+scalar $\chi^2_i$ is related to the likelihood $\like_i$ by
 \begin{eqnarray}\displaystyle
-\chi^2(n,\avec,\bvec) &=& Q - 2\,\ln\like(\n,\avec,\bvec) \nonumber\\
-\like(n,\avec,\bvec) &\equiv& p(\fvec_i|n,\avec,\bvec)
+\chi^2_i(n,\avec,\bvec) &=& Q - 2\,\ln\like_i(n,\avec,\bvec) \nonumber\\
+\like_i(n,\avec,\bvec) &\equiv& p(\fvec_i|n,\avec,\bvec)
 \quad ,
 \end{eqnarray}
 where $Q$ is some constant, and $p(\cdot)$ is a probability
