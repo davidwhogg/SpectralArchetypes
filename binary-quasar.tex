@@ -1,0 +1,206 @@
+% to-do items:
+% ------------
+% - write text
+% - deal with all items marked "TBD"
+
+\documentclass[preprint]{aastex}
+\usepackage{amssymb,amsmath,mathrsfs}
+\newcounter{address}
+\newcommand{\foreign}[1]{\textit{#1}}
+\newcommand{\project}[1]{\textsl{#1}}
+\newcommand{\SDSS}{\project{SDSS}}
+\newcommand{\forbidden}[1]{{[}{\mathrm{#1}}{]}}
+\newcommand{\OIII}{\forbidden{OIII}}
+\newcommand{\mmatrix}[1]{\boldsymbol{#1}}
+\newcommand{\inverse}[1]{{#1}^{-1}}
+\newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\covar}{\mmatrix{C}}
+\newcommand{\avec}{\mmatrix{a}}
+\newcommand{\evec}{\mmatrix{e}}
+\newcommand{\fvec}{\mmatrix{f}}
+\newcommand{\Fvec}{\mmatrix{F}}
+\newcommand{\gvec}{\mmatrix{g}}
+\newcommand{\invvar}{\inverse{\covar}}
+\newcommand{\all}[1]{\{{#1}\}}
+\newcommand{\documentname}{\textsl{Note}}
+\newcommand{\obs}{\mathrm{obs}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\like}{\mathscr{L}}
+
+\begin{document}
+\title{A catalog of binary quasars}
+\author{some permutation of PT\altaffilmark{\ref{MPIA}},
+        RD\altaffilmark{\ref{MPIA}}
+        DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
+\setcounter{address}{1}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
+Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
+D-69117 Heidelberg, Germany}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{CCPP} Center
+for Cosmology and Particle Physics, Department of Physics, New York
+University, 4 Washington Place, New York, NY 10003}
+
+\begin{abstract}
+  With a data-driven model of the space of possible quasar
+  spectra---derived from the collection of all quasars observed by the
+  \project{Sloan Digital Sky Survey} (\SDSS)---we fit every
+  low-redshift ($z<$TBD) \SDSS\ quasar with a pair of quasars at
+  substantial velocity separation.  We find XX new plausible binary
+  quasar candidates and a raft of double-peaked broad-line quasars.
+  The binary quasar candidates have the following physical properties:
+  TBD.
+\end{abstract}
+
+\section{Introduction}
+
+TBD: What is the problem and why is it important?  God tells us that
+there will be many binary quasars; they have been hard to find.
+
+TBD: Here's what's known: Four examples, all with issues.  Also, all
+have the disturbing property that the broad-line component is shifted
+to the red of the narrow-line component.
+
+In this \documentname, we use a data-driven model for quasar spectra
+constructed to explain the observed variations of quasars in the
+\SDSS.  This model is more sophisticated than a principal components
+analysis in that it takes proper account of the observational
+uncertainties but is otherwise similar in spirit.
+
+\section{Method}
+
+We ``learn''---or ``find optimal''---spectral components or basis
+spectra by a bilinear optimization on a training set of spectra.  We
+use linear combinations of these components at two different
+redshifts---the \SDSS\ redshift and a second redshift---to perform a
+two-redshift against one-redshift hypothesis test.
+
+\subsection{Training}
+
+The training data set will be a set of $N$ \SDSS\ spectra $i$, each of
+which is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$ wavelengths
+$\lambda_j$ (logarithmically spaced; see below).  Associated with each
+flux $f_{ij}$ is an inverse uncertainty variance $1/\sigma^2_{ij}$,
+which we will imagine are the elements of a $M\times M$ diagonal
+inverse covariance matrix $\invvar_{i}$.
+
+The model is that any spectrum $\fvec_i$ can be written as a linear
+sum of $K$ components $\gvec_k$ (each of which also has $M$ components
+$g_{kj}$)
+\begin{eqnarray}\displaystyle
+\fvec_i &=& \sum_{k=1}^K a_{ik}\,\gvec_k + \evec_i \nonumber\\
+f_{ij} &=& \sum_{k=1}^K a_{ik}\,g_{kj} + e_{ij}
+\quad ,
+\end{eqnarray}
+where the $a_{ik}$ are coefficients, and the vector $\evec_i$ (with
+$M$ components $e_{ij}$) is a noise vector, imagined to be a random
+variable drawn from a $M$-dimensional Gaussian with zero mean and
+variance tensor $\covar_i$.
+
+We determine the components $\gvec_k$ by bi-linear least-square
+fitting to a \emph{training set}.  The goal is to find the set of
+coefficients $a_{ik}$ and spectral components $g_{kj}$ that jointly
+minimize a total goodness-of-fit scalar $\chi^2$ over all the $N$
+training data:
+\begin{eqnarray}\displaystyle
+\chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma^2_{ij}}
+ \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
+\quad .
+\end{eqnarray}
+This problem is not convex, and there are multiple minima, including
+degenerate solutions.  We optimize to a local minimum using iterated
+least squares.  In each step, we fix the $g_{kj}$ and find the optimal
+$a_{ik}$ by weighted least squares, and then hold the $a_{ik}$ fixed
+and find the optimal $g_{kj}$ by weighted least squares.  Each
+iteration step is guaranteed to reduce the total $\chi^2$ and
+converges in practice in ten or so iterations.  We initialize the
+fitting with the output of a PCA on the spectra after the each
+spectrum has been projected into the subspace orthogonal to the mean
+spectrum of the data set; the first guesses for the $\gvec_k$ are set
+to the mean spectrum and the first $K-1$ principal components.  We
+find that performance is not worse if we initialize with a randomly
+chosen set of spectra.
+
+Importantly in the training, the wavelengths $\lambda_j$ are
+rest-frame wavelengths, and because different training-set spectra
+were taken at different redshifts, not all spectra have coverage at
+all rest-frame wavelengths.  (There are also gaps from bad sky
+subtraction, cosmic rays, and other data issues.)  Missing data in
+spectrum $i$ at wavelength $j$ is handled naturally by setting
+$1/\sigma^2_{ij}=0$; when a data point has vanishing inverse
+variance, it does not contribute to $\chi^2$ or the fitting.  In
+general, weighted least squares---because it uses the error variances
+correctly---is unperturbed by missing data.
+
+For any $K$-dimensional linear subspace, there are many choices for
+the components $\gvec_k$: The components can be reordered, multiplied
+by scalars, or replaced with linear combinations of themselves.  We
+don't try to break all of these degeneracies, but we do enforce the
+constraint that the $\gvec_k\cdot\gvec_k=1$, where the inner product
+is taken with the trivial (identity) metric in the spectrum space.
+
+\subsection{Test time}
+
+At test time, we re-fit each \SDSS\ spectrum $i$ but now with two sets
+of $K$ coefficients, one at the \SDSS\ redshift and one shifted in
+velocity by a velocity difference $\Delta v$.  In order to simplify
+redshift correction, we choose the (rest-frame) wavelength grid
+$\lambda_j$ to be logarithmic
+\begin{eqnarray}\displaystyle
+\ln\lambda_j &=& \ln\lambda_0 + j\,\delta
+\quad ,
+\end{eqnarray}
+where $\ln\lambda_0$ is a constant and the logarithmic wavelength
+interval is set to $\delta=$TBD.  This value is small enough that the
+spectroscopic wavelength element is well sampled.  This permits
+trivial redshift analysis on a fine grid, with redshift spacing
+$\delta\ln(1+z)=\Delta z/[1+z]=B$ or velocity spacing $\delta v=c\,B$,
+where $c$ is the speed of light.  As we will see, finer velocity
+determinations can be obtained by quadratic interpolation.
+
+For any test spectrum $\lambda_i$, at any setting of second velocity
+$v= n\,\delta v$, where $n$ is an integer, any vector $\avec$ of $K$
+coefficients $a_k$ for the quasar spectrum at the \SDSS\ redshift, and
+any vector $\bvec$ of $K$ coefficients $b_k$ for the second quasar
+spectrum shifted relative to the \SDSS\ redshift by velocity
+$n\,\delta v$, there is a goodness-of-fit scalar
+$\chi^2(n,\avec,\bvec)$
+\begin{eqnarray}\displaystyle
+\chi^2(n,\avec,\bvec) &=& \sum_{j=1}^{M} \frac{1}{\sigma^2_{ij}}
+ \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj} - \sum_{k=1}^K b_{ik}\,g{k[j-n]}right]^2
+\quad,
+\end{eqnarray}
+where implicitly the $1/\sigma^2_{ij}$ are set to vanish at any
+wavelengths for which the relatively shifted spectral models don't
+overlap.
+
+The goal is probabilistic inference, which requires computed
+likelihoods.  Under the assumptions laid out in this section, the
+scalar $\chi^2$ is related to the likelihood $\like$ by
+\begin{eqnarray}\displaystyle
+\chi^2(n,\avec,\bvec) &=& Q - 2\,\ln\like(\n,\avec,\bvec) \nonumber\\
+\like(n,\avec,\bvec) &\equiv& p(\fvec_i|n,\avec,\bvec)
+\quad ,
+\end{eqnarray}
+where $Q$ is some constant, and $p(\cdot)$ is a probability
+distribution function (PDF).
+
+TBD:  How do we find the binaries?
+
+\section{Data and results}
+
+TBD:  How did we select spectra?
+
+TBD:  Vivi make figures.
+
+TBD:  Present catalog of binaries.
+
+TBD:  Present catalog of double-peaked lines.
+
+\section{Discussion}
+
+TBD
+
+\acknowledgements Thanks to people.  Thanks to \SDSS.  Thanks to
+\project{R}.  Thanks to grants.
+
+\end{document}

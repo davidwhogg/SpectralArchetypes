@@ -1,6 +1,6 @@
 .SUFFIXES: .tex .dvi .ps .pdf
 
-all: quasar-redshift.pdf
+all: quasar-redshift.pdf binary-quasar.pdf
 
 %.pdf: %.tex
 	pdflatex $<
