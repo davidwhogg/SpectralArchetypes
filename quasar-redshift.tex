@@ -16,6 +16,7 @@
 \newcommand{\avec}{\mmatrix{a}}
 \newcommand{\evec}{\mmatrix{e}}
 \newcommand{\fvec}{\mmatrix{f}}
+\newcommand{\Fvec}{\mmatrix{F}}
 \newcommand{\gvec}{\mmatrix{g}}
 \newcommand{\invvar}{\inverse{\covar}}
 \newcommand{\all}[1]{\{{#1}\}}
@@ -26,10 +27,10 @@
 
 \begin{document}
 \title{Quasar redshift determination with a data-driven model}
-\author{Paraskevi~Tsalmantza\altaffilmark{\ref{MPIA}},
-        Michael~V.~Maseda\altaffilmark{\ref{MPIA},\ref{Caltech}},
-        Joe~Hennawi\altaffilmark{\ref{MPIA},\ref{email}},
-        David~W.~Hogg\altaffilmark{\ref{MPIA},\ref{CCPP}}}
+\author{some permutation of PT\altaffilmark{\ref{MPIA}},
+        MVM\altaffilmark{\ref{MPIA},\ref{Caltech}},
+        JH\altaffilmark{\ref{MPIA},\ref{email}},
+        DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
 \setcounter{address}{1}
 \altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
 Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
@@ -97,6 +98,15 @@ that overcomes most---though not all---of the problems with PCA.
 
 \section{Method}
 
+We ``learn''---or ``find optimal''---spectral components or basis
+spectra by a bilinear optimization on a training set of spectra.  We
+use linear combinations of these components to determine the redshifts
+of spectra in a disjoint test set.  We apply a strong prior on the
+allowed coefficients determined from the population in the training
+set.
+
+\subsection{Training}
+
 The training data set will be a set of $N$ spectra $i$, each of which
 is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$ wavelengths
 $\lambda_j$.  Associated with each flux $f_{ij}$ is an inverse
@@ -152,6 +162,20 @@ variance, it does not contribute to $\chi^2$ or the fitting.  In
 general, weighted least squares---because it uses the error variances
 correctly---is unperturbed by missing data.
 
+For any $K$-dimensional linear subspace, there are many choices for
+the components $\gvec_k$: The components can be reordered, multiplied
+by scalars, or replaced with linear combinations of themselves.  We
+don't try to break all of these degeneracies, but we do enforce the
+constraint that the $\gvec_k\cdot\gvec_k=1$, where the inner product
+is taken with the trivial (identity) metric in the spectrum space.
+
+TBD: Hogg thinks this normalization may be wrong in detail, and maybe
+we should do other things, like order them according to something,
+make them quasi-orthogonal, and multiply them so the skewness of the
+$N$ $a_{ik}$ distribution at fixed $k$ is positive for all $k$.
+
+\subsection{Test time}
+
 At test time, we fit a previously unmodeled spectrum $\ell$ from the
 \emph{test set}, each of which is a vector $\fvec_\ell$ of $M_\obs$
 rest-frame fluxes $f_{\ell m}$ on a grid of $M_\obs$ observed-frame
@@ -203,6 +227,8 @@ $\like_\ell$ by
 where $Q$ is some constant, and the vector $\avec_\ell$ contains the
 $K$ coefficients $a_{\ell k}$ for test spectrum $\ell$.
 
+\subsection{Informative prior}
+
 In the end we want probabilistic information about the redshift $z_n$,
 not the coefficients $\avec_\ell$.  If we have a prior PDF on the
 coefficients $\avec_\ell$, we can marginalize out the coefficients to
@@ -228,7 +254,24 @@ without bounds this prior is improper, but in practice the posterior
 PDFs are always normalizable.  The prior PDF is thus a
 training-set-based mixture-of-lines in coefficient space.
 
-TBD:  Marginalization integral turns into exactly what sum?
+With this informative prior, the marginalization integral can be
+approximated with a sum
+\begin{eqnarray}\displaystyle
+p(\fvec_\ell|z_n) &\approx& \frac{1}{N}\,\sum_{i=1}^N p(\fvec_\ell|z_n,r_{\ell i}\,\avec_i)\,\Delta r_{\ell i} \nonumber\\
+r_{\ell i} &=& \frac{\fvec_\ell\cdot\invvar_\ell\cdot\Fvec_i}{\Fvec_i\cdot\invvar_\ell\cdot\Fvec_i} \nonumber\\
+\Fvec_i &\equiv& \sum_{k=1}^K a_{ik}\,\gvec_k \nonumber\\
+\Delta r_{\ell i} &\equiv& \frac{1}{\sqrt{\Fvec_i\cdot\invvar_\ell\cdot\Fvec_i}}
+\quad ,
+\end{eqnarray}
+where $r_{\ell i}$ is the scalar that (by one-dimensional weighted
+least squares) best fits the fit to training spectrum $\fvec_i$ to
+test spectrum $\fvec_\ell$, $\Fvec_i$ is a short-hand for that fit to
+training spectrum $\fvec_i$, and $\Delta r_{\ell i}$ is the output
+uncertainty on $r_{\ell i}$ from the one-dimensional weighted least
+squares.  This sum becomes exact in the limit that the observational
+uncertainties are Gaussian, the inverse variance matrices
+$\invvar_\ell$ are correct, and the number $N$ of spectra in the
+training set becomes large.
 
 \section{Training and test data}
 
@@ -239,6 +282,14 @@ TBD:  Michael, explain data selection and redshift determination, etc.
 TBD:  Vivi make figures.
 
 \section{Discussion}
+
+The method used here has the advantage of PCA that it is entirely
+data-driven, but far fewer of the disadvantages of PCA.  It uses a
+linear subspace of spectrum space, like PCA, but unlike PCA it applies
+a prior to that subspace so that unrealistic spectra are never
+instantiated.  Most importantly, unlike PCA, the method makes proper
+use of the observational errors, so the basis spectra are models of
+the underlying physical process that generates the quasars.
 
 TBD:  Joe, Hogg go crazy.
 
