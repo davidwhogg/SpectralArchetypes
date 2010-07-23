@@ -30,7 +30,7 @@
 \begin{document}
 \title{A catalog of binary quasars}
 \author{some permutation of PT\altaffilmark{\ref{MPIA}},
-        RD\altaffilmark{\ref{MPIA}}
+        RD\altaffilmark{\ref{MPIA}},
         DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
 \setcounter{address}{1}
 \altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
@@ -146,16 +146,17 @@ velocity by a velocity difference $\Delta v$.  In order to simplify
 redshift correction, we choose the (rest-frame) wavelength grid
 $\lambda_j$ to be logarithmic
 \begin{eqnarray}\displaystyle
-\ln\lambda_j &=& \ln\lambda_0 + j\,\delta
+\ln\lambda_j &=& \ln\lambda_0 + j\,\delta\ln\lambda
 \quad ,
 \end{eqnarray}
 where $\ln\lambda_0$ is a constant and the logarithmic wavelength
-interval is set to $\delta=$TBD.  This value is small enough that the
-spectroscopic wavelength element is well sampled.  This permits
-trivial redshift analysis on a fine grid, with redshift spacing
-$\delta\ln(1+z)=\Delta z/[1+z]=B$ or velocity spacing $\delta v=c\,B$,
-where $c$ is the speed of light.  As we will see, finer velocity
-determinations can be obtained by quadratic interpolation.
+interval is set to $\delta\ln\lambda=$TBD.  This value is small enough
+that the spectroscopic wavelength element is well sampled.  This
+permits trivial redshift analysis on a fine grid, with redshift
+spacing $\delta\ln(1+z)=\delta z/[1+z]=\delta\ln\lambda$ or velocity
+spacing $\delta v=c\,\delta\ln\lambda$, where $c$ is the speed of
+light.  As we will see, finer velocity determinations can be obtained
+by quadratic interpolation.
 
 For any test spectrum $\lambda_i$, at any setting of second velocity
 $v= n\,\delta v$, where $n$ is an integer, any vector $\avec$ of $K$
@@ -183,6 +184,8 @@ scalar $\chi^2_i$ is related to the likelihood $\like_i$ by
 \end{eqnarray}
 where $Q$ is some constant, and $p(\cdot)$ is a probability
 distribution function (PDF).
+
+\subsection{Visual inspection}
 
 TBD:  How do we find the binaries?
 
