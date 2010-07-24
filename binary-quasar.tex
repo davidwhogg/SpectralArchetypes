@@ -174,24 +174,26 @@ where implicitly the $1/\sigma^2_{ij}$ are set to vanish at any
 wavelengths for which the relatively shifted spectral models don't
 overlap.
 
-The goal is probabilistic inference, which requires computed
-likelihoods.  Under the assumptions laid out in this section, the
-scalar $\chi^2_i$ is related to the likelihood $\like_i$ by
-\begin{eqnarray}\displaystyle
-\chi^2_i(n,\avec,\bvec) &=& Q - 2\,\ln\like_i(n,\avec,\bvec) \nonumber\\
-\like_i(n,\avec,\bvec) &\equiv& p(\fvec_i|n,\avec,\bvec)
-\quad ,
-\end{eqnarray}
-where $Q$ is some constant, and $p(\cdot)$ is a probability
-distribution function (PDF).
-
 \subsection{Visual inspection}
 
-TBD:  How do we find the binaries?
+In principle, the question of whether a quasar spectrum is
+significantly better fit by a pair of quasars than it is by a single
+quasar is a straightforward condition on $\chi^2$, since $\chi^2$ is
+simply related to the logarithm of the likelihood.  However, the
+complexity of broad lines, artifacts in the data, intervening
+absorbers, and strange quasars not well represented by the data-driven
+model all lead to peaks in $\chi^2$ as a function of velocity
+separation $n\,\delta v$ that do not in fact represent good fits to
+the data.  For this reason, we applied simple criteria to the function
+$\chi^2(n,\avec,\bvec)$ and inspected all candidates.
+
+TBD:  What criteria did we use?  How many candidates did it produce?
+
+TBD:  Show some examples of different categories.
 
 \section{Data and results}
 
-TBD:  How did we select spectra?
+TBD:  How did we select SDSS spectra?
 
 TBD:  Vivi make figures.
 
