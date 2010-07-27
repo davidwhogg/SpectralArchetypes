@@ -173,11 +173,6 @@ don't try to break all of these degeneracies, but we do enforce the
 constraint that the $\gvec_k\cdot\gvec_k=1$, where the inner product
 is taken with the trivial (identity) metric in the spectrum space.
 
-TBD: Hogg thinks this normalization may be wrong in detail, and maybe
-we should do other things, like order them according to something,
-make them quasi-orthogonal, and multiply them so the skewness of the
-$N$ $a_{ik}$ distribution at fixed $k$ is positive for all $k$.
-
 \subsection{Test time}
 
 At test time, we fit a previously unmodeled spectrum $\ell$ from the
@@ -269,15 +264,14 @@ r_{\ell i} &=& \frac{\transpose{\fvec_\ell}\cdot\invvar_\ell\cdot\Fvec_i}{\trans
 {}[\Delta r_{\ell i}]^2 &\equiv& \frac{1}{\transpose{\Fvec_i}\cdot\invvar_\ell\cdot\Fvec_i}
 \quad ,
 \end{eqnarray}
-where $r_{\ell i}$ is the scalar that (by one-dimensional weighted
-least squares) best fits the fit to training spectrum $\fvec_i$ to
-test spectrum $\fvec_\ell$, $\Fvec_i$ is a short-hand for that fit to
+where $r_{\ell i}$ is the scalar that minimizes the scalar
+$\chi^2_{\ell i}$, $\Fvec_i$ is a short-hand for the best fit to
 training spectrum $\fvec_i$, and $\Delta r_{\ell i}$ is the output
-uncertainty on $r_{\ell i}$ from the one-dimensional weighted least
-squares.  This sum becomes exact in the limit that the observational
-uncertainties are Gaussian, the inverse variance matrices
-$\invvar_\ell$ are correct, and the number $N$ of spectra in the
-training set becomes large.
+uncertainty on $r_{\ell i}$ according to one-dimensional weighted
+least squares.  This sum becomes exact in the limit that the
+observational uncertainties are Gaussian, the inverse variance
+matrices $\invvar_\ell$ are correct, and the number $N$ of spectra in
+the training set becomes large.
 
 \section{Training and test data}
 
