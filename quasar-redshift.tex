@@ -258,9 +258,11 @@ With this informative prior, the marginalization integral can be
 approximated with a sum
 \begin{eqnarray}\displaystyle
 p(\fvec_\ell|z_n) &\approx& \frac{1}{N}\,\sum_{i=1}^N p(\fvec_\ell|z_n,r_{\ell i}\,\avec_i)\,\Delta r_{\ell i} \nonumber\\
-r_{\ell i} &=& \frac{\fvec_\ell\cdot\invvar_\ell\cdot\Fvec_i}{\Fvec_i\cdot\invvar_\ell\cdot\Fvec_i} \nonumber\\
+p(\fvec_\ell|z_n,r_{\ell i}\,\avec_i) &\propto& \exp(-\frac{1}{2}\,\chi^2_{\ell i}) \nonumber\\
+\chi^2_{\ell i} &\equiv& \transpose{[\fvec_\ell - r_{\ell i}\,\Fvec_i]}\cdot\invvar_\ell\cdot[\fvec_\ell - r_{\ell i}\,\Fvec_i] \nonumber\\
+r_{\ell i} &=& \frac{\transpose{\fvec_\ell}\cdot\invvar_\ell\cdot\Fvec_i}{\transpose{\Fvec_i}\cdot\invvar_\ell\cdot\Fvec_i} \nonumber\\
 \Fvec_i &\equiv& \sum_{k=1}^K a_{ik}\,\gvec_k \nonumber\\
-\Delta r_{\ell i} &\equiv& \frac{1}{\sqrt{\Fvec_i\cdot\invvar_\ell\cdot\Fvec_i}}
+{}[\Delta r_{\ell i}]^2 &\equiv& \frac{1}{\transpose{\Fvec_i}\cdot\invvar_\ell\cdot\Fvec_i}
 \quad ,
 \end{eqnarray}
 where $r_{\ell i}$ is the scalar that (by one-dimensional weighted
