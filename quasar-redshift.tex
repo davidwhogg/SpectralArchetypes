@@ -133,6 +133,10 @@ coefficients $a_{ik}$ and spectral components $g_{kj}$ that jointly
 minimize a total goodness-of-fit scalar $\chi^2$ over all the $N$
 training data:
 \begin{eqnarray}\displaystyle
+\chi^2 &=& \sum_{i=1}^N 
+ \,\transpose{\left[\fvec_i - \sum_{k=1}^K a_{ik}\,\gvec_k\right]}
+ \cdot\invvar_i\cdot\left[\fvec_i - \sum_{k=1}^K a_{ik}\,\gvec_k\right]
+ \nonumber\\
 \chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma^2_{ij}}
  \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
 \quad .
