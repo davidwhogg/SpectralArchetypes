@@ -9,6 +9,11 @@
 \newcommand{\foreign}[1]{\textit{#1}}
 \newcommand{\project}[1]{\textsl{#1}}
 \newcommand{\SDSS}{\project{SDSS}}
+\newcommand{\unit}[1]{\mathrm{#1}}
+\newcommand{\km}{\unit{km}}
+\newcommand{\s}{\unit{s}}
+\newcommand{\kmps}{\km\,\s^{-1}}
+\newcommand{\mum}{\unit{\mu m}}
 \newcommand{\forbidden}[1]{{[}{\mathrm{#1}}{]}}
 \newcommand{\OIII}{\forbidden{OIII}}
 \newcommand{\mmatrix}[1]{\boldsymbol{#1}}
@@ -150,13 +155,13 @@ $\lambda_j$ to be logarithmic
 \quad ,
 \end{eqnarray}
 where $\ln\lambda_0$ is a constant and the logarithmic wavelength
-interval is set to $\delta\ln\lambda=$TBD.  This value is small enough
-that the spectroscopic wavelength element is well sampled.  This
-permits trivial redshift analysis on a fine grid, with redshift
-spacing $\delta\ln(1+z)=\delta z/[1+z]=\delta\ln\lambda$ or velocity
-spacing $\delta v=c\,\delta\ln\lambda$, where $c$ is the speed of
-light.  As we will see, finer velocity determinations can be obtained
-by quadratic interpolation.
+interval is set to $\delta\ln\lambda=2.3026\times 10^{-4}$.  This
+value is small enough that the spectroscopic wavelength element is
+well sampled.  This permits trivial redshift analysis on a fine grid,
+with redshift spacing $\delta\ln(1+z)=\delta z/[1+z]=\delta\ln\lambda$
+or velocity spacing $\delta v=c\,\delta\ln\lambda=69.03~\kmps$.  As we
+will see, finer velocity determinations can be obtained by quadratic
+interpolation.
 
 For any test spectrum $\lambda_i$, at any setting of second velocity
 $v= n\,\delta v$, where $n$ is an integer, any vector $\avec$ of $K$

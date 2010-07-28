@@ -7,6 +7,11 @@
 \usepackage{amssymb,amsmath,mathrsfs}
 \newcounter{address}
 \newcommand{\foreign}[1]{\textit{#1}}
+\newcommand{\unit}[1]{\mathrm{#1}}
+\newcommand{\km}{\unit{km}}
+\newcommand{\s}{\unit{s}}
+\newcommand{\kmps}{\km\,\s^{-1}}
+\newcommand{\mum}{\unit{\mu m}}
 \newcommand{\forbidden}[1]{{[}{\mathrm{#1}}{]}}
 \newcommand{\OIII}{\forbidden{OIII}}
 \newcommand{\mmatrix}[1]{\boldsymbol{#1}}
@@ -201,8 +206,10 @@ redshifts $z_n$ are therefore
 \end{eqnarray}
 where $n$ can have a wide range of positive and negative values in
 principle.  Specifically, for the experiments to follow, we set the
-rest-frame wavelength grid to have $M=$TBD, $A=$TBD, and $B=$TBD, and
-the observed-frame wavlength grid to have $M_\obs=$TBD and $C=$TBD.
+training-set rest-frame wavelength grid to have $M=5591$,
+$\exp(A)=178.6~\mum$, and $B=2.3026\times10^{-4}$, and the test-set
+observed-frame wavlength grids have $M_\obs\sim$TBD and $C\sim$TBD.
+On these grids, the velocity spacing is $69.03~\kmps$.
 
 For any test spectrum $\fvec_\ell$, at any setting of redshift $z_n$
 and coefficients $a_{\ell k}$ there is a goodness-of-fit scalar
@@ -256,19 +263,20 @@ training-set-based mixture-of-lines in coefficient space.
 With this informative prior, the marginalization integral can be
 approximated with a sum
 \begin{eqnarray}\displaystyle
-p(\fvec_\ell|z_n) &\approx& \frac{1}{N}\,\sum_{i=1}^N p(\fvec_\ell|z_n,r_{\ell i}\,\avec_i)\,\Delta r_{\ell i} \nonumber\\
-p(\fvec_\ell|z_n,r_{\ell i}\,\avec_i) &\propto& \exp(-\frac{1}{2}\,\chi^2_{\ell i}) \nonumber\\
-\chi^2_{\ell i} &\equiv& \transpose{[\fvec_\ell - r_{\ell i}\,\Fvec_i]}\cdot\invvar_\ell\cdot[\fvec_\ell - r_{\ell i}\,\Fvec_i] \nonumber\\
-r_{\ell i} &=& \frac{\transpose{\fvec_\ell}\cdot\invvar_\ell\cdot\Fvec_i}{\transpose{\Fvec_i}\cdot\invvar_\ell\cdot\Fvec_i} \nonumber\\
-\Fvec_i &\equiv& \sum_{k=1}^K a_{ik}\,\gvec_k \nonumber\\
-{}[\Delta r_{\ell i}]^2 &\equiv& \frac{1}{\transpose{\Fvec_i}\cdot\invvar_\ell\cdot\Fvec_i}
+p(\fvec_\ell|z_n) &\approx& \frac{1}{N}\,\sum_{i=1}^N p(\fvec_\ell|z_n,r_{n\ell i}\,\avec_i)\,\Delta r_{n\ell i} \nonumber\\
+p(\fvec_\ell|z_n,r_{n\ell i}\,\avec_i) &\propto& \exp(-\frac{1}{2}\,\chi^2_{n\ell i}) \nonumber\\
+\chi^2_{n\ell i} &\equiv& \transpose{[\fvec_\ell - r_{n\ell i}\,\Fvec_{ni}]}\cdot\invvar_\ell\cdot[\fvec_\ell - r_{n\ell i}\,\Fvec_{ni}] \nonumber\\
+r_{n\ell i} &=& \frac{\transpose{\fvec_\ell}\cdot\invvar_\ell\cdot\Fvec_{ni}}{\transpose{\Fvec_{ni}}\cdot\invvar_\ell\cdot\Fvec_{ni}} \nonumber\\
+F_{nim} &\equiv& \sum_{k=1}^K a_{ik}\,g_{k[m-n]} \nonumber\\
+{}[\Delta r_{n\ell i}]^2 &\equiv& \frac{1}{\transpose{\Fvec_{ni}}\cdot\invvar_\ell\cdot\Fvec_{ni}}
 \quad ,
 \end{eqnarray}
-where $r_{\ell i}$ is the scalar that minimizes the scalar
-$\chi^2_{\ell i}$, $\Fvec_i$ is a short-hand for the best fit to
-training spectrum $\fvec_i$, and $\Delta r_{\ell i}$ is the output
-uncertainty on $r_{\ell i}$ according to one-dimensional weighted
-least squares.  This sum becomes exact in the limit that the
+where $r_{n\ell i}$ is the scalar that minimizes the scalar
+$\chi^2_{n\ell i}$, $\Fvec_{ni}$ is a short-hand for the best fit to
+training spectrum $\fvec_i$ shifted by $n$ spacings in the velocity
+grid (it has components $F_{nim}$), and $\Delta r_{n\ell i}$ is the
+output uncertainty on $r_{n\ell i}$ according to one-dimensional
+weighted least squares.  This sum becomes exact in the limit that the
 observational uncertainties are Gaussian, the inverse variance
 matrices $\invvar_\ell$ are correct, and the number $N$ of spectra in
 the training set becomes large.
