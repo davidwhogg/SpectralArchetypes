@@ -279,7 +279,9 @@ output uncertainty on $r_{n\ell i}$ according to one-dimensional
 weighted least squares.  This sum becomes exact in the limit that the
 observational uncertainties are Gaussian, the inverse variance
 matrices $\invvar_\ell$ are correct, and the number $N$ of spectra in
-the training set becomes large.
+the training set becomes large.  In practice, when the $\chi^2_{n\ell
+  i}$ are exponentiated, it makes sense to subtract from them a
+constant $Q_\ell$ to protect the exponential function from underflow.
 
 \section{Training and test data}
 
