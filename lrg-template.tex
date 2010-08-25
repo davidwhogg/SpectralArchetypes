@@ -101,8 +101,10 @@ values:
  \nonumber\\
 \chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma_{ij}^2}
  \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
-\quad .
+\quad ,
 \end{eqnarray}
+where we have implicitly assumed that the covariance matrices are all
+diagonal, with diagonal components $\sigma_{ij}^2$.
 
 This problem can be seen as a form of matrix factorization, in which
 we are trying to approximate the large non-square data matrix $f_{ij}$
