@@ -1,0 +1,132 @@
+% to-do items:
+% ------------
+% - write text
+% - deal with all items marked "TBD"
+
+\documentclass[preprint]{aastex}
+\usepackage{amssymb,amsmath,mathrsfs}
+\newcounter{address}
+\newcommand{\foreign}[1]{\textit{#1}}
+\newcommand{\project}[1]{\textsl{#1}}
+\newcommand{\unit}[1]{\mathrm{#1}}
+\newcommand{\km}{\unit{km}}
+\newcommand{\s}{\unit{s}}
+\newcommand{\kmps}{\km\,\s^{-1}}
+\newcommand{\mum}{\unit{\mu m}}
+\newcommand{\mmatrix}[1]{\boldsymbol{#1}}
+\newcommand{\inverse}[1]{{#1}^{-1}}
+\newcommand{\transpose}[1]{{#1}^{\mathsf{T}}}
+\newcommand{\covar}{\mmatrix{C}}
+\newcommand{\avec}{\mmatrix{a}}
+\newcommand{\evec}{\mmatrix{e}}
+\newcommand{\fvec}{\mmatrix{f}}
+\newcommand{\Fvec}{\mmatrix{F}}
+\newcommand{\gvec}{\mmatrix{g}}
+\newcommand{\invvar}{\inverse{\covar}}
+\newcommand{\all}[1]{\{{#1}\}}
+\newcommand{\documentname}{\textsl{Note}}
+\newcommand{\obs}{\mathrm{obs}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\like}{\mathscr{L}}
+
+\begin{document}
+\title{Data-driven templates for redshift determination}
+\author{some permutation of PT\altaffilmark{\ref{MPIA}},
+        DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
+\setcounter{address}{1}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
+Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
+D-69117 Heidelberg, Germany}
+\altaffiltext{\theaddress}{\stepcounter{address}\label{CCPP} Center
+for Cosmology and Particle Physics, Department of Physics, New York
+University, 4 Washington Place, New York, NY 10003}
+
+\begin{abstract}
+  We implement non-negative matrix factorization, adapted to
+  heteroscedastic data, to generate template spectra for redshift
+  determination.  We use the generated templates to determine
+  redshifts for \project{SDSS-III} \project{BOSS} spectra.
+\end{abstract}
+
+\section{Introduction}
+
+In this \documentname, we implement and execute a data-driven model
+for luminous red galaxy spectra that overcomes most of the problems
+associated with PCA-based spectral decompositions.
+
+\section{Method}
+
+The training data set will be a set of $N$ spectra $i$, each of which
+is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$ wavelengths
+$\lambda_j$.  Associated with each flux $f_{ij}$ is an inverse
+uncertainty variance $1/\sigma^2_{ij}$, which we will imagine are the
+elements of a $M\times M$ diagonal inverse covariance matrix
+$\invvar_{i}$.
+
+The model is that any spectrum $\fvec_i$ can be written as a linear
+sum of $K$ components $\gvec_k$ (each of which also has $M$ components
+$g_{kj}$)
+\begin{eqnarray}\displaystyle
+\fvec_i &=& \sum_{k=1}^K a_{ik}\,\gvec_k + \evec_i \nonumber\\
+f_{ij} &=& \sum_{k=1}^K a_{ik}\,g_{kj} + e_{ij}
+\quad,
+\end{eqnarray}
+where the $a_{ik}$ are coefficients, and the vector $\evec_i$ (with
+$M$ components $e_{ij}$) is a noise vector, imagined to be a random
+variable drawn from a $M$-dimensional Gaussian with zero mean and
+(assumed known) variance tensor $\covar_i$.  To this model we add the
+very powerful constraint of non-negativity in all aspects, to wit,
+\begin{eqnarray}\displaystyle
+a_{ik} &>& 0
+g_{kj} &>& 0
+\quad,
+\end{eqnarray}
+for all values of the indices $i$, $j$, and $k$.
+
+In this model, the maximum-likelihood coefficients $a_{ik}$ and
+spectral components $g_{kj}$ are those that jointly minimize a total
+badness-of-fit scalar $\chi^2$ over all the $[M\,N]$ training data
+values:
+\begin{eqnarray}\displaystyle
+\chi^2 &=& \sum_{i=1}^N 
+ \,\transpose{\left[\fvec_i - \sum_{k=1}^K a_{ik}\,\gvec_k\right]}
+ \cdot\invvar_i\cdot\left[\fvec_i - \sum_{k=1}^K a_{ik}\,\gvec_k\right]
+ \nonumber\\
+\chi^2 &=& \sum_{i=1}^N \sum_{j=1}^M \frac{1}{\sigma_{ij}^2}
+ \,\left[f_{ij} - \sum_{k=1}^K a_{ik}\,g_{kj}\right]^2
+\quad .
+\end{eqnarray}
+
+This problem can be seen as a form of matrix factorization, in which
+we are trying to approximate the large non-square data matrix $f_{ij}$
+as a product of two smaller matrices $a_{ik}$ and $g_{kj}$, subject to
+the non-negativity constraint.  The best approximation is the one that
+minimizes the badness-of-fit scalar $\chi^2$.  Non-negative matrix
+factorization is a solved problem (for an astronomical example, see
+Blanton \& Roweis, 2007); briefly, optimization proceeds by starting
+at an all-positive first guess and then iterating these multiplicative
+updates:
+\begin{eqnarray}\displaystyle
+a_{ik} &\leftarrow& a_{ik}
+ \,\left[\sum_{j=1}^M\frac{1}{\sigma_{ij}^2}\,f_{ij}\,g_{kj}\right]
+ \,\left[\sum_{m=1}^K\sum_{j=1}^M\frac{1}{\sigma_{ij}^2}\,a_{im}\,g_{mj}\,g_{kj}\right]^{-1}
+\nonumber\\
+g_{kj} &\leftarrow& g_{kj}
+ \,\left[\sum_{i=1}^N\frac{1}{\sigma_{ij}^2}\,f_{ij}\,a_{ik}\right]
+ \,\left[\sum_{m=1}^K\sum_{i=1}^N\frac{1}{\sigma_{ij}^2}\,a_{ik}\,a_{im}\,g_{mj}\right]^{-1}
+\quad .
+\end{eqnarray}
+
+Ordinarily, for any $K$-dimensional linear subspace, there are many
+choices for the components $\gvec_k$: The components can be reordered,
+multiplied by scalars, or replaced with linear combinations of
+themselves.  Many of these degeneracies get broken by the non-negative
+constraint, but not all.  We don't try to break all of the remaining
+degeneracies, but we do enforce the constraint that the
+$\gvec_k\cdot\gvec_k=M$, where the inner product is taken with the
+trivial (identity) metric in the spectrum space.
+
+\acknowledgements Thanks to people.  Thanks to \project{SDSS-III}.
+Thanks to \project{R}.  Thanks to grants.
+
+\end{document}
