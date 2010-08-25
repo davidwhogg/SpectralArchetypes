@@ -3,6 +3,11 @@
 % - write text
 % - deal with all items marked "TBD"
 
+% style notes:
+% ------------
+% - all equations in eqnarray \displaystyle
+% - all citations in \citealt
+
 \documentclass[preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 \newcounter{address}
@@ -30,31 +35,32 @@
 \newcommand{\like}{\mathscr{L}}
 
 \begin{document}
-\title{Data-driven templates for redshift determination}
-\author{some permutation of PT\altaffilmark{\ref{MPIA}},
-        DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
-\setcounter{address}{1}
-\altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
-Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
-D-69117 Heidelberg, Germany}
-\altaffiltext{\theaddress}{\stepcounter{address}\label{CCPP} Center
-for Cosmology and Particle Physics, Department of Physics, New York
-University, 4 Washington Place, New York, NY 10003}
 
-\begin{abstract}
-  We implement non-negative matrix factorization, adapted to
-  heteroscedastic data, to generate template spectra for redshift
-  determination.  We use the generated templates to determine
-  redshifts for \project{SDSS-III} \project{BOSS} spectra.
-\end{abstract}
+%% \title{Data-driven templates for redshift determination}
+%% \author{some permutation of PT\altaffilmark{\ref{MPIA}},
+%%         DWH\altaffilmark{\ref{MPIA},\ref{CCPP}}}
+%% \setcounter{address}{1}
+%% \altaffiltext{\theaddress}{\stepcounter{address}\label{MPIA}
+%% Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17,
+%% D-69117 Heidelberg, Germany}
+%% \altaffiltext{\theaddress}{\stepcounter{address}\label{CCPP} Center
+%% for Cosmology and Particle Physics, Department of Physics, New York
+%% University, 4 Washington Place, New York, NY 10003}
 
-\section{Introduction}
+%% \begin{abstract}
+%%   We implement non-negative matrix factorization, adapted to
+%%   heteroscedastic data, to generate template spectra for redshift
+%%   determination.  We use the generated templates to determine
+%%   redshifts for \project{SDSS-III} \project{BOSS} spectra.
+%% \end{abstract}
 
-In this \documentname, we implement and execute a data-driven model
-for luminous red galaxy spectra that overcomes most of the problems
-associated with PCA-based spectral decompositions.
+%% \section{Introduction}
 
-\section{Method}
+%% In this \documentname, we implement and execute a data-driven model
+%% for luminous red galaxy spectra that overcomes most of the problems
+%% associated with PCA-based spectral decompositions.
+
+%% \section{Method}
 
 The training data set will be a set of $N$ spectra $i$, each of which
 is a vector $\fvec_i$ of $M$ fluxes $f_{ij}$ at $M$ wavelengths
@@ -78,6 +84,7 @@ variable drawn from a $M$-dimensional Gaussian with zero mean and
 very powerful constraint of non-negativity in all aspects, to wit,
 \begin{eqnarray}\displaystyle
 a_{ik} &>& 0
+\nonumber\\
 g_{kj} &>& 0
 \quad,
 \end{eqnarray}
@@ -103,7 +110,7 @@ as a product of two smaller matrices $a_{ik}$ and $g_{kj}$, subject to
 the non-negativity constraint.  The best approximation is the one that
 minimizes the badness-of-fit scalar $\chi^2$.  Non-negative matrix
 factorization is a solved problem (for an astronomical example, see
-Blanton \& Roweis, 2007); briefly, optimization proceeds by starting
+\citealt{kcorrect}); briefly, optimization proceeds by starting
 at an all-positive first guess and then iterating these multiplicative
 updates:
 \begin{eqnarray}\displaystyle
@@ -122,11 +129,22 @@ choices for the components $\gvec_k$: The components can be reordered,
 multiplied by scalars, or replaced with linear combinations of
 themselves.  Many of these degeneracies get broken by the non-negative
 constraint, but not all.  We don't try to break all of the remaining
-degeneracies, but we do enforce the constraint that the
-$\gvec_k\cdot\gvec_k=M$, where the inner product is taken with the
-trivial (identity) metric in the spectrum space.
+degeneracies, but we do enforce the constraint
+\begin{eqnarray}\displaystyle
+\gvec_k\cdot\gvec_k &=& M
+\quad,
+\end{eqnarray}
+where the inner product is taken with the trivial (identity) metric in
+the spectrum space, and we re-order the components (permute the $k$
+values) to maintain
+\begin{eqnarray}\displaystyle
+\sum_{i=1}^N a_{ik} &>& \sum_{i=1}^N a_{i[k+1]}
+\quad.
+\end{eqnarray}
 
-\acknowledgements Thanks to people.  Thanks to \project{SDSS-III}.
-Thanks to \project{R}.  Thanks to grants.
+\begin{thebibliography}{70}
+\bibitem[Blanton \& Roweis(2007)]{kcorrect}
+Blanton,~M.~R., \& Roweis,~S., 2007, \aj, 133, 734 
+\end{thebibliography}
 
 \end{document}
