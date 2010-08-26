@@ -123,8 +123,19 @@ a_{ik} &\leftarrow& a_{ik}
 g_{kj} &\leftarrow& g_{kj}
  \,\left[\sum_{i=1}^N\frac{1}{\sigma_{ij}^2}\,f_{ij}\,a_{ik}\right]
  \,\left[\sum_{m=1}^K\sum_{i=1}^N\frac{1}{\sigma_{ij}^2}\,a_{ik}\,a_{im}\,g_{mj}\right]^{-1}
-\quad .
+\quad.\label{eq:update}
 \end{eqnarray}
+
+The non-negative updates of \equationname~(\ref{eq:update}) are
+guaranteed to maintain non-negativity if the inputs $f_{ij}$,
+$a_{ik}$, and $g_{kj}$ are all non-negative initially.  There are two
+possible catches: The first is that if a coefficient $a_{ik}$ or
+spectral pixel $g_{kj}$ ever goes to zero or starts at zero, the
+purely multiplicative updates can never ``resurrect'' it.  The second
+is that the data often have---through noise or systematic error (for
+spectra, think ``sky subtraction'')---negative values ($f_{ij}<0$ for
+some $i,j$).  These must be addressed in a responsible way.  TBD: What
+do we do and why?
 
 Ordinarily, for any $K$-dimensional linear subspace, there are many
 choices for the components $\gvec_k$: The components can be reordered,
