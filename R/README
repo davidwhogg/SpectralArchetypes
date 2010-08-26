@@ -1,1 +1,6 @@
-a directory for R code related to spectral modeling
+R code related to spectral modeling
+-----------------------------------
+
+License: All code is copyright 2010 Paraskivi Tsalmantza (MPIA) and
+David W. Hogg (NYU) unless explicitly noted otherwise in the code
+comments.
