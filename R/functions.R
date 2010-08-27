@@ -4,6 +4,7 @@
 ## - keep matrices in same transpose as those documents too
 ##   - a is [N,K]
 ##   - g is [K,M]
+##   - data (spectro200) is [N,M]
 
 ## compute model
 model<- function(a,g) {
