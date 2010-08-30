@@ -20,12 +20,54 @@
 \newcommand{\like}{\mathscr{L}}
 \begin{document}
 
+\section{Introduction}
+
+TBD: What is the problem and why is it important?
+
+The standard data-driven models for quasars---or any other kind of
+spectroscopic object in astronomy---is the highest-ranked principal
+components from a principal components analysis (PCA) or equivalent.
+The PCA has one advantage and a number of drawbacks.  The advantage is
+that it is entirely data-driven: The construction of the PCA requires
+no theoretical or external knowledge about the spectra being modeled;
+it is a dimensionality reduction in the space of the observed spectra.
+
+There are many drawbacks to PCA but the most important is that the PCA
+returns the principal directions---the eigenvectors with maximum
+eigenvalues---of the variance tensor of the data; this variance tensor
+has contributions from intrinsic variation among spectra, and
+contributions from observational noise.  That is, a direction in
+spectrum space can enter into the top principal components because it
+is a direction of great astrophysical variation, or because there is a
+lot of noise in the observations along that direction, or both.  PCA
+is agnostic about the \emph{source} of the variance, while astronomers
+are not; astronomers want to know about the astrophysical processes
+that generate the data \emph{prior} to the addition of observational
+noise.
+
+Other drawbacks to PCA include the following: It treats the data as
+drawn from a linear subspace of the full spectral space.  This
+assumption is unlikely to be true in any application.  It also has
+trouble separating the spectral variation that comes from amplitude
+changes (overall flux or luminosity changes) as distinct from
+variations that come from shape changes in the spectra.  Various hacks
+have been employed to deal with this, but many of them make the linear
+subspace assumption even less valid than it was \foreign{a priori}.
+Finally, PCA has no idea about prior information; it is just as happy
+creating components with negative amplitudes as positive amplitudes
+and the linear subspace therefore contains many quadrants, in general,
+that represent spectra with completely unphysical properties (such as
+negative emission lines and the like).
+
+In this Note, we use a data-driven model for quasar spectra
+that overcomes most---though not all---of the problems with PCA.
+
 \section{Data}
 
 Each of the $N$ spectra $i$ can be thought of as an ordered list or
 column vector $\fvec_i$ of $M$ flux density (energy per area per time
-per wavelength) measurements $f_{im}$ on a grid of $M$ observer-frame
-wavelengths $\lambda^{\mathrm{obs}}_m$:
+per wavelength) measurements $f_{ij}$ on a grid of $M$ observer-frame
+wavelengths $\lambda^{\mathrm{obs}}_j$:
 \begin{equation}
 \fvec_i
 \equiv \left[\begin{array}{c} f_{i1} \\
@@ -40,8 +82,8 @@ wavelengths $\lambda^{\mathrm{obs}}_m$:
 \end{equation}
 where the wavelength grid can be arbitrary but has been made uniform in
 the logarithm $\ln\lambda^{\mathrm{obs}}$ for simplicity of making
-redshift changes.  Associated with each measurement $f_{im}$ is an
-uncertainty variance $\sigma_{im}$ and we will assume in what follows
+redshift changes.  Associated with each measurement $f_{ij}$ is an
+uncertainty variance $\sigma_{ij}$ and we will assume in what follows
 that these uncertainty variances are well measured and that the
 uncertainties are essentially Gaussian.  We will assume that
 off-diagonal terms (covariances) in the uncertainty variance tensor
@@ -95,8 +137,8 @@ total chi-squared:
 \chi^2 & = & X - 2\,\ln\like \nonumber\\
  & = & \sum_{i=1}^N \sum_{m=1}^M
 \frac{\left[f_{im}-\sum_{k=1}^K a_{ik}
-                      \,g_k(\lambda_m/[1+z_i])\right]^2}
-{\sigma^2_{im}}
+                      \,g_k(\lambda_j/[1+z_i])\right]^2}
+{\sigma^2_{ij}}
 \quad ,
 \end{eqnarray}
 where $X$ is some constant and we have implicitly assumed that each
@@ -140,121 +182,38 @@ spectra, we pixelize the basis functions $g_k(\lambda)$ on a grid that
 is uniform in logarithmic wavelength $\ln\lambda$ (with the same grid
 spacing as that used for the observed spectra).
 
-Given a set of basis spectra $g_k(\lambda)$, the optimal coefficients
-$a_{ik}$ are given by standard least-square fitting:
-\begin{equation}
-\avec_i \leftarrow \inverse{\left[\transpose{\Amatrix_i} \inverse{\Cmatrix_i} \Amatrix_i\right]}
- \left[\transpose{\Amatrix_i} \inverse{\Cmatrix_i} \fvec_i\right]
-\quad ,
-\end{equation}
-where the new vector $\avec_i$ and matrix $\Amatrix_i$ are defined by
-\begin{eqnarray}
-\avec_i & \equiv &
- \left[\begin{array}{c} a_{i1} \\
-                        a_{i2} \\
-                        \cdots \\
-                        a_{iK} \end{array}\right] \nonumber\\
-\Amatrix_i & \equiv &
- \left[\begin{array}{cccc}
-  g_1(\lambda_1/[1+z_i]) & g_2(\lambda_1/[1+z_i]) & \cdots & g_K(\lambda_1/[1+z_i]) \\
-  g_1(\lambda_2/[1+z_i]) & g_2(\lambda_2/[1+z_i]) & \cdots & g_K(\lambda_2/[1+z_i]) \\
-  \cdots & \cdots & & \cdots \\
-  g_1(\lambda_M/[1+z_i]) & g_2(\lambda_M/[1+z_i]) & \cdots & g_K(\lambda_M/[1+z_i])
- \end{array}\right]
-\quad .
-\end{eqnarray}
-This step (determining the coefficients $a_{ik}$ or components of the
-vectors $\avec_i$) consists of $N$ operations of $K$-parameter
-least-square fitting, or one operation of $[N\,K]$-parameter
-least-square fitting.
+discussion of Gaussian Processes and this being like a prior
 
-Given a set of coefficients $a_{ik}$, the optimal basis functions are
-given by slightly modified least-square fitting:
-\begin{equation}
-\gvec \leftarrow \inverse{\left[\transpose{\Gmatrix} \inverse{\Sigmamatrix} \Gmatrix
-                                + \epsilon\,\Qmatrix \right]}
- \left[\transpose{\Gmatrix} \inverse{\Sigmamatrix} \Fvec\right]
-\quad ,
-\end{equation}
-where the new vectors $\gvec$ and $\Fvec$ and the matrices $\Gmatrix$,
-$\Sigmamatrix$, and $\Qmatrix$ are defined by
-\begin{eqnarray}
-\gvec & \equiv &
- \left[\begin{array}{c}
-  g_1(\lambda_1) \\
-  g_1(\lambda_2) \\
-  \cdots \\
-  g_1(\lambda_{M_g}) \\
-  g_2(\lambda_1) \\
-  g_2(\lambda_2) \\
-  \cdots \\
-  g_2(\lambda_{M_g}) \\
-  \cdots \\
-  g_K(\lambda_{M_g}) \\
- \end{array}\right]
- \nonumber\\
-\Gmatrix & \equiv &
- \left[\begin{array}{c}
- \mbox{TO BE DONE}
- \end{array}\right]
- \nonumber\\
-\Sigmamatrix & \equiv &
- \left[\begin{array}{cccc}
-  \Cmatrix_1 & 0 & \cdots & 0 \\
-  0 & \Cmatrix_2 & \cdots & 0 \\
-  \cdots & \cdots & & \cdots  \\
-  0 & 0 & \cdots & \Cmatrix_N
- \end{array}\right]
- \nonumber\\
-\Qmatrix & \equiv &
- \left[\begin{array}{cccc}
-  \Qmatrix_1 & 0 & \cdots & 0 \\
-  0 & \Qmatrix_1 & \cdots & 0 \\
-  \cdots & \cdots & & \cdots  \\
-  0 & 0 & \cdots & \Qmatrix_1
- \end{array}\right]
- \nonumber\\
-\Qmatrix_1 & \equiv &
- \left[\begin{array}{ccccccc}
-   1 & -1 &  0 &  0 & \cdots &  0 &  0 \\
-  -1 &  2 & -1 &  0 & \cdots &  0 &  0 \\
-   0 & -1 &  2 & -1 & \cdots &  0 &  0 \\
-   0 &  0 & -1 &  2 & \cdots &  0 &  0 \\
-  \cdots & \cdots & \cdots & \cdots & & \cdots & \cdots \\
-   0 &  0 &  0 &  0 & \cdots &  2 & -1 \\
-   0 &  0 &  0 &  0 & \cdots & -1 &  1
- \end{array}\right]
- \nonumber\\
-\Fvec & \equiv &
- \left[\begin{array}{c} \fvec_1 \\
-                        \fvec_2 \\
-                        \cdots \\
-                        \fvec_N \end{array}\right]
-\quad .
-\end{eqnarray}
-That is, $\gvec$ is a column vector with $[M_g\,K]$ elements,
-$\Gmatrix$ is a sparse $[N_g\,K]\times[N\,M]$ matrix, $\Sigmamatrix$
-is the $[N\,M]\times[N\,M]$ diagonal covariance matrix for the entire
-data set, $\Qmatrix$ is a tridiagonal $[M_g\,K]\times[M_g\,K]$ matrix
-(because each of the $\Qmatrix_1$ matrices is $M_g\times M_g$ and
-there are $K$ of them in $\Qmatrix$), and $\Fvec$ is a column vector
-with $[N\,M]$ elements.  This step (determining the $\gvec$) is one
-operation of $[M_g\,K]$-parameter $\chi_{\epsilon}^2$ minimization.
+possibility of restricting to non-negative components and coefficients.
 
-[Hogg: describe iteration and what it does and does not guarantee for us.]
+\section{Optimization}
 
-\section{Training and test data}
+options for optimizing: block-diagonal (or nearly so) least-square
+fitting a-la astep(); iterated gradient descent a-la astepgd().
 
-[Vivi: How are the training data selected?]
+options for optimizing non-negative case.
 
-[Vivi: How do we know we have converged?]
+options for initializing: Kmeans, PCA, random spectra, basis functions.  Issues with each.
 
-[Vivi: How are the test data selected?]
+degeneracies in subspace description when not non-negative:  We break these how?  Normalization, rotation, etc.
 
-[Vivi: What is chi-squared on the test data as a function of $K$ and
-  $\epsilon$?]
+\section{Application}
 
-\section{Hypothesis test}
+To demonstrate the power of the technique, we are going to confirm known double-redshift objects in the SDSS spectroscopic sample.
+
+\subsection{Training}
+
+Vivi: How are the training data selected?
+
+Vivi: How do we initialize, how do we optimize, how do we know we have converged?
+
+Vivi: show results as a function of epsilon, K, iteration number.  Need to explain that you shouldn't compare basis functions; you should compare fits to real objects.
+
+Vivi: show non-negative, other initializations, etc
+
+Vivi: baby step towards cross-validation:  Define a disjoint test set.  How do our fits to *new* data vary with epsilon, K, nonnegative?
+
+\subsection{Hypothesis test}
 
 For each spectrum $i$, we generate $Z+1$ mutually exclusive hypotheses:
 The null hypothesis $S_i$ that spectrum $i$ only has significant flux
@@ -327,4 +286,23 @@ data are affected by perfectly known, perfectly Gaussian noise and
 that one of the two hypotheses is capable of providing a good fit to
 the data.
 
+\section{Discussion points}
+
+Objectively choosing K
+
+Train all data, subsample (practical reasons)
+
+Compare to PCA; compare by comparing the quality of fits, not the basis functions themselves.
+
+Search for the secondery object also at lower redshift than the primary
+
+Other application SMBHB, redshift determination
+
+Priors on amplitudes
+
+Prior for non negativity (spectra, amplitudes)
+
+Convexity
+
+Slower than PCA
 \end{document}
