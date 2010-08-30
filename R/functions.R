@@ -1,14 +1,20 @@
-## style notes:
-## ------------
-## - synchronize all variable names with documents in astrometry/documents/papers/archetypes
-## - keep matrices in same transpose as those documents too
+## Copyright 2010 by Paraskevi Tsalmantza & David W. Hogg.
+## All rights reserved.
+
+## Comments:
+## - Synchronize all variable names with documents in
+##   http://trac.astrometry.net/browser/trunk/documents/papers/archetypes
+## - Keep matrices in same transpose as those documents too:
 ##   - a is [N,K]
 ##   - g is [K,M]
 ##   - data (spectro200) is [N,M]
 ##   - innvar is either a scalar or else [N,M]
 ##   - epsilon is a scalar
-## - use of "noise" (rather than "invvar") is deprecated
-## - astep() and gstep() are deprecated
+## - Use of "noise" (rather than "invvar") is deprecated.
+## - astep() and gstep() are deprecated.
+
+## Bugs:
+## - astep() and gstep() are slow-o-rama.
 
 ## compute model
 model<- function(a,g) {
