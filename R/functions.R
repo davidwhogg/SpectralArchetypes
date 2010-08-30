@@ -5,6 +5,10 @@
 ##   - a is [N,K]
 ##   - g is [K,M]
 ##   - data (spectro200) is [N,M]
+##   - innvar is either a scalar or else [N,M]
+##   - epsilon is a scalar
+## - use of "noise" (rather than "invvar") is deprecated
+## - astep() and gstep() are deprecated
 
 ## compute model
 model<- function(a,g) {
@@ -17,8 +21,8 @@ return(spectra-model(a,g))
 }
 
 ## compute chi (scaled residual)
-chi<- function(a,g,spectra,noise) {
-return(resid(a,g,spectra)/noise)
+chi<- function(a,g,spectra,invvar) {
+return(resid(a,g,spectra)*sqrt(invvar))
 }
 
 ## compute penalty for non-smoothness
@@ -28,8 +32,8 @@ return(epsilon*sum((g[,-M]-g[,2:M])^2))
 }
 
 ## compute scalar
-badness<- function(a,g,spectra,noise,epsilon){
-return(sum(chi(a,g,spectra,noise)^2)+penalty(g,epsilon))
+badness<- function(a,g,spectra,invvar,epsilon){
+return(sum(chi(a,g,spectra,invvar)^2)+penalty(g,epsilon))
 }
 
 ## apply standard component normalization
@@ -80,8 +84,40 @@ g[,j]<-t(ex1$coefficients)
 return(g)
 }
 
-## non-negative update for coefficients fixed component spectra (A step) 
-## all inputs must be matrices
+## gradient-descent update for coefficients fixed component spectra
+## following Shewchuk
+## http://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf
+astepgd<- function(a,spectra,invvar,g) {
+gradient<-((spectra-a%*%g)*invvar)%*%t(g)
+Agradient<-((gradient%*%g)*invvar)%*%t(g)
+alpha<-sum(gradient*gradient)/sum(gradient*Agradient)
+return(a+alpha*gradient)
+}
+
+## left-multiply by the horrifying Q-matrix
+## (custom sparse matrix operation)
+## needed for gstepgd(), and probably other functions
+leftQ<- function(g){
+M<-ncol(g)
+K<-nrow(g)
+diff1<-cbind(matrix(0,K,1),g[,1:M-1]-g[,2:M])
+diff2<-cbind(g[,2:M]-g[,1:M-1],matrix(0,K,1))
+return(diff1+diff2)
+}
+
+## gradient-descent update for component spectra at fixed coefficients
+## following Shewchuk
+## http://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf
+gstepgd<- function(g,spectra,invvar,a,epsilon) {
+gradient<-t(a)%*%((spectra-a%*%g)*invvar)+epsilon*leftQ(g)
+Agradient<-t(a)%*%((a%*%gradient)*invvar)-epsilon*leftQ(gradient)
+alpha<-sum(gradient*gradient)/sum(gradient*Agradient)
+return(g+alpha*gradient)
+}
+
+## non-negative update for coefficients fixed component spectra
+## following Blanton & Roweis
+## http://adsabs.harvard.edu/abs/2007AJ....133..734B
 astepnn<- function(a,spectra,invvar,g) {
 numerator<-(spectra*invvar)%*%t(g)
 denominator<-((a%*%g)*invvar)%*%t(g)
@@ -89,8 +125,9 @@ a<-a*(numerator/denominator)
 return(a)
 }
 
-## non-negative update for component spectra at fixed coefficients (G step)
-## all inputs must be matrices
+## non-negative update for component spectra at fixed coefficients
+## following Blanton & Roweis
+## http://adsabs.harvard.edu/abs/2007AJ....133..734B
 gstepnn<- function(g,spectra,invvar,a) {
 numerator<-t(a)%*%(spectra*invvar)
 denominator<-t(a)%*%((a%*%g)*invvar)
