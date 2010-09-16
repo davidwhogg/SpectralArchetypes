@@ -10,7 +10,6 @@
 ##   - data (spectro200) is [N,M]
 ##   - innvar is either a scalar or else [N,M]
 ##   - epsilon is a scalar
-## - Use of "noise" (rather than "invvar") is deprecated.
 ## - astep() and gstep() are deprecated.
 
 ## Bugs:
@@ -48,12 +47,12 @@ return(sqrt(rowMeans(as.matrix((g)^2))))
 }
 
 ## find coefficients at fixed component spectra (A step) 
-astep<- function(spectra,noise,g) {
+astep<- function(spectra,invvar,g) {
 N=nrow(spectra)
 K=nrow(g)
 a<-matrix(0,N,K)
 for (i in 1:N) {
-c<-as.vector(1/noise[i,]^2)
+c<-as.vector(invvar[i,])
 ex<-lm(spectra[i,]~t(g)+0,weights=c)
 a[i,]<-t(ex$coefficients)
 }
@@ -61,7 +60,7 @@ return(a)
 }
 
 ## find component spectra at fixed coefficients (G step)
-gstep<- function(spectra,noise,a,oldg,epsilon) {
+gstep<- function(spectra,invvar,a,oldg,epsilon) {
 M<-ncol(spectra)
 K<-ncol(a)
 g<-matrix(0,K,M)
@@ -82,12 +81,21 @@ if (j<M){
   epsjp1<-0.
   basejp1 <- rep(0.,K)
 }
-c1<-c(as.vector(1/noise[,j]^2),rep(epsjm1,K),rep(epsjp1,K))
+c1<-c(as.vector(invvar[,j]),rep(epsjm1,K),rep(epsjp1,K))
 datamatrix<-as.matrix(c(spectra[,j],basejm1,basejp1))
 ex1<-lm(datamatrix~modelmatrix+0,weights=c1)
 g[,j]<-t(ex1$coefficients)
 }
 return(g)
+}
+
+## re-order and rotate basis analogous to PCA
+reorder<- function(a,g) {
+  eig<-eigen(t(a)%*%a,symmetric=TRUE)
+  U<-eig$vectors
+  a<-a%*%U
+  g<-t(U)%*%g
+  return(list(a=a, g=g))
 }
 
 ## gradient-descent update for coefficients fixed component spectra
