@@ -1,110 +1,43 @@
+
 \documentclass[apj]{emulateapj}
-\usepackage{apjfonts}
+\usepackage{apjfonts,amsmath,natbib}
 
-\usepackage{amsmath,natbib}
-%%
-%% Beginning of file 'sample.tex'
-%%
-%% Modified 2005 December 5
-%%
-%% This is a sample manuscript marked up using the
-%% AASTeX v5.x LaTeX 2e macros.
-
-%% The first piece of markup in an AASTeX v5.x document
-%% is the \documentclass command. LaTeX will ignore
-%% any data that comes before this command.
-
-%% The command below calls the preprint style
-%% which will produce a one-column, single-spaced document.
-%% Examples of commands for other substyles follow. Use
-%% whichever is most appropriate for your purposes.
-%%
-%%\documentclass[12pt,preprint]{aastex}
-
-%% manuscript produces a one-column, double-spaced document:
-
-%\documentclass[manuscript]{aastex}
-
-%% preprint2 produces a double-column, single-spaced document:
-%%\documentclass[preprint2]{aastex}
-
-%% Sometimes a paper's abstract is too long to fit on the
-%% title page in preprint2 mode. When that is the case,
-%% use the longabstract style option.
-
-%% \documentclass[preprint2,longabstract]{aastex}
-
-%% If you want to create your own macros, you can do so
-%% using \newcommand. Your macros should appear before
-%% the \begin{document} command.
-%%
-%% If you are submitting to a journal that translates manuscripts
-%% into SGML, you need to follow certain guidelines when preparing
-%% your macros. See the AASTeX v5.x Author Guide
-%% for information.
-
-\newcommand{\vdag}{(v)^\dagger}
-\newcommand{\myemail}{skywalker@galaxy.far.far.away}
-
-%% You can insert a short comment on the title page using the command below.
-
-\slugcomment{Not to appear in Nonlearned J., 45.}
-
-%% If you wish, you may supply running head information, although
-%% this information may be modified by the editorial offices.
-%% The left head contains a list of authors,
-%% usually a maximum of three (otherwise use et al.).  The right
-%% head is a modified title of up to roughly 44 characters.
-%% Running heads will not print in the manuscript style.
-
-\shorttitle{Title}
-\shortauthors{Tsalmantza \& Hogg}
-
-%% This is the end of the preamble.  Indicate the beginning of the
-%% paper itself with \begin{document}.
+\slugcomment{\texttt{draft 2010-12-01 / not ready for distribution}}
+\shorttitle{\textsc{data-driven spectral modeling}}
+\shortauthors{\textsc{tsalmantza \& hogg}}
 
 \begin{document}
 
-%% LaTeX will automatically break titles if they run longer than
-%% one line. However, you may use \\ to force a line break if
-%% you desire.
-
-\title{A data-driven method for modeling observed spectra\\
-Application to double redshift spectra in SDSS}
-
-%% Use \author, \affil, and the \and command to format
-%% author and affiliation information.
-%% Note that \email has replaced the old \authoremail command
-%% from AASTeX v4.0. You can use \email to mark an email address
-%% anywhere in the paper, not just in the front matter.
-%% As in the title, use \\ to force line breaks.
-
-\author{P. Tsalmantza\altaffilmark{1} and D. W. Hogg\altaffilmark{2}}
+\title{A data-driven model for spectra,\\
+       with application to double redshifts in the SDSS}
+\author{P.~Tsalmantza\altaffilmark{1} and David~W.~Hogg\altaffilmark{1,2}}
 \email{vivitsal@mpia.de}
-
-
-%% Notice that each of these authors has alternate affiliations, which
-%% are identified by the \altaffilmark after each name.  Specify alternate
-%% affiliation information with \altaffiltext, with one command per each
-%% affiliation.
-
 \altaffiltext{1}{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, 69117 Heidelberg, Germany}
 \altaffiltext{2}{Center~for~Cosmology~and~Particle~Physics, Department~of~Physics, New York University}
 
-%% Mark off your abstract in the ``abstract'' environment. In the manuscript
-%% style, abstract will output a Received/Accepted line after the
-%% title and affiliation information. No date will appear since the author
-%% does not have this information. The dates will be filled in by the
-%% editorial office after submission.
-
 \begin{abstract}
-We present a data-driven method for modeling observed spectra. The method uses an iterative least squared minimization procedure to estimate a set of basis functions and achieve dimensionality reduction. One of the main advantages of the method, compared to most of the other data-driven techniques, is that for a given number of basis functions the extracted components can achieve a better quality fit to the observations. Additionally, for the estimation of the basis functions the errors in the data are taken into account. The method was tested using SDSS data. The components produced were used to fit SDSS spectra of known double-redshift objects. The objects used were the gravitational lens candidates of the SLACS survey and the known candidates of Super Massive Black Hole Binaries (SMBHBs). We find that we can successfully confirm 129 of the 131 SLACS objects and all the 4 SMBHB candidates.
+We present a data-driven method for modeling or performing
+dimensionality reduction on observed spectra.  The method uses an
+iterative inverse-variance-weighted least-squares minimization
+procedure to generate a best set of basis functions.  The method is a
+matrix factorization method, similar to principal components analysis,
+but with the substantial advantage that it uses measurement
+uncertainties in a responsible way and accounts naturally for poorly
+measured and missing data.  A regularization can be applied, in the
+form of a smoothness prior (inspired by Gaussian processes) or a
+non-negative constraint, without making the method prohibitively slow.
+Because the method optimizes a justified scalar (related to the
+logarithm of the likelihood), the basis provides a better fit to the
+data in a probabilistic sense than any PCA basis.  We test the method
+on SDSS spectra, concentrating on spectra known to contain two
+redshift components: These are spectra of gravitational lens
+candidates and super-massive black-hole binaries (SMBHBs). We apply a
+hypothesis test to compare one-redshift and two-redshift models for
+these spectra, utilizing the data-driven model trained on a random
+subset of all SDSS spectra.  This test confirms 129 of the 131 lens
+candidates in our sample and all 4 of the known SMBHB candidates, and
+turns up very few false positives.
 \end{abstract}
-
-%% Keywords should appear after the \end{abstract} command. The uncommented
-%% example has been keyed in ApJ style. See the instructions to authors
-%% for the journal to which you are submitting your paper to determine
-%% what keyword punctuation is appropriate.
 
 \keywords{keywords}
 
