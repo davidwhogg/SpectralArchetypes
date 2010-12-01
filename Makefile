@@ -1,6 +1,6 @@
 .SUFFIXES: .tex .dvi .ps .pdf
 
-all: quasar-redshift.pdf binary-quasar.pdf lrg-template.pdf
+all: mf_method.pdf
 
 %.pdf: %.tex
 	pdflatex $<
