@@ -3,7 +3,10 @@
 % - write text
 % - deal with all items marked "TBD"
 
-\documentclass[preprint]{aastex}
+\documentclass[apj]{emulateapj}
+\usepackage{epsfig}
+\usepackage{apjfonts,amsmath,natbib}
+%\documentclass[preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 \newcounter{address}
 \newcommand{\foreign}[1]{\textit{#1}}
@@ -374,16 +377,22 @@ constructed two informative plots to try to distinguish between these
 scenarios, which are showin in Figure~\ref{fig:plots}. 
 
 In the first 
-\begin{figure}[!t]
+\begin{figure*}[!t]
   \centerline{
-    \epsfig{file=fig1a.eps,bb=0 0 504 360,width=0.50\textwidth}
-    \epsfig{file=fig1b.eps,bb=0 0 504 360,width=0.50\textwidth}}
-  \caption{ \label{fig:plots}}
-\end{figure}
-
-
-
-
+    \epsfig{file=Figures/Dv_iterations.ps,bb= 18 18 594 774
+      ,height=0.50\textwidth,angle=270}
+    \epsfig{file=Figures/hist_Dv_last_iteration.ps,bb= 18 18 594 774
+      ,height=0.50\textwidth,angle=270}}
+  \caption{\emph{Left:} Median of the absolute value of the velocity
+    shift between the redshifts for two successive iterations. The
+    first iteration $i=1$ corresponds to difference between the fitted 
+    redshifts and the original first guess redshifts from the SDSS CAS. 
+    This test used $K=4$ basis functions. \emph{Right:} The distribution 
+    of the total change in the redshifts between the $i=2$ iteration and 
+    the final iteration $i=10$. The first iteration $i=1$ is not included
+    in the difference because that uses the CASS guess redshifts. 
+    \label{fig:plots}}
+\end{figure*}
 
 
 
