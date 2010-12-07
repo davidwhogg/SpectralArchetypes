@@ -303,6 +303,90 @@ the underlying physical process that generates the quasars.
 
 TBD:  Joe, Hogg go crazy.
 
+\section{NYU December 2010}
+
+The basic idea thing that we tried to implement during this visit was to create
+a set of data driven basis functions in the correct quasar systemic redshift
+frame. The hope is that these basis functions will encapsulate correlations
+between quasar emission line shifts and the systemic frame. Thus spectral 
+model fits in this basis would allow us to accurately determine quasar
+systemic redshifts. 
+
+There are two potential approaches that we discussed in this
+context. The first one is obvious and straightforward: train the basis
+functions given a training set of quasars which all have accurate
+systemic redshifts.  These basis functions can then be applied to the
+training set (or a distinct but similar set) to quantify how
+accurately we can fit for quasar redshifts. In the second approach, we
+imagine having one training set, a subset of which has accurate
+systemic redshifts (from [OIII] or [OII]), and a subset which do
+not. This is the scenario that arises in nature. For example [OIII]
+and [OII], both good tracers of the systemic frame, are redshifted into the
+near-IR at $z = 0.8$ and $z = 1.5$, respectively (assuming SDSS-I/II
+spectral coverage to 9200A). Thus low-redshift quasars could have
+accurate systemic redshifts out to $z = 1.5$, whereas higher redshift
+quasars would not. However, spectra of higher redshift quasars
+would cover more of the rest-frame UV, providing expanded spectral
+coverage. Finally, not all $ z < 1.5$ have strong [OII] or [OIII] that
+can be easily centered, so the typical situaton is to have large samples
+of spectra with inhomogenous knowledge of redshifts. 
+
+It is this second scenario that we explored at NYU. The basic idea
+behind our approach is to train on \emph{all} spectra, and use the 
+good redshift sample as a cornerstone, which allow us to lock in 
+to the correct redshifts, on average, for the poor redshift sample. This is 
+done via the following procedure: 
+
+\begin{enumerate}
+\item{} Use all spectra, i.e. both the good redshift sample and bad
+  redshift sample, to fit for data driven basis functions.  For the
+  bad redshift sample, we use initial guess redshifts from the SDSS
+  CASS to convert observed frame wavelenghts to the rest frame.
+
+\item{} Use these basis functions to update the redshifts of the bad
+redshift sample. This is done by determining the best linear-combination
+of the basis functions which minimizes $\chi^2$ as a function of redshift. The
+redshift at the $\chi^2$ minimum $z_{1}$ is the new redshift. 
+
+\item{} Using these new updated redshifts, re-compute the data driven basis
+functions. 
+
+\item{} Iterate this procedure, sequentially updating redshifts and basis
+functions until convergence. 
+\end{enumerate}
+
+What are the convergence criteria? This is something we experimented with. The
+best metric for the success of this method would be to minimize the variance
+of the distribution $dv$ of velocity shifts between the estimated redshifts
+and systemic redshift. This could be done, e.g. if we had the true systemic
+redshifts for some subset of the bad redshift sample. In practice this would
+mean coverage of either [OIII] or [OII] though, and coverage of these lines
+would influence the fits. Thus one possibility would be to mask the [OII] line
+when determining the redshift to see how well one does with only broad lines. 
+
+Another convergence criterion, without using the truth as above, would
+be to simply require that the redshifts of the bad redshift sample no 
+longer change significantly with successive iterations. This is somewhat
+subtle, because it is hard to distinguish between small secular 'drifting' of 
+the basis functions toward the correct frame, and random jitter due to some
+a limit cycle whereby the redshifts simply bounce back and forth. We
+constructed two informative plots to try to distinguish between these
+scenarios, which are showin in Figure~\ref{fig:plots}. 
+
+In the first 
+\begin{figure}[!t]
+  \centerline{
+    \epsfig{file=fig1a.eps,bb=0 0 504 360,width=0.50\textwidth}
+    \epsfig{file=fig1b.eps,bb=0 0 504 360,width=0.50\textwidth}}
+  \caption{ \label{fig:plots}}
+\end{figure}
+
+
+
+
+
+
+
 \acknowledgements
 Thanks to people.  Thanks to SDSS.  Thanks to R.  Thanks to grants.
 
