@@ -1,86 +1,151 @@
-
 \documentclass[apj]{emulateapj}
 \usepackage{apjfonts,amsmath,natbib}
 
 \slugcomment{\texttt{draft 2010-12-01 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
+\newcommand{\project}[1]{\textsl{#1}}
+\newcommand{\sdss}{\project{SDSS}}
+\newcommand{\SDSS}{\sdss}
 
 \begin{document}
 
-\title{A data-driven model for spectra,\\
-       with application to double redshifts in the SDSS}
+\title{A data-driven model for spectra:\\
+       finding double redshifts in the \SDSS}
 \author{P.~Tsalmantza\altaffilmark{1} and David~W.~Hogg\altaffilmark{1,2}}
 \email{vivitsal@mpia.de}
 \altaffiltext{1}{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, 69117 Heidelberg, Germany}
 \altaffiltext{2}{Center~for~Cosmology~and~Particle~Physics, Department~of~Physics, New York University}
 
 \begin{abstract}
-We present a data-driven method for modeling or performing
-dimensionality reduction on observed spectra.  The method uses an
-iterative inverse-variance-weighted least-squares minimization
-procedure to generate a best set of basis functions.  The method is a
-matrix factorization method, similar to principal components analysis,
-but with the substantial advantage that it uses measurement
-uncertainties in a responsible way and accounts naturally for poorly
-measured and missing data.  A regularization can be applied, in the
-form of a smoothness prior (inspired by Gaussian processes) or a
-non-negative constraint, without making the method prohibitively slow.
-Because the method optimizes a justified scalar (related to the
+We present a data-driven method---heteroscedastic matrix
+factorization---for modeling or performing dimensionality reduction on
+observed spectra.  The method uses an iterative
+inverse-variance-weighted least-squares minimization procedure to
+generate a best set of basis functions.  The method is similar to
+principal components analysis, but with the substantial advantage that
+it uses measurement uncertainties in a responsible way and accounts
+naturally for poorly measured and missing data; it models the variance
+in the noise-deconvolved data space.  A regularization can be applied,
+in the form of a smoothness prior (inspired by Gaussian processes) or
+a non-negative constraint, without making the method prohibitively
+slow.  Because the method optimizes a justified scalar (related to the
 logarithm of the likelihood), the basis provides a better fit to the
 data in a probabilistic sense than any PCA basis.  We test the method
-on SDSS spectra, concentrating on spectra known to contain two
+on \SDSS\ spectra, concentrating on spectra known to contain two
 redshift components: These are spectra of gravitational lens
 candidates and super-massive black-hole binaries (SMBHBs). We apply a
 hypothesis test to compare one-redshift and two-redshift models for
 these spectra, utilizing the data-driven model trained on a random
-subset of all SDSS spectra.  This test confirms 129 of the 131 lens
+subset of all \SDSS\ spectra.  This test confirms 129 of the 131 lens
 candidates in our sample and all 4 of the known SMBHB candidates, and
 turns up very few false positives.
 \end{abstract}
 
 \keywords{keywords}
 
-%% From the front matter, we move on to the body of the paper.
-%% In the first two sections, notice the use of the natbib \citep
-%% and \citet commands to identify citations.  The citations are
-%% tied to the reference list via symbolic KEYs. The KEY corresponds
-%% to the KEY in the \bibitem in the reference list below. We have
-%% chosen the first three characters of the first author's name plus
-%% the last two numeral of the year of publication as our KEY for
-%% each reference.
-
-
-%% Authors who wish to have the most important objects in their paper
-%% linked in the electronic edition to a data center may do so by tagging
-%% their objects with \objectname{} or \object{}.  Each macro takes the
-%% object name as its required argument. The optional, square-bracket 
-%% argument should be used in cases where the data center identification
-%% differs from what is to be printed in the paper.  The text appearing 
-%% in curly braces is what will appear in print in the published paper. 
-%% If the object name is recognized by the data centers, it will be linked
-%% in the electronic edition to the object data available at the data centers  
-%%
-%% Note that for sources with brackets in their names, e.g. [WEG2004] 14h-090,
-%% the brackets must be escaped with backslashes when used in the first
-%% square-bracket argument, for instance, \object[\[WEG2004\] 14h-090]{90}).
-%%  Otherwise, LaTeX will issue an error. 
-
 \section{Introduction}\label{intro}
-During the last decade the amount of spectroscopic data obtained by new surveys has increased tremendously. In order to process this large amount of information, the development of automatic algorithms is mandatory. In many cases these algorithms make use of model spectra in order to fit the observed ones and extract physical properties of the sources (e.g. estimation of redshift for extragalactic objects). The efficiency and the speed of this procedure depends on the number of model spectra and the fraction of the observed variance that they cover.
+Modeling data with data-driven models is necessary for many
+applications, in part because it is rare that theoretical models are
+specific enough, accurate enough, or rich enough to generate all of
+the features of a data set.  Common examples in astronomy come in the
+study and analysis of spectra.  Redshift determination (CITE),
+emission-line measurements (CITE), and decomposition into different
+stellar populations (CITE) can all in principle be performed with
+spectral models, but rarely are the spectral models accurate enough or
+detailed enough to make measurements as precise as contemporary data
+permit.  In addition to the quantitative deficiencies of theoretical
+models---the fact that they rarely can explain the data at the
+precision of the observations---heoretical models contain qualitative
+uncertainties---uncertainties about model assumptions and
+computational approximations---that inevitably propagate into
+theory-driven models.  For these reasons, the highest-performing
+redshift determination systems, for example, use data-driven models
+that involve principal components analysis (PCA) or similar approaches
+(DWH CITE SDSS).
 
-To define these model spectra for each type of source, one can use synthetic spectra provided by a number of models. However, this will lead to an unavoidable propagation of the model uncertainties in the results. For that reason it is better, wherever possible, to extract the model spectra directly from the observed data (i.e. using data-driven methods).
+DWH: OUTLIER DETECTION paragraph.
 
-The standard data-driven models used for spectroscopic astronomical data are the highest-ranked principal components from a principal component analysis (PCA) or equivalent. The PCA has one advantage and a number of drawbacks.  The advantage is that it is entirely data-driven: The construction of the PCA requires no theoretical or external knowledge about the spectra being modeled; it is a dimensionality reduction in the space of the observed spectra.
+DWH: CLASSIFICATION paragraph.
 
-There are many drawbacks to PCA but the most important is that the PCA returns the principal directions---the eigenvectors with maximum eigenvalues---of the variance tensor of the data; this variance tensor has contributions from intrinsic variation among spectra, and contributions from observational noise.  That is, a direction in spectrum space can enter into the top principal components because it is a direction of great astrophysical variation, or because there is a lot of noise in the observations along that direction, or both.  PCA is agnostic about the source of the variance, while astronomers are not; astronomers want to know about the astrophysical processes that generate the data prior to the addition of observational noise.
+The standard data-driven models used for spectroscopic astronomical
+data are the highest-ranked principal components from a principal
+component analysis (PCA) or equivalent. The PCA has one advantage and
+a number of drawbacks.  The advantage is that it is entirely
+data-driven: The construction of the PCA requires no theoretical or
+external knowledge about the spectra being modeled; it is a
+dimensionality reduction in the space of the observed spectra.
 
-Other drawbacks to PCA include the following: It treats the data as drawn from a linear subspace of the full spectral space. This
-assumption is unlikely to be true in any application.  It also has trouble separating the spectral variation that comes from amplitude
-changes (overall flux or luminosity changes) as distinct from variations that come from shape changes in the spectra.  Various hacks
-have been employed to deal with this, but many of them make the linear subspace assumption even less valid than it was \textit{a priori}. Finally, PCA has no idea about prior information; it is just as happy creating components with negative amplitudes as positive amplitudes and the linear subspace therefore contains many quadrants, in general, that represent spectra with completely unphysical properties (such as negative emission lines and the like).
+There are many drawbacks to PCA but the most important is that the PCA
+returns the principal directions---the eigenvectors with maximum
+eigenvalues---of the variance tensor of the data; this variance tensor
+has contributions from intrinsic variation among spectra, and
+contributions from observational noise.  That is, a direction in
+spectrum space can enter into the top principal components because it
+is a direction of great astrophysical variation, or because there is a
+lot of noise in the observations along that direction, or both.  PCA
+is agnostic about the source of the variance, while astronomers are
+not; astronomers want to know about the astrophysical processes that
+generate the data prior to the addition of observational noise.
 
-In this paper, we introduce a new data-driven technique for modeling observed spectra that overcomes most---though not all---of the problems with PCA. The method is based on an iterative $\chi^2$ minimization procedure. For a given number of components and with a set of observed spectra as a training set, the method uses a set of basis functions as an initialization and estimates the coefficients that provide the best fit to the data. Then, by keeping that set of coefficients fixed, it estimates a new set of basis functions that improves the fit to the spectra of the training set. After a small number of iterations of these two steps the method converges to the components with the minimum $\chi^2$ value. The method is presented in detail in sections \ref{method} and \ref{optimization}. Applications of this technique are presented in section \ref{applications} where we confirm known double-redshift objects, such as gravitational lenses and Super Massive Black Hole Binaries (SMBHBs) in SDSS. This is achieved by comparing the fitting of the spectra when we use the estimated components at the redshift provided by SDSS and when we use an additional set of components at a second redshift. In almost all the cases tested here we were able to detect a significant improvement in the quality of the fit when the object was considered as a superposition of the linear combination of two sets of components at different redshifts. The paper closes with a brief discussion in section \ref{discussion}.
+Other drawbacks to PCA include the following: It treats the data as
+drawn from a linear subspace of the full spectral space. This
+assumption is unlikely to be true in any application.  It also has
+trouble separating the spectral variation that comes from amplitude
+changes (overall flux or luminosity changes) as distinct from
+variations that come from shape changes in the spectra.  Various hacks
+have been employed to deal with this, but many of them make the linear
+subspace assumption even less valid than it was \textit{a
+  priori}. Finally, PCA has no idea about prior information; it is
+just as happy creating components with negative amplitudes as positive
+amplitudes and the linear subspace therefore contains many quadrants,
+in general, that represent spectra with completely unphysical
+properties (such as negative emission lines and the like).
+
+In this paper, we introduce a new data-driven
+technique---heteroscedastic matrix factorization (HMF)---for modeling
+observed spectra that overcomes some---though not all---of the
+problems with PCA.  The principal advantage of HMF over PCA is that
+the method optimizes not squared error, but rather the justified
+probabilistic objective of $\chi^2$.  This leads to the important
+difference with PCA that HMF builds a model of the variance in the
+data set \emph{not} introduced by observational noise.  That is, it
+returns a model of the noise-deconvolved spectral space, which is the
+space of interest to the scientific investigator.
+
+As a natural by-product and with no modifications, HMF also deals
+responsibly and correctly with missing data.  HMF does not directly
+address the linearity and prior problems with PCA.  However, because
+the objective function has a direct likelihood interpretation, it
+becomes possible to incorporate its work into a Bayesian inference
+with proper prior information.  We give some examples of this below.
+
+At the beginning of this introduction, we mentioned outlier
+identification.  Some of the most important outliers found in the
+\sdss\ data are HOGG
+
+HOGGGGGG
+
+For a given number of components and with a
+set of observed spectra as a training set, the method uses a set of
+basis functions as an initialization and estimates the coefficients
+that provide the best fit to the data. Then, by keeping that set of
+coefficients fixed, it estimates a new set of basis functions that
+improves the fit to the spectra of the training set. After a small
+number of iterations of these two steps the method converges to the
+components with the minimum $\chi^2$ value. The method is presented in
+detail in sections \ref{method} and \ref{optimization}. Applications
+of this technique are presented in section \ref{applications} where we
+confirm known double-redshift objects, such as gravitational lenses
+and super-massive black-hole binaries (SMBHBs) in the \sdss. This is
+achieved by comparing the fitting of the spectra when we use the
+estimated components at the redshift provided by the \sdss\ and when
+we use an additional set of components at a second redshift. In almost
+all the cases tested here we were able to detect a significant
+improvement in the quality of the fit when the object was considered
+as a superposition of the linear combination of two sets of components
+at different redshifts. The paper closes with a brief discussion in
+section \ref{discussion}.
 
 \section{Spectral model}\label{method}
 Each of the $N$ observed spectra $i$ can be thought of as an ordered list or column vector $\vec{f}_i$ of $M$ flux density (energy per area per time
