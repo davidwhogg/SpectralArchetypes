@@ -45,36 +45,49 @@ turns up very few false positives.
 \keywords{keywords}
 
 \section{Introduction}\label{intro}
-Modeling data with data-driven models is necessary for many
-applications, in part because it is rare that theoretical models are
-specific enough, accurate enough, or rich enough to generate all of
-the features of a data set.  Common examples in astronomy come in the
-study and analysis of spectra.  Redshift determination (CITE),
-emission-line measurements (CITE), and decomposition into different
-stellar populations (CITE) can all in principle be performed with
-spectral models, but rarely are the spectral models accurate enough or
-detailed enough to make measurements as precise as contemporary data
-permit.  In addition to the quantitative deficiencies of theoretical
-models---the fact that they rarely can explain the data at the
-precision of the observations---heoretical models contain qualitative
+Data-driven models are necessary for many applications: It is rare
+that theoretical models are specific enough, accurate enough, or rich
+enough to generate all of the features of a data set.  Common examples
+in astronomy come in the study and analysis of spectra.  Redshift
+determination (CITE), emission-line measurements (CITE), and
+decomposition into different stellar populations (CITE) can all in
+principle be performed with theory-based spectral models, but rarely
+are the spectral models accurate enough or detailed enough to make
+measurements as precise as contemporary data permit.  In addition to
+the quantitative deficiencies of theoretical models---the fact that
+they rarely can explain the data at the precision of the
+observations---theoretical models contain qualitative
 uncertainties---uncertainties about model assumptions and
-computational approximations---that inevitably propagate into
-theory-driven models.  For these reasons, the highest-performing
-redshift determination systems, for example, use data-driven models
-that involve principal components analysis (PCA) or similar approaches
-(DWH CITE SDSS).
+computational approximations---that inevitably propagate into results.
+For these reasons, the highest-performing redshift determination
+systems, for example, use data-driven models that involve principal
+components analysis (PCA) or similar approaches (DWH CITE SDSS).
 
-DWH: OUTLIER DETECTION paragraph.
+Data-driven models like PCA are excellent for describing the range of
+the data---the subspace of the (usually enormous) data space in which
+real data examples live.  For this reason, data-driven models are
+excellent for finding \emph{outliers}, objects that are unusual in the
+data set.  This application is not as well explored in astrophysics,
+but one of the motiviations of the present investigation is to explore
+the use of probabilistically justified data-driven models for outlier
+detection.
 
-DWH: CLASSIFICATION paragraph.
+Similarly, data-driven models are often used for classification.  When
+a data-driven model produces ``eigenspectra'' or clusters or
+equivalent, it is tempting to see these model properties as defining
+classes in the data.  This gets into the area of unsupervised
+classification, which is beyond the scope of the present work.  When a
+generic data-driven model is being used without theoretical
+justification, it is often a mistake to interpret the internals of
+that model physically, however tempting that may be.
 
 The standard data-driven models used for spectroscopic astronomical
-data are the highest-ranked principal components from a principal
-component analysis (PCA) or equivalent. The PCA has one advantage and
-a number of drawbacks.  The advantage is that it is entirely
-data-driven: The construction of the PCA requires no theoretical or
-external knowledge about the spectra being modeled; it is a
-dimensionality reduction in the space of the observed spectra.
+data are the highest-ranked principal components (from PCA or
+equivalent). The PCA has one advantage and a number of drawbacks.  The
+advantage is that it is entirely data-driven: The construction of the
+PCA requires no theoretical or external knowledge about the spectra
+being modeled; it is a dimensionality reduction in the space of the
+observed spectra.
 
 There are many drawbacks to PCA but the most important is that the PCA
 returns the principal directions---the eigenvectors with maximum
@@ -120,9 +133,8 @@ the objective function has a direct likelihood interpretation, it
 becomes possible to incorporate its work into a Bayesian inference
 with proper prior information.  We give some examples of this below.
 
-At the beginning of this introduction, we mentioned outlier
-identification.  Some of the most important outliers found in the
-\sdss\ data are HOGG
+At the beginning, we mentioned outlier identification.  Some of the
+most important outliers found in the \sdss\ data are HOGG
 
 HOGGGGGG
 
