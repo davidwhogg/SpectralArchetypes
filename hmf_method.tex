@@ -1,12 +1,13 @@
-\documentclass[apj]{emulateapj}
-\usepackage{apjfonts,amsmath,natbib}
+\documentclass[12pt,preprint]{aastex}
 
-\slugcomment{\texttt{draft 2010-12-01 / not ready for distribution}}
+\slugcomment{\texttt{draft 2010-12-23 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
 \newcommand{\sdss}{\project{SDSS}}
 \newcommand{\SDSS}{\sdss}
+\newcommand{\equationname}{equation}
+\newcommand{\etal}{\textit{et~al.}}
 
 \begin{document}
 
@@ -34,15 +35,15 @@ logarithm of the likelihood), the basis provides a better fit to the
 data in a probabilistic sense than any PCA basis.  We test the method
 on \SDSS\ spectra, concentrating on spectra known to contain two
 redshift components: These are spectra of gravitational lens
-candidates and super-massive black-hole binaries (SMBHBs). We apply a
+candidates and super-massive black-hole binaries. We apply a
 hypothesis test to compare one-redshift and two-redshift models for
 these spectra, utilizing the data-driven model trained on a random
 subset of all \SDSS\ spectra.  This test confirms 129 of the 131 lens
-candidates in our sample and all 4 of the known SMBHB candidates, and
+candidates in our sample and all 4 of the known binary candidates, and
 turns up very few false positives.
 \end{abstract}
 
-\keywords{keywords}
+\keywords{HOGG keywords}
 
 \section{Introduction}\label{intro}
 Data-driven models are necessary for many applications: It is rare
@@ -54,9 +55,9 @@ decomposition into different stellar populations (CITE) can all in
 principle be performed with theory-based spectral models, but rarely
 are the spectral models accurate enough or detailed enough to make
 measurements as precise as contemporary data permit.  In addition to
-the quantitative deficiencies of theoretical models---the fact that
+the quantitative deficiencies of theoretical models (the fact that
 they rarely can explain the data at the precision of the
-observations---theoretical models contain qualitative
+observations), theoretical models contain qualitative
 uncertainties---uncertainties about model assumptions and
 computational approximations---that inevitably propagate into results.
 For these reasons, the highest-performing redshift determination
@@ -91,8 +92,8 @@ observed spectra.
 
 There are many drawbacks to PCA but the most important is that the PCA
 returns the principal directions---the eigenvectors with maximum
-eigenvalues---of the variance tensor of the data; this variance tensor
-has contributions from intrinsic variation among spectra, and
+eigenvalues---of the \emph{variance tensor} of the data; this variance
+tensor has contributions from intrinsic variation among spectra, and
 contributions from observational noise.  That is, a direction in
 spectrum space can enter into the top principal components because it
 is a direction of great astrophysical variation, or because there is a
@@ -102,13 +103,13 @@ not; astronomers want to know about the astrophysical processes that
 generate the data prior to the addition of observational noise.
 
 Other drawbacks to PCA include the following: It treats the data as
-drawn from a linear subspace of the full spectral space. This
-assumption is unlikely to be true in any application.  It also has
-trouble separating the spectral variation that comes from amplitude
-changes (overall flux or luminosity changes) as distinct from
-variations that come from shape changes in the spectra.  Various hacks
-have been employed to deal with this, but many of them make the linear
-subspace assumption even less valid than it was \textit{a
+having been drawn from a linear subspace of the full spectral
+space. This assumption is unlikely to be true in any application.  It
+also has trouble separating the spectral variation that comes from
+amplitude changes (overall flux or luminosity changes) as distinct
+from variations that come from shape changes in the spectra.  Various
+hacks have been employed to deal with this, but many of them make the
+linear subspace assumption even less valid than it was \textit{a
   priori}. Finally, PCA has no idea about prior information; it is
 just as happy creating components with negative amplitudes as positive
 amplitudes and the linear subspace therefore contains many quadrants,
@@ -120,7 +121,7 @@ technique---heteroscedastic matrix factorization (HMF)---for modeling
 observed spectra that overcomes some---though not all---of the
 problems with PCA.  The principal advantage of HMF over PCA is that
 the method optimizes not squared error, but rather the justified
-probabilistic objective of $\chi^2$.  This leads to the important
+probabilistic objective of chi-squared.  This leads to the important
 difference with PCA that HMF builds a model of the variance in the
 data set \emph{not} introduced by observational noise.  That is, it
 returns a model of the noise-deconvolved spectral space, which is the
@@ -134,34 +135,32 @@ becomes possible to incorporate its work into a Bayesian inference
 with proper prior information.  We give some examples of this below.
 
 At the beginning, we mentioned outlier identification.  Some of the
-most important outliers found in the \sdss\ data are HOGG
+most important outliers found in the \sdss\ data (CITE) are
+double-redshift objects.  Indeed, the set of luminous red galaxies
+that show evidence for a second (higher) redshift in their spectra
+include as a subset a significant fraction of all known gravitational
+lenses (CITE).  Other valuable double-redshift sources include merging
+galaxies, binary stars, and binary quasars.  In the latter category,
+there are very few known examples where the best explanation for a
+spectrum is a bound pair of super-massive black holes (CITES).  In both
+cases---gravitational lenses and binary black holes---the best
+candidates have been found with heuristic searches.  These searches
+involve (in the case of gravitational lenses) looking for isolated
+emission lines at the second redshift, or (in the case of black-hole
+binaries) visual inspection of double or shifted broad emission lines.
+In both cases, very high quality data-driven models ought to make the
+searches more sensitive and more complete.
 
-HOGGGGGG
-
-For a given number of components and with a
-set of observed spectra as a training set, the method uses a set of
-basis functions as an initialization and estimates the coefficients
-that provide the best fit to the data. Then, by keeping that set of
-coefficients fixed, it estimates a new set of basis functions that
-improves the fit to the spectra of the training set. After a small
-number of iterations of these two steps the method converges to the
-components with the minimum $\chi^2$ value. The method is presented in
-detail in sections \ref{method} and \ref{optimization}. Applications
-of this technique are presented in section \ref{applications} where we
-confirm known double-redshift objects, such as gravitational lenses
-and super-massive black-hole binaries (SMBHBs) in the \sdss. This is
-achieved by comparing the fitting of the spectra when we use the
-estimated components at the redshift provided by the \sdss\ and when
-we use an additional set of components at a second redshift. In almost
-all the cases tested here we were able to detect a significant
-improvement in the quality of the fit when the object was considered
-as a superposition of the linear combination of two sets of components
-at different redshifts. The paper closes with a brief discussion in
-section \ref{discussion}.
+In what follows, we introduce the HMF data-driven model and methods
+for implementing it.  We test the model and methods on \sdss\ spectra.
+We assess the value of the HMF model by asking whether it confirms the
+known double-redshift objects in the \sdss\ spectroscopic data set.
 
 \section{Spectral model}\label{method}
-Each of the $N$ observed spectra $i$ can be thought of as an ordered list or column vector $\vec{f}_i$ of $M$ flux density (energy per area per time
-per wavelength) measurements $f_{ij}$ on a grid of $M$ observer-frame wavelengths $\lambda^{\mathrm{obs}}_j$:
+Each of the $N$ observed spectra $i$ can be thought of as an ordered
+list or column vector $\vec{f}_i$ of $M$ flux density (energy per area
+per time per wavelength) measurements $f_{ij}$ on a grid of $M$
+observer-frame wavelengths $\lambda^{\mathrm{obs}}_j$:
 \begin{equation}\label{e1}
 \vec{f}_i
 \equiv \left[\begin{array}{c} f_{i1} \\
@@ -174,7 +173,13 @@ per wavelength) measurements $f_{ij}$ on a grid of $M$ observer-frame wavelength
                               f_{\lambda,i}(\lambda^{\mathrm{obs}}_M) \end{array}\right]
 \quad ,
 \end{equation}
-Associated with each measurement $f_{ij}$ is an uncertainty variance $\sigma_{ij}$ and we will assume in what follows that these uncertainty variances are well measured and that the uncertainties are essentially Gaussian.  We will assume that off-diagonal terms (covariances) in the uncertainty variance tensor are small, or that the uncertainty variance tensor (covariance matrix) $\textbf{C}_i$ is approximately
+Associated with each measurement $f_{ij}$ is an uncertainty variance
+$\sigma_{ij}$ and we will assume in what follows that these
+uncertainty variances are well measured and that the uncertainties are
+essentially Gaussian.  We will assume that off-diagonal terms
+(covariances) in the uncertainty variance tensor are small, or that
+the uncertainty variance tensor (covariance matrix) $\textbf{C}_i$ is
+approximately
 \begin{equation}\label{e2}
 \textbf{C}_i =
  \left[\begin{array}{cccc} \sigma_{i1}^2 & 0 & & 0 \\
@@ -189,39 +194,97 @@ We want to model the spectrum of each object with a sum of $K$ linear components
 f_{\lambda}(\lambda) = \sum_{k=1}^{K} a_k\,g_k(\lambda)
 \quad ,
 \end{equation}
-where the modeling is done implicitly in the object rest frame, the $a_k$ are coefficients, and the $g_k(\lambda)$ are basis spectra.
-Given basis spectra, the best set of coefficients for any observed spectrum---under the assumption of known, Gaussian uncertainties---are found by least-square fitting.  The challenge is to find the best set of basis spectra.
+where the modeling is done implicitly in the object rest frame, the
+$a_k$ are coefficients, and the $g_k(\lambda)$ are basis spectra.
+Given basis spectra, the best set of coefficients for any observed
+spectrum---under the assumption of known, Gaussian uncertainties---are
+found by least-square fitting.  The challenge is to find the best set
+of basis spectra.
 
-Often in astronomy, this basis is found by principal component analysis (or equivalent) and then selection of the largest-variance
-components or largest-eigenvalue eigenvectors.  However, this use of PCA naturally locates the $K$-dimensional linear basis that minimizes the mean-squared error in the space in which all pixels of all spectra are treated equally: They are weighted equally in the analysis, and residuals in them are minimized by the PCA with equal aggression. This is an inappropriate approach in the real situation in which different data points come with very different uncertainty variances, and it is absolutely inapplicable when there are missing data---as there always are in real data sets.
+Often in astronomy, this basis is found by principal components
+analysis (or equivalent) and then selection of the largest-variance
+components or largest-eigenvalue eigenvectors.  However, this use of
+PCA naturally locates the $K$-dimensional linear basis that minimizes
+the mean-squared error in the space in which all pixels of all spectra
+are treated equally: They are weighted equally in the analysis, and
+residuals in them are minimized by the PCA with equal aggression. This
+is an inappropriate approach in the real situation in which different
+data points come with very different uncertainty variances, and it is
+absolutely inapplicable when there are missing data---as there always
+are in real data sets.
 
-For these reasons, we seek to find the basis set that optimizes a justified scalar objective, one that is consistent with the individual spectral pixel uncertainty variances and with the fact that there are missing data.  When uncertainties are gaussian with known variances, the logarithm of the likelihood is proportional to chi-squared, so we seek to find the basis functions and coefficients that minimize a total chi-squared:
-\begin{eqnarray}\label{e4}\displaystyle
-\chi^2 & = & X - 2ln\mathcal{L} \nonumber\\
- & = & \sum_{i=1}^N \sum_{j=1}^M
-\frac{\left[f_{ij}-\sum_{k=1}^K a_{ik}
+For these reasons, we seek to find the basis set that optimizes a
+justified scalar objective, one that is consistent with the individual
+spectral pixel uncertainty variances and with the fact that there are
+missing data.  When uncertainties are close to Gaussian with known
+variances, the logarithm of the likelihood is proportional to
+chi-squared, so we seek to find the basis functions and coefficients
+that minimize a total chi-squared:
+\begin{eqnarray}\label{chi-squared}\displaystyle
+\chi^2 & = & X - 2\,\ln p(d|m) \nonumber\\
+\chi^2 & = & \sum_{i=1}^N \sum_{j=1}^M
+             \frac{\left[f_{ij}-\sum_{k=1}^K a_{ik}
                       \,g_{kj}(\lambda_j/[1+z_i])\right]^2}
 {\sigma^2_{ij}}
 \quad ,
 \end{eqnarray}
-where $X$ is some constant and we have implicitly assumed that each spectrum $i$ under consideration at this stage is well explained by having all its flux come from a single object at a known redshift $z_i$. The free parameters are the $N\,K$ coefficients $a_{ik}$ and the $K$ functions $g_k(\lambda)$. Roughly speaking, we seek to find the coefficients and basis functions that globally minimize this scalar $\chi^2$.
+where $X$ is a constant, $p(d|m)$ represents the likelihood function
+(probability of all the data given the model), and we have implicitly
+assumed that each spectrum $i$ under consideration at this stage is
+well explained by having all its flux come from a single object at a
+known redshift $z_i$. The model contains the $N\,K$ coefficients
+$a_{ik}$ and the $K$ functions $g_k(\lambda)$. Roughly speaking, we
+seek to find the coefficients and basis functions that globally
+minimize this scalar $\chi^2$.
 
-Precisely speaking, we make two adjustments to this goal. The first is that we can't demand global optimization; this problem is not
-convex.  Indeed, there are enormous numbers of local minima, in both the trivial sense that there are exact degeneracies (swap two basis functions and their corresponding coefficients, or re-scale a basis function and the corresponding coefficients, and so on) and in the non-trivial sense that there are qualitatively different solutions. All that our methods (described in detail below) guarantee is that we have, at fixed coefficients $a_{ik}$ the globally optimal basis functions $g_k(\lambda)$ and that we have, at fixed basis functions $g_k(\lambda)$ the globally optimal coefficients $a_{ik}$.
+Precisely speaking, we make two adjustments to this goal. The first is
+that we can't demand global optimization; this problem is not convex.
+Indeed, there are enormous numbers of local minima, in both the
+trivial sense that there are exact degeneracies (swap two basis
+functions and their corresponding coefficients, or re-scale a basis
+function and the corresponding coefficients, and so on) and in the
+non-trivial sense that there are multiple qualitatively different
+optima. All that our methods (described in detail below) guarantee is
+that we have, at fixed coefficients $a_{ik}$ the globally optimal
+basis functions $g_k(\lambda)$ and that we have, at fixed basis
+functions $g_k(\lambda)$ the globally optimal coefficients $a_{ik}$.
 
-The second adjustment is that we impose a smoothness prior to improve performance at (rest-frame) wavelengths at which we have very few data. In practice, we implement this prior by constructing the basis functions $g_k(\lambda)$ on a grid of $M_g>M$ rest wavelengths $\lambda_{\ell}$ and penalizing quadratically large pixel-to-pixel variations. That is, we optimize not the pure $\chi^2$ above but a modified scalar $\chi_{\epsilon}^2$
-\begin{equation}\label{e5}
+The second adjustment is that we sometimes choose to impose a
+regularization to improve the performance or realism of the model.
+The first kind of regularization we can impose is a smoothness prior
+that improves performance at (rest-frame) wavelengths at which we have
+very few data. In practice, we implement this prior by constructing
+the basis functions $g_k(\lambda)$ on a grid of $M_g>M$ rest
+wavelengths $\lambda_{\ell}$ and penalizing quadratically large
+pixel-to-pixel variations. That is, we optimize not the pure $\chi^2$
+above but a modified scalar $\chi_{\epsilon}^2$
+\begin{equation}\label{chi-epsilon}
 \chi_{\epsilon}^2 \equiv \chi^2
  + \epsilon\,\sum_{k=1}^K \sum_{\ell=2}^{M_g}
  \left[g_k(\lambda_{\ell})-g_k(\lambda_{\ell-1})\right]^2
 \quad ,
 \end{equation}
-where $\epsilon$ is a scalar that sets the strength of the smoothing. Optimization of this scalar $\chi_{\epsilon}^2$ is equivalent to
-optimization of the posterior probability distribution with a Gaussian prior applied to the pixel-to-pixel differences.
+where $\chi^2$ is defined in \equationname~(\ref{chi-squared}),
+$\epsilon$ is a scalar that sets the strength of the
+smoothing. Optimization of this scalar $\chi_{\epsilon}^2$ is
+equivalent to optimization of the posterior probability distribution
+with a Gaussian prior applied to the pixel-to-pixel differences
+\citep[for example, ][]{smoothness}; it is similar to what is done
+with Gaussian Processes \citep[for example, ][]{Rasmussen06a}.
 
-\textbf{discussion of Gaussian Processes and this being like a prior}
+The second kind of regularization we can impose is non-negativity.
+That is, we can optimize \equationname~(\ref{chi-squared}) but subject
+to the constraint that all basis functions and all coefficients be
+non-negative:
+\begin{eqnarray}\displaystyle
+a_{ik} & \geq & 0 \quad\mbox{for all $i$, $k$} \nonumber\\
+g_{k}(\lambda) & \geq & 0 \quad\mbox{for all $k$, $\lambda$}
+\end{eqnarray}
+This can lead to solutions that are much more physically meaningful.
 
-The basis functions extracted by minimizing equation \ref{e5} are not restricted to be non-negative. This can lead to solutions that lack physical meaning. For this reason the method also provides the possibility of using a non-negative constraint for the components and the coefficients. To proceed with the optimization in this case we start with an all-positive first guess and then iterate these multiplicative updates (Blanton \& Roweis \citealt{blanton}):
+HOGG:  Move the rest of this (below) to the optimization section.
+
+For this reason the method also provides the possibility of using a non-negative constraint for the components and the coefficients. To proceed with the optimization in this case we start with an all-positive first guess and then iterate these multiplicative updates \citep{blanton}:
 \begin{equation}\label{e6}
 a_{ik} \gets a_{ik}\left[\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}f_{ij}g_{kj}\right]\left[\sum_{n=1}^{K}\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}a_{in}g_{nj}g_{kj}\right]^{-1}
 \quad ,
@@ -261,7 +324,8 @@ To speed up the process of extracting the basis $g_{k}$ that minimizes the total
 
 Using equation \ref{e9} we can minimize the $\chi^2$ value for each wavelength J and define the new set of basis functions. Since the estimation of the component values at the Jth pixel requires their values at the (J+1) and (J-1) pixels, we make use of the values that the components had in those pixels at the previous iteration.
 
-When using conjugate gradient descent we update the coefficients based on the equations (Shewchuk \citealt{shewchuk}):
+When using conjugate gradient descent we update the coefficients based
+on the equations \citep[for example, ][]{shewchuk}:
 \begin{equation}\label{e10}
 a_{ik} \gets a_{ik}+\alpha r_{ik}
 \quad ,
@@ -304,12 +368,39 @@ By comparing the two methods, through tests performed with SDSS spectra, we see 
 In the case with non-negative constrains the solution of equations \ref{e6} and \ref{e7} is very fast, allowing us to perform a large number of iterations ($\approx 10^3$) until they converge. To decrease the number of iterations, we iterate equation \ref{e6} many times ($\approx 10^2$) during the initialization while keeping the initial basis fixed, in order to optimize the set of initial coefficients.
 
 \section{Applications}\label{applications}
-To assess the power of the technique, we are going to confirm known double-redshift objects in the SDSS spectroscopic sample. More specifically, by using the method presented above, we define a small number of components that is sufficient for modeling the SDSS spectra. Using these components we fit each observed spectrum at the redshift provided by SDSS. Then we repeat the fitting, but this time using one set of components at the SDSS redshift and one set of components at values of redshift that lie on a nominal grid. If a second object is present we expect the fit to be improved when we use two sets of components, one at the redshift of SDSS and one at that of the second object. In the examples that follow we will demonstrate this using the SLACS sample of gravitational lenses (Bolton et al. \citealt{bolton}) and the four known candidates of Supermassive Black Hole Binaries (SMBHBs) (\textbf{ref}).
+To assess the power of the technique, we are going to confirm known
+double-redshift objects in the SDSS spectroscopic sample. More
+specifically, by using the method presented above, we define a small
+number of components that is sufficient for modeling the SDSS
+spectra. Using these components we fit each observed spectrum at the
+redshift provided by SDSS. Then we repeat the fitting, but this time
+using one set of components at the SDSS redshift and one set of
+components at values of redshift that lie on a nominal grid. If a
+second object is present we expect the fit to be improved when we use
+two sets of components, one at the redshift of SDSS and one at that of
+the second object. In the examples that follow we will demonstrate
+this using the SLACS sample of gravitational lenses \citep{bolton} and
+the four known candidates of Supermassive Black Hole Binaries (SMBHBs)
+(\textbf{ref}).
 
 \subsection{Training}\label{training}
 In order to detect the presence of two objects at different redshifts in the SDSS spectra, we need to be able to model the spectra of all types of objects that have been observed by the survey (galaxies, LRGs and QSOs). To do so, we have to train our method separately for each class. For this purpose we selected a small random sample of spectra for each type of object (approximately 5000 for galaxies and LRGs and 10000 for QSOs, the numbers were selected as such in order to make sure that we have at least as many objects as number of pixels, which was needed for some of the tests we performed using PCA). The spectra were taken from the 7th Data Release (DR7) of SDSS (\textbf{ref}). The values of redshift were selected to be in the ranges of  0.01-0.06, 0.20-0.50 and 0.10-1.50 for galaxies, LRGs and QSOs respectively.
 
-For the selection of the LRG sample used in this study we followed the target selection of the LRG sample in SDSS which is based on 2 cuts, defined using magnitudes, colors and surface brightness criteria (Eisenstein et al. \citealt{eisenstein}). Cut I is suitable for selecting LRGs with z$<$0.4 and CUT II for LRGs with z$>$0.4. According to Eisenstein et al. \cite{eisenstein} these criteria are suitable for redshifts in the range of values greater than 0.15 and less than 0.55. The number of galaxies fulfilling these criteria is expected to be about 100,000 by the end of the survey. The primTarget field that is provided in the SpecObjAll table of SDSS is set to GALAXY\_RED if the LRG passes either CUT I or CUTII and to GALAXY\_RED\_II if it passes CUTII but not CUTI. For this study we downloaded the data for the LRGs that had their primTarget equal to either GALAXY\_RED and GALAXY\_RED\_II and only GALAXY\_RED (since if the primTarget is set as GALAXY\_RED\_II it is by default set as GALAXY\_RED as well).
+For the selection of the LRG sample used in this study we followed the
+target selection of the LRG sample in SDSS which is based on 2 cuts,
+defined using magnitudes, colors and surface brightness criteria
+\citep{eisenstein}. Cut I is suitable for selecting LRGs with z$<$0.4
+and CUT II for LRGs with z$>$0.4. According to \cite{eisenstein} these
+criteria are suitable for redshifts in the range of values greater
+than 0.15 and less than 0.55. The number of galaxies fulfilling these
+criteria is expected to be about 100,000 by the end of the survey. The
+primTarget field that is provided in the SpecObjAll table of SDSS is
+set to GALAXY\_RED if the LRG passes either CUT I or CUTII and to
+GALAXY\_RED\_II if it passes CUTII but not CUTI. For this study we
+downloaded the data for the LRGs that had their primTarget equal to
+either GALAXY\_RED and GALAXY\_RED\_II and only GALAXY\_RED (since if
+the primTarget is set as GALAXY\_RED\_II it is by default set as
+GALAXY\_RED as well).
 
 The sample was used to determine the maximum wavelength coverage, i.e. a wavelength area for which at least 10 sources have valid data at the beginning and the end of the spectrum. In this way we are able to fit the part of the spectrum that is produced by the second object for a large range of redshift values. During this procedure, pixels with any of the flags: SP\_MASK\_FULLREJECT, SP\_MASK\_NODATA, SP\_MASK\_BRIGHTSKY, SP\_MASK\_NOSKY or pixels that correspond to zero noise were treated as masked. All the spectra and their noise were moved to the rest-frame by keeping the energy constant in each spectral bin while relabeling the wavelength axis.  The final wavelength coverage for each object is: 3580.964-9109.615 \AA\ for galaxies, 2544.486-7615.528 \AA\ for LRGs and 1522.299-8352.183 \AA\ for QSOs, corresponding to 4056, 4762 and 7394 pixels respectively. Since only 10 spectra include data at the bluest and reddest wavelengths, missing data is present in almost all the spectra of our sample. To deal with this problem we have set the fluxes at those areas equal to the first or the last non-masked pixel of the spectrum and we have set the noise of those pixels to a very high value ($10^{-12} erg/sec/cm^2/$\AA), so that they will not be taken into account by the method. As a last step before the application of the method all spectra were interpolated to the wavelengths selected for each type of source using cubic splines. The selected wavelengths are uniformly distributed in log space as in the case of the original SDSS wavelengths. For the resulting spectra we interpolated linearly the values of the masked pixels.
 
@@ -404,13 +495,22 @@ In the section that follows we apply this hypothesis test to the spectra of know
 \subsection{Testing}\label{testing}
 
 \subsubsection{The SLACS survey}\label{slacs}
-The SLACS survey (Bolton et al. \citealt{bolton}) includes 131 strong galaxy-galaxy gravitational lens candidates, selected by the presence of higher redshift emission lines and lower redshift continuum. Using the components extracted by the method presented here (section \ref{training}) for galaxy and LRG SDSS spectra we try to apply the hypothesis test described above and reproduce the results of the SLACS survey for the second redshift.
+The SLACS survey \citep{bolton} includes 131 strong galaxy-galaxy gravitational lens candidates, selected by the presence of higher redshift emission lines and lower redshift continuum. Using the components extracted by the method presented here (section \ref{training}) for galaxy and LRG SDSS spectra we try to apply the hypothesis test described above and reproduce the results of the SLACS survey for the second redshift.
 
 As a first step we applied the test using the 14 galaxy components of section \ref{training} for both the foreground and the background object. Each spectrum of the SLACS survey was fitted once with the components at the SDSS redshift and the $\chi^2$ value of the fit was calculated. Then the spectrum was fitted again with one set of components at the SDSS redshift and one set of components at a redshift scanning a regular grid of values. The difference between the two $\chi^2$ values (with one and two sets of components) was used to search for peaks in the second redshift. For the case that both sets of components used correspond to galaxy spectra, we detected peaks for 120 SLACS spectra at the same redshifts as in the SLACS survey (figure \ref{f6}). An additional criterium that we used was that the peaks (if present) should correspond to fits that did not produce negative OIII lines if they were included in the spectral range of the fit.
 
 For the remaining 11 cases we applied the same proceedure but this time using the LRG components to fit the foreground object and the galaxy components to fit the background one. The results show that using our method we are extracting the same results as the SLACS survey for 6 of those spectra (figure \ref{f7}).
 
-For the 5 remaining spectra we detect a different second redshift than the one provided by Bolton et al. \cite{bolton}. For those objects we applied once again our method but this time assuming the presence of three objects instead of two. More specifically we fit the spectrum using a set of components (LRG or galaxy) at the SDSS redshift, a set of components (galaxy) at the second redshift to which was given the highest probability according to our method, and a set of components (galaxy) at a redshift scanning a regular grid of values. This time we managed to predict the SLACS second redshift for 3 additional objects (figure \ref{f8}).
+For the 5 remaining spectra we detect a different second redshift than
+the one provided by \cite{bolton}. For those objects we applied once
+again our method but this time assuming the presence of three objects
+instead of two. More specifically we fit the spectrum using a set of
+components (LRG or galaxy) at the SDSS redshift, a set of components
+(galaxy) at the second redshift to which was given the highest
+probability according to our method, and a set of components (galaxy)
+at a redshift scanning a regular grid of values. This time we managed
+to predict the SLACS second redshift for 3 additional objects (figure
+\ref{f8}).
 
 For only 2 out of the 131 spectra tested here were we not able to detect their second redshift. The results for these spectra as well as the fitting at the second redshift given by SLACS are shown in figure \ref{f9}. From this figure we see that this is a weak detection with no obvious signature of an additional object at the second redshift.
 
@@ -443,7 +543,7 @@ In comparison to PCA the method presented here has the advantage of taking into 
 
 Another problem of the method is the existence of many local minima in the resulting basis space. However, this can be solved by using many different initializations and using the results that produce the best fit to the test data. We should point out once again that comparison between the resulting components extracted from different initializations (or different methods) shouldn't be done by straight comparison between the components themselves but by camparing the quality of the fit to a test set of data.
 
-An additional advantage of this method compared to the PCA is that it also provides an option for non-negative constrains in the resulting components and coefficients, based on the work of Blanton \& Roweis \cite{blanton}. This option can produce results that do not include unphysical features (e.g. negative emission lines). We should keep in mind though that since this is a very hard constraint, it has a big impact in the results by producing a poorer fit to the observed spectra.
+An additional advantage of this method compared to the PCA is that it also provides an option for non-negative constrains in the resulting components and coefficients, based on the work of \cite{blanton}. This option can produce results that do not include unphysical features (e.g. negative emission lines). We should keep in mind though that since this is a very hard constraint, it has a big impact in the results by producing a poorer fit to the observed spectra.
 
 The results of the method were applied to the problem of confirming double redshift objects in SDSS. From the 131 galaxy-galaxy gravitational lenses in the SLACS survey we were able to automatically detect 129, using the components extracted by the method when trained with galaxy and LRG SDSS spectra, to fit the candidates. The confirmation was made by fitting the spectra once with a set of components at the SDSS redshift and once with an additional set of components at a redshift scanning a regular grid of values. The maximum improvement of the fitting when two sets of components at different redshifts were used instead of one set at the SDSS redshift, occurred at the redshift predicted by SLACS for the second object. Similar were the results for the case of the four known SMBHBs candidates where we were able to reproduce all of them. In the future we will perform an automatic search for objects of these types in all the SDSS spectroscopic data. For the case of gravitational lens candidates we are also planning to expand the search for cases that the secondary object is at lower redshift than the primary and that it could also be another type of source (e.g. QSO). Another application of this method could be for the determination of more accurate redshifts for single objects. This application will be very interesting for the case of QSOs at high redshifts and for defining template spectra for redshift estimation of objects that are going to observed by future surveys. This is is another subject that we seek to work on in the near future.
 
@@ -493,16 +593,24 @@ Funding for the Sloan Digital Sky Survey (SDSS) has been provided by the Alfred 
 \end{figure}
 
 \begin{thebibliography}{}
-\bibitem[2007]{blanton}
+\bibitem[Blanton \& Roweis(2007)]{blanton}
 Blanton M. R. \& Roweis S. 2007, AJ, 133, 734
 
-\bibitem[2007]{bolton}
+\bibitem[Bolton \etal(2007)]{bolton}
 Bolton A. S., Burles S., Koopmans L. V. E., True T., Gavazzi R., Moustakas L. A., Wayth R., Schlegel D. J. 2008, ApJ, 682, 964
 
-\bibitem[2001]{eisenstein}
+\bibitem[Eisenstein \etal(2001)]{eisenstein}
 Eisenstein D. J., Annis J., Gunn J. E., Szalay A. S., Connolly A. J., Nichol R. C., Bahcall N. A., Bernardi M., Burles S., Castander F. J. el al. 2001, AJ, 122, 2267
 
-\bibitem[1994]{shewchuk}
+\bibitem[Kitagawa \& Gersch(1996)]{smoothness}
+Kitagawa,~G. \& Gersch,~W., 1996, Smoothness Priors Analysis of Time
+Series, Lecture Notes in Statistics 116 (Springer)
+
+\bibitem[Rasmussen \& Williams(2006)]{Rasmussen06a}
+  Rasmussen,~C.~E. \& Williams,~C., 2006,
+  Gaussian Processes for Machine Learning (MIT Press)
+
+\bibitem[Shewchuk(1994)]{shewchuk}
 Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gradient.pdf
 \end{thebibliography}{}
 

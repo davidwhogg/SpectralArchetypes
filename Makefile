@@ -1,6 +1,6 @@
 .SUFFIXES: .tex .dvi .ps .pdf
 
-all: mf_method.pdf
+all: hmf_method.pdf
 
 %.pdf: %.tex
 	pdflatex $<
