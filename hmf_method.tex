@@ -2,6 +2,7 @@
 % -----
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro should have a paragraph about k-means!
+% - intro needs to introduce SDSS, or it needs to be introduced somewhere
 % - split optimization section into three cases, postpone initialization discussion
 % - make separate initialization section
 
@@ -18,10 +19,10 @@
 \newcommand{\equationname}{equation}
 \newcommand{\etal}{\textit{et~al.}}
 
-\begin{document}
+\begin{document}\sloppy
 
 \title{A data-driven model for spectra:\\
-       finding double redshifts in the \SDSS}
+       Finding double redshifts in the \project{Sloan Digital Sky Survey}}
 \author{P.~Tsalmantza\altaffilmark{1} and David~W.~Hogg\altaffilmark{1,2}}
 \email{vivitsal@mpia.de}
 \altaffiltext{1}{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, 69117 Heidelberg, Germany}
@@ -53,17 +54,17 @@ turns up very few false positives.
 \end{abstract}
 
 \keywords{
-black hole physics
+black~hole~physics
 ---
-cosmology: observations
+cosmology:~observations
 ---
-gravitational lensing
+gravitational~lensing
 ---
-methods: data analysis
+methods:~data~analysis
 ---
-methods: statistical
+methods:~statistical
 ---
-techniques: spectroscopic
+techniques:~spectroscopic
 }
 
 \section{Introduction}\label{sec:introduction}
@@ -256,10 +257,18 @@ where $X$ is a constant, $p(d|m)$ represents the likelihood function
 assumed that each spectrum $i$ under consideration at this stage is
 well explained by having all its flux come from a single object at a
 known redshift $z_i$. The model contains the $N\,K$ coefficients
-$a_{ik}$ and the $K$ functions $g_k(\lambda)$. Roughly speaking, we
-seek to find the coefficients and basis functions that globally
-minimize this scalar $\chi^2$.
+$a_{ik}$ and the $K$ functions $g_k(\lambda)$.
 
+The model of \equationname~(\ref{eq:model}) is a \emph{matrix
+  factorization} in the sense that if we think of the full set of data
+$f_{ij}$ as comprising a large rectantular matrix, the coefficients
+and basis functions provide a low-rank outer-product approximation to
+that matrix.  The scalar objective $\chi^2$ is \emph{heteroscedastic}
+in that it takes account of the fact that each matrix element has a
+noise contribution with a different expected variance.
+
+Roughly speaking, we seek to find the coefficients $a_{ik}$ and basis
+functions $g_k(\lambda)$ that globally minimize the scalar $\chi^2$.
 Precisely speaking, we make two adjustments to this goal. The first is
 that we can't demand global optimization; this problem is not convex.
 Indeed, there are enormous numbers of local minima, in both the
@@ -310,7 +319,7 @@ optically thin.
 
 \section{Optimization}\label{sec:optimization}
 
-The spectral model is defined by the coefficients $a_{ik}$ and basis
+The HMF spectral model is defined by the coefficients $a_{ik}$ and basis
 functions $g_k(\lambda)$ in \equationname~(\ref{eq:model}) and the
 objective function in \equationname~(\ref{eq:chi-squared}), with possible
 regularization for smoothness given in
@@ -324,9 +333,25 @@ convex, so the \emph{initialization} for the optimization matters.  We
 leave discussion of the initialization to
 \sectionname~\ref{sec:initialization}.
 
-HOGG: HOW TO PARAMETERIZE $g_k(\lambda)$ as a set of $g_{kj}$.
-HOGG: Note about why logarithmic $\lambda_j$ is a good idea;
-rest-frame; and so on.
+In principle there are many parameterizations for the basis functions
+$g_k(\lambda)$.  For any implementation of the optimization methods
+given here, it makes sense for the parameterization of these basis
+functions to be \emph{linear}.  For our specific purposes here, where
+redshifting is an important task, it makes sense for the the basis
+functions to be delta-functions (or narrow non-overlapping basis
+functions, on a wavelength grid that is linearly spaced in
+log-wavelength.  That is, we set coefficients $g_{kj}$ defined by
+\begin{eqnarray}\displaystyle
+g_{kj} & \equiv & g_k(\lambda_j) \nonumber\\
+\ln\lambda_j & = & \ln(\lambda_0) + j\,\Delta
+\quad ,
+\end{eqnarray}
+where $\lambda_0$ is the minimum wavelength under consideration, and
+$\Delta$ is a logarithmic wavelength interval.  In what follows, much
+of the fitting is in rest-frame wavelengths, given observations in
+observed-frame wavelengths.  The logarithmic wavelength grid makes
+redshift transformations simple and fast.  It is also the case the
+\sdss\ spectra are extracted on a logarithmic grid of this kind.
 
 From any initialization, we can descend to a local minimum using
 iterated least squares.  To begin, consider the unregularized case,
