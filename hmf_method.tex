@@ -213,16 +213,18 @@ approximately
 
 We want to model the spectrum of each object $i$ with a sum of $K$ linear components:
 \begin{equation}\label{eq:model}
-f_{\lambda,i}(\lambda) = \sum_{k=1}^{K} a_{ik}\,g_k(\lambda) + e_i(\lambda)
+f_{ij} = f_{\lambda,i}(\lambda_j) = \sum_{k=1}^{K} a_{ik}\,g_k(\lambda_j) + e_{ij}
 \quad ,
 \end{equation}
 where the modeling is done implicitly in the object rest frame, the
 $a_{ik}$ are coefficients, the $g_k(\lambda)$ are basis spectra, and
-the $e_i(\lambda)$ represents the individual noise in spectrum $i$.
-Given basis spectra $g_k(\lambda)$, the best set of coefficients for
-any observed spectrum---under the assumption of known, Gaussian
-uncertainties---can be found by weighted least-square fitting.  The
-challenge is to find the best set of basis spectra.
+the $e_{ij}$ represents the individual noise in pixel $j$ of spectrum
+$i$.  The noise element $e_{ij}$ is assumed to be drawn from a
+Gaussian of zero mean and variance $\sigma_{ij}^2$.  Given basis
+spectra $g_k(\lambda)$, the best set of coefficients for any observed
+spectrum---under the assumption of known, Gaussian uncertainties---can
+be found by weighted least-square fitting.  The challenge is to find
+the best set of basis spectra.
 
 Often in astronomy, this basis has been found by principal components
 analysis (or equivalent) and then selection of the largest-variance
@@ -861,8 +863,18 @@ template spectra for redshift estimation of objects that are going to
 observed by future surveys. This is is another subject that we seek to
 work on in the near future.
 
-\section{Acknowledgments}
-\textbf{The authors would like to thank...}
+\acknowledgments It is a pleasure to thank Sam Roweis (deceased) who
+initiated this work by suggesting the model and all the optimization
+strategies.  In addition, we thank Mike Blanton (NYU), Jo Bovy (NYU),
+Adam Bolton (Utah), Roberto Decarli (MPIA), Dustin Lang (Princeton),
+and Hans-Walter Rix (MPIA) for valuable discussions.  Partial funding
+for this project was provided by NASA (grant NNX08AJ48G), the NSF
+(grant AST-0908357), and the Alexander von Humboldt Foundation.  This
+research made use of the SAO/NASA \project{Astrophysics Data System}
+and the \project{R} Project for Statistical Computing.  All the code
+used in this project is available from the authors upon request.
+
+VIVI: GRANTS AND GRANT NUMBERS FOR YOU?
 
 Funding for the Sloan Digital Sky Survey (SDSS) has been provided by
 the Alfred P. Sloan Foundation, the Participating Institutions, the
