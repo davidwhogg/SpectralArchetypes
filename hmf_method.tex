@@ -338,20 +338,24 @@ $g_k(\lambda)$.  For any implementation of the optimization methods
 given here, it makes sense for the parameterization of these basis
 functions to be \emph{linear}.  For our specific purposes here, where
 redshifting is an important task, it makes sense for the the basis
-functions to be delta-functions (or narrow non-overlapping basis
-functions, on a wavelength grid that is linearly spaced in
-log-wavelength.  That is, we set coefficients $g_{kj}$ defined by
+functions to be evaluations of the basis spectra on a wavelength grid
+that is linearly spaced in log-wavelength.  That is, we set
+coefficients $g_{kj}$ defined by
 \begin{eqnarray}\displaystyle
 g_{kj} & \equiv & g_k(\lambda_j) \nonumber\\
 \ln\lambda_j & = & \ln(\lambda_0) + j\,\Delta
 \quad ,
 \end{eqnarray}
 where $\lambda_0$ is the minimum wavelength under consideration, and
-$\Delta$ is a logarithmic wavelength interval.  In what follows, much
-of the fitting is in rest-frame wavelengths, given observations in
-observed-frame wavelengths.  The logarithmic wavelength grid makes
-redshift transformations simple and fast.  It is also the case the
-\sdss\ spectra are extracted on a logarithmic grid of this kind.
+$\Delta$ is a logarithmic wavelength interval.  The basis spectrum
+$g_k(\lambda)$ is defined to be the cubic-spline interplation in
+logarithmic wavelength $\ln\lambda$ from the control points at the
+$\lambda_j$ to the wavelength of interest $\lambda$.  In what follows,
+much of the fitting is in rest-frame wavelengths, given observations
+in observed-frame wavelengths.  The logarithmic wavelength grid and
+cubic spline interpolation makes redshift transformations simple and
+fast.  It is also the case the \sdss\ spectra are extracted on a
+logarithmic cubic-spline basis of this kind.
 
 From any initialization, we can descend to a local minimum using
 iterated least squares.  To begin, consider the unregularized case,
