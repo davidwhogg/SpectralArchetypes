@@ -7,6 +7,7 @@
 % - make separate initialization section
 
 \documentclass[12pt,preprint]{aastex}
+\usepackage{amssymb,amsmath,mathrsfs}
 
 \slugcomment{\texttt{draft 2010-12-23 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
@@ -18,6 +19,8 @@
 \newcommand{\sectionname}{Section}
 \newcommand{\equationname}{equation}
 \newcommand{\etal}{\textit{et~al.}}
+\newcommand{\tv}[1]{\boldsymbol{#1}}
+\newcommand{\inverse}[1]{{#1}^{-1}}
 
 \begin{document}\sloppy
 
@@ -200,10 +203,10 @@ $\sigma_{ij}$ and we will assume in what follows that these
 uncertainty variances are well measured and that the uncertainties are
 essentially Gaussian.  We will assume that off-diagonal terms
 (covariances) in the uncertainty variance tensor are small, or that
-the uncertainty variance tensor (covariance matrix) $\textbf{C}_i$ is
+the uncertainty variance tensor (covariance matrix) $\tv{C}_i$ is
 approximately
 \begin{equation}
-\textbf{C}_i =
+\tv{C}_i =
  \left[\begin{array}{cccc} \sigma_{i1}^2 & 0 & & 0 \\
                            0 & \sigma_{i2}^2 & & 0 \\
                            & & \cdots & \\
@@ -288,14 +291,14 @@ regularization to improve the performance or realism of the model.
 The first kind of regularization we can impose is a smoothness prior
 that improves performance at (rest-frame) wavelengths at which we have
 very few data. In practice, we implement this prior by constructing
-the basis functions $g_k(\lambda)$ on a grid of $M_g>M$ rest
-wavelengths $\lambda_{\ell}$ and penalizing quadratically large
+the basis functions $g_k(\lambda)$ on a grid of $M$ rest
+wavelengths $\lambda_j$ and penalizing quadratically large
 pixel-to-pixel variations. That is, we optimize not the pure $\chi^2$
 above but a modified scalar $\chi_{\epsilon}^2$
 \begin{equation}\label{eq:smoothness}
 \chi_{\epsilon}^2 \equiv \chi^2
- + \epsilon\,\sum_{k=1}^K \sum_{\ell=2}^{M_g}
- \left[g_k(\lambda_{\ell})-g_k(\lambda_{\ell-1})\right]^2
+ + \epsilon\,\sum_{k=1}^K \sum_{j=2}^{M}
+ \left[g_k(\lambda_{j})-g_k(\lambda_{j-1})\right]^2
 \quad ,
 \end{equation}
 where $\chi^2$ is defined in \equationname~(\ref{eq:chi-squared}),
@@ -372,6 +375,32 @@ below) in ten or so iterations.
 
 HOGG: note block-diagonal-ness of it all and then GIVE EXPLICIT
 EQUATIONS.  Define ``a-step'' and ``g-step'' notation.
+
+The \emph{a-step} is, for each $i$,
+\begin{eqnarray}\label{eq:astep}\displaystyle
+\tv{A}_i & \leftarrow & \inverse{\tv{G}_i}\cdot\tv{F}_i \nonumber\\
+\left[\tv{A}_i\right]_k & \equiv & a_{ik} \nonumber\\
+\left[\tv{G}_i\right]_{kk'} & \equiv & \sum_{j=1}^{M} \frac{g_{kj}\,g_{k'j}}{\sigma_{ij}^2} \nonumber\\
+\left[\tv{F}_i\right]_k     & \equiv & \sum_{j=1}^{M} \frac{g_{kj}\,f_{i j}}{\sigma_{ij}^2}
+\quad ,
+\end{eqnarray}
+where at fixed $i$, $\tv{A}_i$ is a vector of the $K$ coefficients
+$a_{ik}$, $\tv{G}_i$ is a $K\times K$ matrix to be inverted, and
+$\tv{F}_i$ is a $K$-vector.  This is just weighted linear least
+squares at each index $i$, fixing the $g_{kj}$.
+
+The \emph{g-step} is, for each $j$,
+\begin{eqnarray}\label{eq:gstep}\displaystyle
+\tv{G}_j & \leftarrow & \inverse{\tv{A}_j}\cdot\tv{F}_j \nonumber\\
+\left[\tv{G}_j\right]_k & \equiv & g_{kj} \nonumber\\
+\left[\tv{A}_j\right]_{kk'} & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,a_{ik'}}{\sigma_{ij}^2} \nonumber\\
+\left[\tv{F}_j\right]_k     & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,f_{i j}}{\sigma_{ij}^2}
+\quad ,
+\end{eqnarray}
+where at fixed $j$, $\tv{G}_j$ is a vector of the $K$ spectral element
+values $g_{kj}$, $\tv{A}_j$ is a $K\times K$ matrix to be inverted, and
+$\tv{F}_j$ is a $K$-vector.  Note the parallelism with the a-step
+\equationname~(\ref{eq:astep}).
 
 VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD?
 For any $K$-dimensional linear subspace, there are many choices for
