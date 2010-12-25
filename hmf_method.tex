@@ -1,5 +1,6 @@
 % to-do
 % -----
+% - intro needs to make it clear that there is nothing special about spectra
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro should have a paragraph about k-means!
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
@@ -306,8 +307,8 @@ $\epsilon$ is a scalar that sets the strength of the
 smoothing. Optimization of this scalar $\chi_{\epsilon}^2$ is
 equivalent to optimization of the posterior probability distribution
 with a Gaussian prior applied to the pixel-to-pixel differences
-\citep[for example, ][]{smoothness}; it is similar to what is done
-with Gaussian Processes \citep[for example, ][]{Rasmussen06a}.
+\citep[for example,][]{smoothness}; it is similar to what is done
+with Gaussian Processes \citep[for example,][]{Rasmussen06a}.
 
 The second kind of regularization we can impose is non-negativity.
 That is, we can optimize \equationname~(\ref{eq:chi-squared}) but subject
@@ -360,7 +361,9 @@ much of the fitting is in rest-frame wavelengths, given observations
 in observed-frame wavelengths.  The logarithmic wavelength grid and
 cubic spline interpolation makes redshift transformations simple and
 fast.  It is also the case the \sdss\ spectra are extracted on a
-logarithmic cubic-spline basis of this kind.
+logarithmic cubic-spline basis of this kind.  In detail, we will have
+to put all the input data and basis spectra on the same wavelength
+grid.
 
 From any initialization, we can descend to a local minimum using
 iterated least squares.  To begin, consider the unregularized case,
@@ -373,8 +376,20 @@ $g_{kj}$ by weighted least squares. Each iteration step is guaranteed
 to reduce the total $\chi^2$ and converges (in practice in the tests
 below) in ten or so iterations.
 
-HOGG: note block-diagonal-ness of it all and then GIVE EXPLICIT
-EQUATIONS.  Define ``a-step'' and ``g-step'' notation.
+There are $[N\,K]$ coefficients $a_{ik}$ and $[K\,M]$ parameters
+$g_{kj}$ in the basis spectra.  For most data sets, least-square fits
+with this many parameters are impossible with na\"ive algorithms.
+However, the relevant matrices are extremely sparse, in the sense that
+each parameter only affects a small number of data points $f_{ij}$.
+Any high-quality sparse-matrix linear algebra system can efficiently
+solve the full weighted least-square minimization problem for all the
+$a_{ik}$ in one shot (what we will call the ``a-step''), and then the
+full problem for all the $g_{kj}$ (the ``g-step'') in a second shot.
+Then iteration can proceed to convergence.  However, the sparseness is
+very simple, so in the absence of a sparse-matrix linear algebra
+solver, the a-step and g-step can be split into iterated blocks.  The
+a-step involves an iteration over objects $i$, and the g-step involves
+an iteration over wavelength indices $j$.
 
 The \emph{a-step} is, for each $i$,
 \begin{eqnarray}\label{eq:astep}\displaystyle
@@ -402,6 +417,13 @@ values $g_{kj}$, $\tv{A}_j$ is a $K\times K$ matrix to be inverted, and
 $\tv{F}_j$ is a $K$-vector.  Note the parallelism with the a-step
 \equationname~(\ref{eq:astep}).
 
+Each of these iterated steps, in turn, optimizes one part of the
+problem leaving the other fixed; each step therefore reduces the
+scalar objective $\chi^2$ of \equationname~(\ref{eq:chi-squared}); the
+pair of iterated steps can be iterated until the system reaches a
+minimum.  These steps must be modified when smoothness or
+non-negativity regularizations are applied, as we discuss next.
+
 VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD?
 For any $K$-dimensional linear subspace, there are many choices for
 the components $g_k$: The components can be reordered, multiplied by
@@ -415,37 +437,31 @@ reorder the components according to the variance they include:
 \sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
 \end{equation}
 
-\paragraph{Optimization with smoothness prior}
+\paragraph{Optimization with smoothness prior:}
 
-HOGG: MASSAGE AWAY HERE...
+The smoothness regularization---the move to the $\chi^2_{\epsilon}$
+scalar objective of \equationname~(\ref{eq:smoothness})---reduces the
+sparseness of the linear system.  For this reason, the simple blocking
+of the problem in {\equationname}s~(\ref{eq:astep}) and
+(\ref{eq:gstep}) is no longer possible as an exact solution.  However,
+it is possible to approximate an exact solution by HOGG MODIFYING THE G-STEP HOW?
 
-To speed up the process of extracting the basis $g_{k}$ that minimizes
-the total $\chi^2$ for a given set of coefficients $a_{k}$ we have
-implimented two different methods: i) a block-diagonal (or nearly so)
-least-square fitting and ii) an iterated gradient descent. In the
-first case we approximate \equationname~(\ref{eq:chi-squared}) with:
-\begin{equation}\label{eq:9}
-\begin{array}{rcl}
-\chi^2_{J} & \equiv & \sum_{i=1}^{N}\frac{(f_{iJ}-\sum_{k=1}^{K}a_{ik}g_{kJ})^2}{\sigma^2_{iJ}}+\epsilon\sum_{k=1}^{K}(g_{kJ}-g_{k(J+1)})^2+ \\
-&&\\
- & & +\epsilon\sum_{k=1}^{K}(g_{k(J-1)}-g_{kJ})^2
-\quad 
-\end{array}
-\end{equation}
-
-Using \equationname~(\ref{eq:9}) we can minimize the $\chi^2$ value
+HOGG Using \equationname~(\ref{eq:9}) we can minimize the $\chi^2$ value
 for each wavelength J and define the new set of basis functions. Since
 the estimation of the component values at the Jth pixel requires their
 values at the (J+1) and (J-1) pixels, we make use of the values that
 the components had in those pixels at the previous iteration.
 
-When using conjugate gradient descent we update the coefficients based
-on the equations \citep[for example, ][]{shewchuk}:
+HOGG: Also, when the system becomes non-sparse, it might become
+sensible to use conjugate gradient method \citep[for
+  example,][]{shewchuk}, which permits optimization of least-squares
+problems without explicit matrix decompositions or inversions.  When
+using conjugate gradient descent we update the coefficients based on
+the equations
 \begin{equation}\label{eq:10}
 a_{ik} \gets a_{ik}+\alpha r_{ik}
 \quad ,
 \end{equation}
-
 where:
 \begin{equation}\label{eq:11}
 r_{ik}=\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}g_{kj}}{\sigma^2_{ij}}g_{jk}
@@ -459,7 +475,6 @@ r_{ik}=\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}g_{kj}}{\sigma^2_{ij}}g_{jk}
 R_{ik}=\frac{r_{ik}g_{kj}}{\sigma^2_{ij}}g_{jk}
 \quad ,
 \end{equation}
-
 and the basis functions:
 \begin{equation}\label{eq:14}
 g_{kj} \gets a_{kj}+\beta p_{ik}
@@ -485,7 +500,7 @@ requires many more iterations in order to converge to the same
 results. This makes the first option faster and for that reason, it is
 the one used for the results presented below.
 
-\paragraph{Optimization with non-negative constraints}
+\paragraph{Optimization with non-negative constraints:}
 
 HOGG:  The following needs to be massaged
 
