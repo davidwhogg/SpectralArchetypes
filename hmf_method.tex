@@ -9,6 +9,7 @@
 % to-do
 % -----
 % - intro needs to make it clear that there is nothing special about spectra
+% - intro needs to make it clear that the BASIS doesn't have to be control points
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro should have a paragraph about k-means!
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
@@ -455,16 +456,30 @@ scalar objective of \equationname~(\ref{eq:smoothness})---reduces the
 sparseness of the linear system.  For this reason, the simple blocking
 of the problem in {\equationname}s~(\ref{eq:astep}) and
 (\ref{eq:gstep}) is no longer possible as an exact solution.  However,
-it is possible to approximate an exact solution by HOGG MODIFYING THE G-STEP HOW?
+it is possible to approximate an exact solution by modifying the
+block-diagonal g-step to:
+\begin{eqnarray}\label{eq:gstep_smooth}\displaystyle
+\tv{G}_j & \gets & \inverse{\tv{A}_j}\cdot\tv{F}_j \nonumber\\
+\left[\tv{G}_j\right]_k & \equiv & g_{kj} \nonumber\\
+\left[\tv{A}_j\right]_{kk'} & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,a_{ik'}}{\sigma_{ij}^2} + 2\,\epsilon\,\delta_{kk'} \nonumber\\
+\left[\tv{F}_j\right]_k     & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,f_{i j}}{\sigma_{ij}^2} + \epsilon\,[g_{k[j-1]} + g_{k[j+1]}]
+\quad ,
+\end{eqnarray}
+where $\delta_{kk'}$ is the $K\times K$ identity matrix, and where
+small changes need to be made at $j=1$ and $j=M$:
+\begin{eqnarray}\label{eq:gstep_tweaks}\displaystyle
+\left[\tv{A}_1\right]_{kk'} & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,a_{ik'}}{\sigma_{i1}^2} + \epsilon\,\delta_{kk'} \nonumber\\
+\left[\tv{F}_1\right]_k     & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,f_{i 1}}{\sigma_{i1}^2} + \epsilon\,g_{k2} \nonumber\\
+\left[\tv{A}_M\right]_{kk'} & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,a_{ik'}}{\sigma_{iM}^2} + \epsilon\,\delta_{kk'} \nonumber\\
+\left[\tv{F}_M\right]_k     & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,f_{i M}}{\sigma_{iM}^2} + \epsilon\,g_{k[M-1]}
+\quad .
+\end{eqnarray}
+This new g-step is justified by seeing the neighboring $g_{kj}$ pixels
+as ``data'' that constrain the model with inverse variance $\epsilon$.
+VIVI: CAN YOU CHECK THAT THESE ARE THE EQUATIONS WE ACTUALLY USED?
 
-HOGG: DROP?  We can minimize the $\chi^2$ value for each wavelength J
-and define the new set of basis functions. Since the estimation of the
-component values at the Jth pixel requires their values at the (J+1)
-and (J-1) pixels, we make use of the values that the components had in
-those pixels at the previous iteration.
-
-HOGG: Also, when the system becomes non-sparse, it might become
-sensible to use conjugate gradient method \citep[for
+Because the smoothness constraint makes the system less sparse, it
+might become sensible to use conjugate gradient method \citep[for
   example,][]{shewchuk}, which permits optimization of least-squares
 problems without explicit matrix decompositions or inversions.  When
 using conjugate gradient descent we update the coefficients based with
@@ -480,19 +495,21 @@ and a new \emph{conjugate-gradient g-step}:
 \begin{eqnarray}\label{eq:gstep_conj}\displaystyle
 g_{kj} & \gets & g_{kj}+\beta\,q_{ik} \quad \mbox{where} \nonumber\\
 q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
-\beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{ik}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
+\beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{kj}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
 Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
 \quad .
 \end{eqnarray}
 (VIVI, CAN YOU CHECK THE ABOVE?  I ADDED SOME SUMMATIONS THAT I
-THOUGHT WERE MISSING.)  In our limited tests in the \project{R}
-language, we found that conjugate gradient was much faster per
-iteration than the block-diagonal method but required many more
-iterations to converge to the same precision.  We therefore used the
-block-diagonal method in everything that follows.  But the relative
-speed of one-shot optmization with a sparse matrix representation, the
-block-diagonal versions, and the conjugate-gradient version will in
-principle depend on the linear algebra system being used, quantitative
+THOUGHT WERE MISSING.  ALSO I AM CONCERNED BY THE $q_{kj}$ in the
+$Q_{kj}$ line.)  In our limited tests in the \project{R} language, we
+found that conjugate gradient was much faster per iteration than the
+block-diagonal method but required many more iterations to converge to
+the same precision.  We therefore used the block-diagonal a-step and
+g-step in everything that follows with the smoothness regularization.
+But the relative performance of any real system running the one-shot
+optmization with a sparse matrix representation, the block-diagonal
+versions, or the conjugate-gradient version will in principle depend
+on the numerical linear algebra system under use, the quantitative
 properties of the data and its associated noise variances, and the
 magnitudes of $N$, $M$, and $K$.
 
@@ -565,32 +582,51 @@ and ordered in decreasing variance order such that
 
 \section{Initialization}\label{sec:initialization}
 
-HOGG: NEEDS TO BE MASSAGED -- four initializations; PCA is best in one
-case, K-means in the other.
+In \sectionname~\ref{sec:model} we introduced the HMF model; in
+\sectionname~\ref{sec:optimization} we described how to optimize from
+a sensible first guess or starting point.  Here we discuss the
+initialization, which is conceptually independent of both the model
+definition and the optimization choice.
 
- We initialize the fitting with the
-output of a PCA on the spectra after each spectrum has been projected
-into a subspace orthogonal to the mean spectrum of the data set; the
-first guesses for the $g_{k}$ are set to the mean spectrum and the
-first $[K-1]$ principal components.
+An initialization consists of an initial setting for the basis
+spectrum parameters $g_{kj}$.  It also consists of an initial setting
+for the amplitudes $a_{ik}$, but because---given basis spectra---the
+finding of these amplitudes requires only weighted least squares
+(given in \equationname~\ref{eq:astep} or the non-negative version of
+it given in \equationname~\ref{eq:astep_nonneg}), initialization can
+be thought of as only being about finding a good initial guess for the
+$g_{kj}$.
 
-We find that performance is not worse if we use different
-initializations. In \sectionname~\ref{sec:training} we demonstrate
-this by applying the method to a set of SDSS spectra when we use PCA
-or K-means results (\textbf{ref}), a randomly chosen set of spectra,
-or functions like sin and cosin for the initialization. For the case
-that non-negative constraints are applied to the estimated components
-and coefficients, we are forced to use an initialization with positive
-values. Even though we could use any set of positive basis functions,
-the best initialization seems to be the results of the K-means
-algorithm. That is expected since the components extracted by K-means,
-that correspond to the centers of the groups into which the algorithm
-divides the training spectra, include more physical information than
-other non-negative initializations. We expect that the K-means results
-will include only positive values because if the number of groups is
-not very large (this might result in groups with very few spectra as
-members), the mean spectrum in each group very rarely includes
-negative values of flux caused by errors.
+There are four natural (to us, anyway) choices for initialization: $K$
+spectra can be chosen at random from the data sample of $N$ spectra;
+$K$ linearly independent mathematical basis functions such as
+Chebyshev Polynomials or sines and cosines can be used; $K$ principal
+components can be generated by a PCA; or $K$ cluster centers can be
+found with a K-means algorithm run in spectrum space.  In our tests,
+PCA-initialized and K-means-initialized optimizations almost always
+out-performed random-spectrum and basis-function initializations.  For
+this reason we only consider PCA and K-means in what follows.
+
+\paragraph{PCA initialization}
+HOGG: We initialize the fitting with the output of a PCA on the
+spectra after each spectrum has been projected into a subspace
+orthogonal to the mean spectrum of the data set; the first guesses for
+the $g_{k}$ are set to the mean spectrum and the first $[K-1]$
+principal components.
+
+\paragraph{K-means initialization}
+HOGG: For the case that non-negative constraints are applied to the
+estimated components and coefficients, we are forced to use an
+initialization with positive values. Even though we could use any set
+of positive basis functions, the best initialization seems to be the
+results of the K-means algorithm. That is expected since the
+components extracted by K-means, that correspond to the centers of the
+groups into which the algorithm divides the training spectra, include
+more physical information than other non-negative initializations. We
+expect that the K-means results will include only positive values
+because if the number of groups is not very large (this might result
+in groups with very few spectra as members), the mean spectrum in each
+group very rarely includes negative values of flux caused by errors.
 
 \section{Applications}\label{sec:applications}
 To assess the power of the technique, we are going to confirm known
