@@ -580,6 +580,12 @@ and ordered in decreasing variance order such that
 \quad .
 \end{equation}
 
+We never (below) optimize with \emph{both} the smoothness
+regularization and the non-negative regularization operating at the
+same time.  It is left as an exercise to the reader to generalize the
+non-negative g-step of \equationname~(\ref{eq:gstep_nonneg}) to the
+doubly regularized case.
+
 \section{Initialization}\label{sec:initialization}
 
 In \sectionname~\ref{sec:model} we introduced the HMF model; in
