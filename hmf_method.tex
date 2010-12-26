@@ -275,7 +275,7 @@ $a_{ik}$ and the $K$ functions $g_k(\lambda)$.
 
 The model of \equationname~(\ref{eq:model}) is a \emph{matrix
   factorization} in the sense that if we think of the full set of data
-$f_{ij}$ as comprising a large rectantular matrix, the coefficients
+$f_{ij}$ as comprising a large rectangular matrix, the coefficients
 and basis functions provide a low-rank outer-product approximation to
 that matrix.  The scalar objective $\chi^2$ is \emph{heteroscedastic}
 in that it takes account of the fact that each matrix element has a
@@ -322,7 +322,7 @@ The second kind of regularization we can impose is non-negativity.
 That is, we can optimize \equationname~(\ref{eq:chi-squared}) but subject
 to the constraint that all basis functions and all coefficients be
 non-negative:
-\begin{eqnarray}\label{eq:non-negativity}\displaystyle
+\begin{eqnarray}\label{eq:non-negative}\displaystyle
 a_{ik} & \geq & 0 \quad\mbox{for all $i$, $k$} \nonumber\\
 g_{k}(\lambda) & \geq & 0 \quad\mbox{for all $k$, $\lambda$}
 \end{eqnarray}
@@ -338,7 +338,7 @@ functions $g_k(\lambda)$ in \equationname~(\ref{eq:model}) and the
 objective function in \equationname~(\ref{eq:chi-squared}), with possible
 regularization for smoothness given in
 \equationname~(\ref{eq:smoothness}) or non-negativity given in
-\equationname~(\ref{eq:non-negativity}).  Optimization of the model is an
+\equationname~(\ref{eq:non-negative}).  Optimization of the model is an
 engineering problem that is in principle independent of the arguments
 for the model freedom or the objective function.  In practice, there
 is a natural optimization technique for bi-linear models like this
@@ -430,8 +430,10 @@ Each of these iterated steps, in turn, optimizes one part of the
 problem leaving the other fixed; each step therefore reduces the
 scalar objective $\chi^2$ of \equationname~(\ref{eq:chi-squared}); the
 pair of iterated steps can be iterated until the system reaches a
-minimum.  These steps must be modified when smoothness or
-non-negativity regularizations are applied, as we discuss next.
+minimum.  These steps must be modified when smoothness
+(\equationname~\ref{eq:smoothness}) or non-negativity
+(\equationname~\ref{eq:non-negative}) regularizations are applied, as
+we discuss next.
 
 VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD?
 For any $K$-dimensional linear subspace, there are many choices for
@@ -455,11 +457,11 @@ of the problem in {\equationname}s~(\ref{eq:astep}) and
 (\ref{eq:gstep}) is no longer possible as an exact solution.  However,
 it is possible to approximate an exact solution by HOGG MODIFYING THE G-STEP HOW?
 
-HOGG Using \equationname~(\ref{eq:9}) we can minimize the $\chi^2$ value
-for each wavelength J and define the new set of basis functions. Since
-the estimation of the component values at the Jth pixel requires their
-values at the (J+1) and (J-1) pixels, we make use of the values that
-the components had in those pixels at the previous iteration.
+HOGG: DROP?  We can minimize the $\chi^2$ value for each wavelength J
+and define the new set of basis functions. Since the estimation of the
+component values at the Jth pixel requires their values at the (J+1)
+and (J-1) pixels, we make use of the values that the components had in
+those pixels at the previous iteration.
 
 HOGG: Also, when the system becomes non-sparse, it might become
 sensible to use conjugate gradient method \citep[for
@@ -467,7 +469,7 @@ sensible to use conjugate gradient method \citep[for
 problems without explicit matrix decompositions or inversions.  When
 using conjugate gradient descent we update the coefficients based with
 a new \emph{conjugate-gradient a-step}:
-\begin{eqnarray}\label{eq:astep-conj}\displaystyle
+\begin{eqnarray}\label{eq:astep_conj}\displaystyle
 a_{ik} & \gets & a_{ik}+\alpha\,r_{ik} \quad \mbox{where} \nonumber\\
 r_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}} \nonumber\\
 \alpha & = & \frac{\sum_{i=1}^{N}\sum_{k=1}^{K}r^2_{ik}}{\sum_{i=1}^{N}\sum_{k=1}^{K}r_{ik}\,R_{ik}} \nonumber\\
@@ -475,11 +477,11 @@ R_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{r_{ik}\,g_{kj}}{\sigma^2_{ij}}
 \quad ,
 \end{eqnarray}
 and a new \emph{conjugate-gradient g-step}:
-\begin{eqnarray}\label{eq:gstep-conj}\displaystyle
+\begin{eqnarray}\label{eq:gstep_conj}\displaystyle
 g_{kj} & \gets & g_{kj}+\beta\,q_{ik} \quad \mbox{where} \nonumber\\
 q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
 \beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{ik}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
-Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}] \nonumber\\
+Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
 \quad .
 \end{eqnarray}
 (VIVI, CAN YOU CHECK THE ABOVE?  I ADDED SOME SUMMATIONS THAT I
@@ -496,40 +498,70 @@ magnitudes of $N$, $M$, and $K$.
 
 \paragraph{Optimization with non-negative constraints:}
 
-HOGG:  The following needs to be massaged
+If the non-negative constraint of
+\equationname~(\ref{eq:non-negative}) is applied, normal weighted
+least-squares techniques cannot be used; these know nothing about
+constraints.  Fortunately, there are straightforward algorithms for
+quadratic programming with linear constraints.  Indeed, as we
+mentioned in \sectionname~\ref{sec:introduction}, the non-negative HMF
+model has been used previously \citep{blanton}.  Optimization in this
+case can proceed from all-positive initialization (to be discussed in
+\sectionname~\ref{sec:initialization}) by purely multiplicative
+updates.
 
-For this reason the method also provides the possibility of using a
-non-negative constraint for the components and the coefficients. To
-proceed with the optimization in this case we start with an
-all-positive first guess and then iterate these multiplicative updates
-\citep{blanton}:
-\begin{equation}\label{eq:6}
-a_{ik} \gets a_{ik}\left[\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}f_{ij}g_{kj}\right]\left[\sum_{n=1}^{K}\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}a_{in}g_{nj}g_{kj}\right]^{-1}
+The \emph{non-negative a-step} is:
+\begin{equation}\label{eq:astep_nonneg}
+a_{ik} \gets a_{ik}\,\left[\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}\,f_{ij}\,g_{kj}\right]\left[\sum_{n=1}^{K}\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}\,a_{in}\,g_{nj}\,g_{kj}\right]^{-1}
 \quad ,
 \end{equation}
-\begin{equation}\label{eq:7}
-g_{kj} \gets g_{kj}\left[\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}f_{ij}a_{ik}\right]\left[\sum_{n=1}^{K}\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}a_{ik}g_{in}g_{nj}\right]^{-1}
+and the \emph{non-negative g-step} is
+\begin{equation}\label{eq:gstep_nonneg}
+g_{kj} \gets g_{kj}\,\left[\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,f_{ij}\,a_{ik}\right]\left[\sum_{n=1}^{K}\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,a_{ik}\,g_{in}\,g_{nj}\right]^{-1}
 \quad ,
 \end{equation}
+where in both cases the ``inverse'' is just a scalar inverse of each
+term, not a matrix inverse of any kind.  These updates (for what might
+be called non-negative HMF or NNHMF) were first written down in the
+context of the $K$~correction system $\textsl{k-correct}$
+\citep{blanton}.
 
-As is obvious from those equations, the presence of negative fluxes
-$f_{ij}$ in the observed spectra could lead to negative solutions for
-the estimated components and coefficients. For this reason, before we
-apply the method to the observed training set, all the negative fluxes
-and their corresponding errors are set to zero. In this way the data
-of those pixels is not taken into account when we use
-{\equationname}s~(\ref{eq:6}) and (\ref{eq:7}).
+As may be obvious from those equations, the presence of negative
+fluxes $f_{ij}$ in the (noisy) observed spectra can lead to negative
+solutions for the estimated components and coefficients. For this
+reason, before we apply the method to the observed training set, all
+the negative fluxes and their corresponding errors are set to zero. In
+this way the data of those pixels is not taken into account when we
+use the non-negative a-step and g-step.  Strictly speaking, this step
+of removing negative fluxes is unjustified, but in practice very few
+pixels are usually affected, and the alternatives are substantially
+harder to implement.
 
-In the case with non-negative constrains the solution of
-{\equationname}s~(\ref{eq:6}) and (\ref{eq:7}) is very fast, allowing
-us to perform a large number of iterations ($\approx 10^3$) until they
-converge. To decrease the number of iterations, we iterate
-\equationname~(\ref{eq:6}) many times ($\approx 10^2$) during the
-initialization while keeping the initial basis fixed, in order to
-optimize the set of initial coefficients.
+The non-negative a-step and g-step are very fast, permitting large
+numbers of iterations ($\approx 10^3$), but that is good, because
+convergence is generally slow.  To decrease the number of optimization
+iterations, we find that it is beneficial to iterate the non-negative
+a-step of \equationname~(\ref{eq:astep_nonneg}) many times ($\approx
+10^2$) during the initialization while keeping the initial basis
+$g_{kj}$ fixed, in order to start at a good set of initial
+coefficients $a_{ik}$.
 
-HOGG: NOTE THAT WE CAN'T DO ANY ROTATIONS (like SVD) IN THE SPACE WHEN
-WE ARE NN, all we can do is re-order the spectra.
+In the standard method (no regularization), the basis spectra define
+an unconstrained linear subspace in which the spectra live; for this
+reason, any (non-degenerate) linear combination of the basis spectra
+constitute an equivalent basis.  When the non-negative constraint is
+applied, this is no longer true; rotations, coadditions, or shears in
+the basis-spectrum space will in general break non-negativity.  For
+this reason, the basis spectra cannot be orthogonalized in any
+sensible way; at best they can be re-scaled to ensure
+\begin{equation}\label{eq:nnnormalization}
+\sum_{j=1}^{M}g_{kj}^2 = 1
+\quad ,
+\end{equation}
+and ordered in decreasing variance order such that
+\begin{equation}\label{eq:nnordering}
+\sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
+\quad .
+\end{equation}
 
 \section{Initialization}\label{sec:initialization}
 
@@ -548,16 +580,15 @@ this by applying the method to a set of SDSS spectra when we use PCA
 or K-means results (\textbf{ref}), a randomly chosen set of spectra,
 or functions like sin and cosin for the initialization. For the case
 that non-negative constraints are applied to the estimated components
-and coefficients (see {\equationname}s~\ref{eq:6} and \ref{eq:7}), we
-are forced to use an initialization with positive values. Even though
-we could use any set of positive basis functions, the best
-initialization seems to be the results of the K-means algorithm. That
-is expected since the components extracted by K-means, that correspond
-to the centers of the groups into which the algorithm divides the
-training spectra, include more physical information than other
-non-negative initializations. We expect that the K-means results will
-include only positive values because if the number of groups is not
-very large (this might result in groups with very few spectra as
+and coefficients, we are forced to use an initialization with positive
+values. Even though we could use any set of positive basis functions,
+the best initialization seems to be the results of the K-means
+algorithm. That is expected since the components extracted by K-means,
+that correspond to the centers of the groups into which the algorithm
+divides the training spectra, include more physical information than
+other non-negative initializations. We expect that the K-means results
+will include only positive values because if the number of groups is
+not very large (this might result in groups with very few spectra as
 members), the mean spectrum in each group very rarely includes
 negative values of flux caused by errors.
 
@@ -700,14 +731,15 @@ with components that include negative values has no physical
 meaning. This problem can be solved be applying a non-negative
 constraint to our basis. The way that this is achieved is by
 initializing with a non-negative set of components and coefficients
-and iterating according to {\equationname}s~(\ref{eq:6}) and
-(\ref{eq:7}). One of the best ways to initialize this method with a
-set of non-negative components that include physical information is to
-use once again the K-means algorithm. The results of the fitting of
-the test set of spectra with the components extracted in this way
-after 2048 iterations are presented in \figurename~\ref{fig:4}, while
-in \figurename~\ref{fig:5} we present the resulting components for
-each type of object for $K=7$.
+and iterating according to the non-negative a-step of
+\equationname~(\ref{eq:astep_nonneg}) and the non-negative g-step of
+equationname~(\ref{eq:gstep_nonneg}). One of the best ways to
+initialize this method with a set of non-negative components that
+include physical information is to use once again the K-means
+algorithm. The results of the fitting of the test set of spectra with
+the components extracted in this way after 2048 iterations are
+presented in \figurename~\ref{fig:4}, while in \figurename~\ref{fig:5}
+we present the resulting components for each type of object for $K=7$.
 
 By comparing those results with the ones obtained without the
 non-negative constraint we see that the fitting is now worse. This was
@@ -907,14 +939,15 @@ work on in the near future.
 initiated this work by suggesting the model and all the optimization
 strategies.  In addition, we thank Mike Blanton (NYU), Jo Bovy (NYU),
 Adam Bolton (Utah), Roberto Decarli (MPIA), Dustin Lang (Princeton),
-and Hans-Walter Rix (MPIA) for valuable discussions.  Partial funding
-for this project was provided by NASA (grant NNX08AJ48G), the NSF
-(grant AST-0908357), and the Alexander von Humboldt Foundation.  This
-research made use of the SAO/NASA \project{Astrophysics Data System}
-and the \project{R} Project for Statistical Computing.  All the code
-used in this project is available from the authors upon request.
+Iain Murray (Edinburgh), and Hans-Walter Rix (MPIA) for valuable
+discussions.  Partial funding for this project was provided by NASA
+(grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
+Humboldt Foundation.  This research made use of the SAO/NASA
+\project{Astrophysics Data System} and the \project{R} Project for
+Statistical Computing.  All the code used in this project is available
+from the authors upon request.
 
-VIVI: GRANTS AND GRANT NUMBERS FOR YOU?
+VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU?
 
 Funding for the Sloan Digital Sky Survey (SDSS) has been provided by
 the Alfred P. Sloan Foundation, the Participating Institutions, the
@@ -956,7 +989,7 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-% \includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig1.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig1}
 \caption{The total $\chi^2$ value estimated by the fit of the training
   set of spectra by the components produced by the method vs. the
   number of components for each type of object (rows) and values of
@@ -966,18 +999,16 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-\begin{center}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig2.ps}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig3.ps}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig4.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig2}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig3}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig4}
 \caption{The first 7 components for each type of object (galaxies, LRGS and QSOs) as estimated by the PCA (grey lines) and the method presented here (black lines).}
 \label{fig:2}
-\end{center}
 \end{figure}
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig5.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig5}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
   of spectra by the components produced by the method vs. the number
   of components for each type of object (rows: galaxies, LRGs and QSOs
@@ -988,7 +1019,7 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig6.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig6}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
   of galaxy spectra by the components produced by the method vs. the
   number of components. The different types of lines represent the
@@ -999,24 +1030,22 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-\begin{center}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig7.ps}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig8.ps}
-%\includegraphics[angle=-90,width=0.99\columnwidth]{paper_plots/fig9.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig7}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig8}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig9}
 \caption{The first 7 components for each type of object (galaxies,
   LRGs and QSOs) as estimated by the PCA (grey lines) and the method
   presented here (black lines) when non-negative constraints were
   applied.}
 \label{fig:5}
-\end{center}
 \end{figure}
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/1qq.ps}
-%\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/2qq.ps}
-%\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/3qq.ps}
-%\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/4qq.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/1qq}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/2qq}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/3qq}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/4qq}
 \caption{The four known SMBHB candidates. \textsl{Top panel:} The
   $\chi^2$ difference between the fitting of the spectrum with 1 and 2
   sets of components. The green and blue lines represent the SDSS
@@ -1032,9 +1061,9 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/1gg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/2gg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/3gg.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/1gg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/2gg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/3gg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
   that were fitted with two sets of galaxy components.}
 \label{fig:6}
@@ -1042,9 +1071,9 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/103lg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/18lg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/55lg.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/103lg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/18lg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/55lg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
   that were fitted with one set of LRG components and one set of
   galaxy components.}
@@ -1053,9 +1082,9 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/12ggg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/59lgg.ps}
-%\includegraphics[angle=-90,width=0.32\columnwidth]{paper_plots/68lgg.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/12ggg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/59lgg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/68lgg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
   that were fitted with three sets of components (galaxies and
   LRGs). The bottom pannel shows the fitting of the residuals by two
@@ -1065,18 +1094,16 @@ Shewchuk J. R. 1994, http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gra
 
 \clearpage
 \begin{figure}
-\begin{center}
-%\includegraphics[angle=-90,width=0.34\columnwidth]{paper_plots/36gg.ps}
-%\includegraphics[angle=-90,width=0.34\columnwidth]{paper_plots/36ggSLACS.ps}
-%\includegraphics[angle=-90,width=0.34\columnwidth]{paper_plots/66gg.ps}
-%\includegraphics[angle=-90,width=0.34\columnwidth]{paper_plots/66ggSLACS.ps}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/36gg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/36ggSLACS}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/66gg}
+\includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/66ggSLACS}
 \caption{The 2 SLACS candidates that couldn't be confirmed by the
   method presented here. The left plots show the results of the
   fitting with the second set of components at the second redshift
   estimated with the method, while the right at the SLACS second
   redshift.}
 \label{fig:9}
-\end{center}
 \end{figure}
 
 \end{document}
