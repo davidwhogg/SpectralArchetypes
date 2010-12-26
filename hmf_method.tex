@@ -1,3 +1,11 @@
+% style notes
+% -----------
+% - use \equationname, \figurename, \sectionname, and so-on, not the words
+% - put equation numbers into ()
+% - use \, as multiplication signs -- that is, add space to mean ``multiply''
+% - separate all discussion of objective from optimization
+% - separate all discussion of optimization from initialization
+
 % to-do
 % -----
 % - intro needs to make it clear that there is nothing special about spectra
@@ -10,7 +18,7 @@
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2010-12-23 / not ready for distribution}}
+\slugcomment{\texttt{draft 2010-12-26 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -388,12 +396,13 @@ full problem for all the $g_{kj}$ (the ``g-step'') in a second shot.
 Then iteration can proceed to convergence.  However, the sparseness is
 very simple, so in the absence of a sparse-matrix linear algebra
 solver, the a-step and g-step can be split into iterated blocks.  The
-a-step involves an iteration over objects $i$, and the g-step involves
-an iteration over wavelength indices $j$.
+block-diagonal a-step involves an iteration over objects $i$, and the
+block-diagonal g-step involves an iteration over wavelength indices
+$j$.
 
-The \emph{a-step} is, for each $i$,
+The \emph{block-diagonal a-step} is, for each $i$,
 \begin{eqnarray}\label{eq:astep}\displaystyle
-\tv{A}_i & \leftarrow & \inverse{\tv{G}_i}\cdot\tv{F}_i \nonumber\\
+\tv{A}_i & \gets & \inverse{\tv{G}_i}\cdot\tv{F}_i \nonumber\\
 \left[\tv{A}_i\right]_k & \equiv & a_{ik} \nonumber\\
 \left[\tv{G}_i\right]_{kk'} & \equiv & \sum_{j=1}^{M} \frac{g_{kj}\,g_{k'j}}{\sigma_{ij}^2} \nonumber\\
 \left[\tv{F}_i\right]_k     & \equiv & \sum_{j=1}^{M} \frac{g_{kj}\,f_{i j}}{\sigma_{ij}^2}
@@ -404,9 +413,9 @@ $a_{ik}$, $\tv{G}_i$ is a $K\times K$ matrix to be inverted, and
 $\tv{F}_i$ is a $K$-vector.  This is just weighted linear least
 squares at each index $i$, fixing the $g_{kj}$.
 
-The \emph{g-step} is, for each $j$,
+The \emph{block-diagonal g-step} is, for each $j$,
 \begin{eqnarray}\label{eq:gstep}\displaystyle
-\tv{G}_j & \leftarrow & \inverse{\tv{A}_j}\cdot\tv{F}_j \nonumber\\
+\tv{G}_j & \gets & \inverse{\tv{A}_j}\cdot\tv{F}_j \nonumber\\
 \left[\tv{G}_j\right]_k & \equiv & g_{kj} \nonumber\\
 \left[\tv{A}_j\right]_{kk'} & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,a_{ik'}}{\sigma_{ij}^2} \nonumber\\
 \left[\tv{F}_j\right]_k     & \equiv & \sum_{i=1}^{N} \frac{a_{ik}\,f_{i j}}{\sigma_{ij}^2}
@@ -456,49 +465,34 @@ HOGG: Also, when the system becomes non-sparse, it might become
 sensible to use conjugate gradient method \citep[for
   example,][]{shewchuk}, which permits optimization of least-squares
 problems without explicit matrix decompositions or inversions.  When
-using conjugate gradient descent we update the coefficients based on
-the equations
-\begin{equation}\label{eq:10}
-a_{ik} \gets a_{ik}+\alpha r_{ik}
+using conjugate gradient descent we update the coefficients based with
+a new \emph{conjugate-gradient a-step}:
+\begin{eqnarray}\label{eq:astep-conj}\displaystyle
+a_{ik} & \gets & a_{ik}+\alpha\,r_{ik} \quad \mbox{where} \nonumber\\
+r_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}} \nonumber\\
+\alpha & = & \frac{\sum_{i=1}^{N}\sum_{k=1}^{K}r^2_{ik}}{\sum_{i=1}^{N}\sum_{k=1}^{K}r_{ik}\,R_{ik}} \nonumber\\
+R_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{r_{ik}\,g_{kj}}{\sigma^2_{ij}}
 \quad ,
-\end{equation}
-where:
-\begin{equation}\label{eq:11}
-r_{ik}=\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}g_{kj}}{\sigma^2_{ij}}g_{jk}
-\quad ,
-\end{equation}
-\begin{equation}\label{eq:12}
-\alpha=\frac{\sum_{i=1}^{N}\sum_{k=1}^{K}r^2_{ik}}{\sum_{i=1}^{N}\sum_{k=1}^{K}r_{ik}R_{ik}}
-\quad ,
-\end{equation}
-\begin{equation}\label{eq:13}
-R_{ik}=\frac{r_{ik}g_{kj}}{\sigma^2_{ij}}g_{jk}
-\quad ,
-\end{equation}
-and the basis functions:
-\begin{equation}\label{eq:14}
-g_{kj} \gets a_{kj}+\beta p_{ik}
-\quad ,
-\end{equation}
-\begin{equation}\label{eq:15}
-q_{kj}=a_{ki}\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}g_{kj}}{\sigma^2_{ij}}+\epsilon(g_{k(j+1)}-g_{kj})+\epsilon(g_{k(j-1)}-g_{kj})
-\quad ,
-\end{equation}
-\begin{equation}\label{eq:16}
-\beta=\frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{ik}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}Q_{kj}}
-\quad ,
-\end{equation}
-\begin{equation}\label{eq:17}
-Q_{kj}=a_{ki}\frac{a_{ik}q_{kj}}{\sigma^2_{ij}}-\epsilon(q_{k(j+1)}-q_{kj})-\epsilon(q_{k(j-1)}-q_{kj})
-\quad ,
-\end{equation}
-
-By comparing the two methods, through tests performed with SDSS
-spectra, we see that even though the use of the gradient descent is
-much faster at each iteration than the block diagonal case, it
-requires many more iterations in order to converge to the same
-results. This makes the first option faster and for that reason, it is
-the one used for the results presented below.
+\end{eqnarray}
+and a new \emph{conjugate-gradient g-step}:
+\begin{eqnarray}\label{eq:gstep-conj}\displaystyle
+g_{kj} & \gets & g_{kj}+\beta\,q_{ik} \quad \mbox{where} \nonumber\\
+q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
+\beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{ik}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
+Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}] \nonumber\\
+\quad .
+\end{eqnarray}
+(VIVI, CAN YOU CHECK THE ABOVE?  I ADDED SOME SUMMATIONS THAT I
+THOUGHT WERE MISSING.)  In our limited tests in the \project{R}
+language, we found that conjugate gradient was much faster per
+iteration than the block-diagonal method but required many more
+iterations to converge to the same precision.  We therefore used the
+block-diagonal method in everything that follows.  But the relative
+speed of one-shot optmization with a sparse matrix representation, the
+block-diagonal versions, and the conjugate-gradient version will in
+principle depend on the linear algebra system being used, quantitative
+properties of the data and its associated noise variances, and the
+magnitudes of $N$, $M$, and $K$.
 
 \paragraph{Optimization with non-negative constraints:}
 
@@ -534,11 +528,13 @@ converge. To decrease the number of iterations, we iterate
 initialization while keeping the initial basis fixed, in order to
 optimize the set of initial coefficients.
 
-HOGG: NOTE THAT WE CAN'T DO ANY ROTATIONS IN THE SPACE WHEN WE ARE NN.
+HOGG: NOTE THAT WE CAN'T DO ANY ROTATIONS (like SVD) IN THE SPACE WHEN
+WE ARE NN, all we can do is re-order the spectra.
 
 \section{Initialization}\label{sec:initialization}
 
-HOGG:  NEEDS TO BE MASSAGED
+HOGG: NEEDS TO BE MASSAGED -- four initializations; PCA is best in one
+case, K-means in the other.
 
  We initialize the fitting with the
 output of a PCA on the spectra after each spectrum has been projected
