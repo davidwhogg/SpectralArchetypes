@@ -8,14 +8,8 @@
 
 % to-do
 % -----
-% - intro needs to make it clear that there is nothing special about spectra
-% - intro needs to make it clear that the BASIS doesn't have to be control points
 % - intro needs a citation to Blanton \& Roweis as having priority
-% - intro should have a paragraph about k-means!
-% - intro needs a paragraph about factor analysis, ICA, and the like
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
-% - split optimization section into three cases, postpone initialization discussion
-% - make separate initialization section
 
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
@@ -151,6 +145,8 @@ just as happy creating components with negative amplitudes as positive
 amplitudes and the linear subspace therefore contains many quadrants,
 in general, that represent spectra with completely unphysical
 properties (such as negative emission lines and the like).
+
+HOGG: INSERT HERE PARAGRAPH ABOUT K-MEANS, ICA, and FACTOR ANALYSIS.
 
 In this \documentname, we introduce a new data-driven
 technique---heteroscedastic matrix factorization (HMF)---for modeling
@@ -938,20 +934,81 @@ presented in \figurename~\ref{fig:6a} where we can see that we are
 able to detect all of the four second redshifts that are given in the
 literature.
 
-In the future we plan to apply this method to the whole sample of QSO spectra in SDSS in order to detect more candidates of this type of object.
+In the future we plan to apply this method to the whole sample of QSO
+spectra in SDSS in order to detect more candidates of this type of
+object.
 
 \section{Discussion}\label{sec:discussion}
-We have developed a new technique based on iterative least-square minimization to model observed spectra. The method is based on estimating the minimum number of components whose linear combination can reproduce well the whole training set of the observations. In order to define the optimal number (K) of components we train the method for different values of K and then we use the produced components to fit a test set of observed spectra. By checking the changes in the total $\chi^2$ value of the fit with the number of components we can define the minimum number that should be used. An additional test for objectively choosing K for specific problems is to use the components extracted by the method for different values of K in order to reproduce accurately the results of known examples.
+We have developed a new technique based on iterative least-square
+minimization to model observed spectra. The method is based on
+estimating the minimum number of components whose linear combination
+can reproduce well the whole training set of the observations.
+In order to define the optimal number (K) of components we train the
+method for different values of K and then we use the produced
+components to fit a test set of observed spectra. By checking the
+changes in the total $\chi^2$ value of the fit with the number of
+components we can define the minimum number that should be used. An
+additional test for objectively choosing K for specific problems is to
+use the components extracted by the method for different values of K
+in order to reproduce accurately the results of known examples.
 
-For the training part of the method we use a subset of the observed spectra to which we want to apply the results. A way to improve the results would be to use the whole set of spectra, except the one under testing, in order to train the method. However, this is a very time consuming procedure, almost impossible in the case of large surveys like SDSS, and for that reason we choose to use a subsample of the data for training purposes.
+For the training part of the method we use a subset of the observed
+spectra to which we want to apply the results. A way to improve the
+results would be to use the whole set of spectra, except the one under
+testing, in order to train the method. However, this is a very time
+consuming procedure, almost impossible in the case of large surveys
+like SDSS, and for that reason we choose to use a subsample of the
+data for training purposes.
 
-Another way to improve the results, could be to add prior information on the amplitudes. Based on the coefficients extracted by the fitting of the training spectra by the components, we can draw conclusions about the amplitudes that will occur when the fitting is done for the testing spectra. This way outliers could be detected and unrealistic solutions could be excluded. However, this is also a subject that depends on the size of the training sample and the fraction of the observed variance that it covers. If the training sample doesn't fulfill these criteria then it is possible to produce worse results instead of improving the performance.
+Another way to improve the results, could be to add prior information
+on the amplitudes. Based on the coefficients extracted by the fitting
+of the training spectra by the components, we can draw conclusions
+about the amplitudes that will occur when the fitting is done for the
+testing spectra. This way outliers could be detected and unrealistic
+solutions could be excluded. However, this is also a subject that
+depends on the size of the training sample and the fraction of the
+observed variance that it covers. If the training sample doesn't
+fulfill these criteria then it is possible to produce worse results
+instead of improving the performance.
 
-In comparison to PCA the method presented here has the advantage of taking into account the errors in the observations. This will lead to components that include more physical information since they are not affected by the variance in the spectra caused by problems or artifacts during the observations. Additionally, since this method is based on the minimization of the total $\chi^2$ value instead of maximization of the variance included in the top components, it produces basis functions that fit the real data much better than the PCA results, for the same number of components, even from the first iteration. Finally, in contrast to PCA the method is also able to handle missing data. This is a big advantage since it allows us to increase the amount of information in the training set by including more objects that we wouldn't be able to use with PCA. An example of this is that we managed to achieve maximum wavelength coverage in the final components even though the training set included objects in a large range of redshifts. However, PCA has an advantage compared to our method which is its time efficiency. Even though techniques like block-diagonal and gradient descent seem to improve the speed of the $\chi^2$ minimization performed, the iterations needed make the method still much slower than PCA. This is an issue that we seek to improve in the future.
+In comparison to PCA the method presented here has the advantage of
+taking into account the errors in the observations. This will lead to
+components that include more physical information since they are not
+affected by the variance in the spectra caused by problems or
+artifacts during the observations. Additionally, since this method is
+based on the minimization of the total $\chi^2$ value instead of
+maximization of the variance included in the top components, it
+produces basis functions that fit the real data much better than the
+PCA results, for the same number of components, even from the first
+iteration. Finally, in contrast to PCA the method is also able to
+handle missing data. This is a big advantage since it allows us to
+increase the amount of information in the training set by including
+more objects that we wouldn't be able to use with PCA. An example of
+this is that we managed to achieve maximum wavelength coverage in the
+final components even though the training set included objects in a
+large range of redshifts. However, PCA has an advantage compared to
+our method which is its time efficiency. Even though techniques like
+block-diagonal and gradient descent seem to improve the speed of the
+$\chi^2$ minimization performed, the iterations needed make the method
+still much slower than PCA. This is an issue that we seek to improve
+in the future.
 
-Another problem of the method is the existence of many local minima in the resulting basis space. However, this can be solved by using many different initializations and using the results that produce the best fit to the test data. We should point out once again that comparison between the resulting components extracted from different initializations (or different methods) shouldn't be done by straight comparison between the components themselves but by camparing the quality of the fit to a test set of data.
+Another problem of the method is the existence of many local minima in
+the resulting basis space. However, this can be solved by using many
+different initializations and using the results that produce the best
+fit to the test data. We should point out once again that comparison
+between the resulting components extracted from different
+initializations (or different methods) shouldn't be done by straight
+comparison between the components themselves but by camparing the
+quality of the fit to a test set of data.
 
-An additional advantage of this method compared to the PCA is that it also provides an option for non-negative constrains in the resulting components and coefficients, based on the work of \cite{blanton}. This option can produce results that do not include unphysical features (e.g. negative emission lines). We should keep in mind though that since this is a very hard constraint, it has a big impact in the results by producing a poorer fit to the observed spectra.
+An additional advantage of this method compared to the PCA is that it
+also provides an option for non-negative constrains in the resulting
+components and coefficients, based on the work of \cite{blanton}. This
+option can produce results that do not include unphysical features
+(e.g. negative emission lines). We should keep in mind though that
+since this is a very hard constraint, it has a big impact in the
+results by producing a poorer fit to the observed spectra.
 
 The results of the method were applied to the problem of confirming
 double redshift objects in SDSS. From the 131 galaxy-galaxy
@@ -978,17 +1035,22 @@ template spectra for redshift estimation of objects that are going to
 observed by future surveys. This is is another subject that we seek to
 work on in the near future.
 
-\acknowledgments It is a pleasure to thank Sam Roweis (deceased) who
-initiated this work by suggesting the model and all the optimization
-strategies.  In addition, we thank Mike Blanton (NYU), Jo Bovy (NYU),
-Adam Bolton (Utah), Roberto Decarli (MPIA), Dustin Lang (Princeton),
-Iain Murray (Edinburgh), and Hans-Walter Rix (MPIA) for valuable
-discussions.  Partial funding for this project was provided by NASA
-(grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
-Humboldt Foundation.  This research made use of the SAO/NASA
-\project{Astrophysics Data System} and the \project{R} Project for
-Statistical Computing.  All the code used in this project is available
-from the authors upon request.
+HOGG: Finally, it is worth noting that nothing in the method is
+specific to spectral data.  HOGG: Also worth noting that the
+delta-function or control-point bases are not the only choices;
+re-cite Blanton.
+
+\acknowledgments It is with great regret that we thank Sam Roweis
+(deceased), who initiated this work by suggesting the model and all
+the optimization strategies.  It is a pleasure to thank Mike Blanton
+(NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA),
+Dustin Lang (Princeton), Iain Murray (Edinburgh), and Hans-Walter Rix
+(MPIA) for valuable discussions.  Partial funding for this project was
+provided by NASA (grant NNX08AJ48G), the NSF (grant AST-0908357), and
+the Alexander von Humboldt Foundation.  This research made use of the
+SAO/NASA \project{Astrophysics Data System} and the \project{R}
+Project for Statistical Computing.  All the code used in this project
+is available from the authors upon request.
 
 VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU?
 
