@@ -1,7 +1,7 @@
 % style notes
 % -----------
 % - use \equationname, \figurename, \sectionname, and so-on, not the words
-% - put equation numbers into ()
+% - put equation numbers into () unless the reference is already in parens
 % - use \, as multiplication signs -- that is, add space to mean ``multiply''
 % - separate all discussion of objective from optimization
 % - separate all discussion of optimization from initialization
@@ -14,7 +14,7 @@
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2010-12-26 / not ready for distribution}}
+\slugcomment{\texttt{draft 2010-12-29 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -222,7 +222,8 @@ approximately
 \quad .
 \end{equation}
 
-We want to model the spectrum of each object $i$ with a sum of $K$ linear components:
+We want to model the spectrum of each object $i$ with a sum of $K$
+linear components:
 \begin{equation}\label{eq:model}
 f_{ij} = f_{\lambda,i}(\lambda_j) = \sum_{k=1}^{K} a_{ik}\,g_k(\lambda_j) + e_{ij}
 \quad ,
@@ -231,11 +232,13 @@ where the modeling is done implicitly in the object rest frame, the
 $a_{ik}$ are coefficients, the $g_k(\lambda)$ are basis spectra, and
 the $e_{ij}$ represents the individual noise in pixel $j$ of spectrum
 $i$.  The noise element $e_{ij}$ is assumed to be drawn from a
-Gaussian of zero mean and variance $\sigma_{ij}^2$.  Given basis
-spectra $g_k(\lambda)$, the best set of coefficients for any observed
-spectrum---under the assumption of known, Gaussian uncertainties---can
-be found by weighted least-square fitting.  The challenge is to find
-the best set of basis spectra.
+Gaussian of zero mean and variance $\sigma_{ij}^2$.  The
+dimensionality $K$ is an investigator-set model complexity parameter,
+the objective setting of which is discussed briefly below.  Given
+basis spectra $g_k(\lambda)$, the best set of coefficients for any
+observed spectrum---under the assumption of known, Gaussian
+uncertainties---can be found by weighted least-square fitting.  The
+challenge is to find the best set of basis spectra.
 
 Often in astronomy, this basis has been found by principal components
 analysis (or equivalent) and then selection of the largest-variance
@@ -311,12 +314,14 @@ modified scalar $\chi_{\epsilon}^2$
 \quad ,
 \end{equation}
 where $\chi^2$ is defined in \equationname~(\ref{eq:chi-squared}),
-$\epsilon$ is a scalar that sets the strength of the
-smoothing. Optimization of this scalar $\chi_{\epsilon}^2$ is
-equivalent to optimization of the posterior probability distribution
-with a Gaussian prior applied to the pixel-to-pixel differences
-\citep[for example,][]{smoothness}; it is similar to what is done
-with Gaussian Processes \citep[for example,][]{Rasmussen06a}.
+$\epsilon$ is a scalar that sets the strength of the smoothing.  The
+investigator can set $\epsilon$ to tune the smoothness of the model;
+setting this parameter objectively is discussed briefly below.
+Optimization of this scalar $\chi_{\epsilon}^2$ is equivalent to
+optimization of the posterior probability distribution with a Gaussian
+prior applied to the pixel-to-pixel differences \citep[for
+  example,][]{smoothness}; it is similar to what is done with Gaussian
+Processes \citep[for example,][]{Rasmussen06a}.
 
 The second kind of regularization we can impose is non-negativity.
 That is, we can optimize \equationname~(\ref{eq:chi-squared}) but subject
@@ -333,16 +338,82 @@ optically thin.
 
 \paragraph{Model complexity:}
 The model has $[N\,K + M\,K]$ free parameters, where $N$ is the number
-of data points (set by the size of the data set), $M$ is the number of
-wavelengths (set by the size of each data point), and $K$ is the
-number of components permitted, or the dimensionality of the model
-space.  The dimension $K$ has to be chosen either arbitrarily by the
-investigator, or else by a process of model selection.
+of $M$-dimensional data points (set by the size of the data set), $M$
+is the number of wavelengths (set by the size of each data point), and
+$K$ is the number of components permitted, or the dimensionality of
+the model space.  The dimension $K$ has to be chosen either
+arbitrarily by the investigator, or else by a process of model
+selection.
 
-HOGG: quickly bash AIC, BIC, and Bayes integral; praise cross-validation.
+Standard frequentist model selection methods (for example, the AIC
+CITE or the BIC CITE) compares the objective $\chi^2$ of
+\equationname~(\ref{eq:chi-squared}) to some re-scaling of the
+\emph{number of degrees of freedom}, which is the number of independent
+data measurements ($[N\,M]$ in this case) minus the number of free
+parameters ($[N\,K + M\,K]$ in this case).  These model-selection
+methods are simple to implement but have many problems
+including---but not limited to---the following: They are only
+justified by certain un-stated \emph{utility} assumptions; model
+selection requires a utility, and these leave that utility unstated.
+They are only justified in the case of pure linear fitting, and this
+model is not linear; it is bi-linear.  The number of measurements is
+not a well-defined quantity; for example it is not clear what to do
+about measurements $f_{ij}$ for which the inverse variance
+$1/\sigma^2_{ij}$ is very small, or zero.  In practice, also, we find
+that the AIC and BIC also tend to prefer very high $K$, even in
+situations where the data are clearly well-described by a model with
+low $K$.  This may have to do with the assumption of Gaussianity; the
+AIC and BIC are strongly pulled by outliers in the data.
 
-HOGG: Note that epsilon is also a model complexity parameter; explain
-why and praise cross-validation.
+The standard Bayesian model selection involves performing an integral
+of the likelihood (which is an exponential of $\chi^2$) over the prior
+to obtain the \emph{evidence} for each model.  This method also has
+several problems including the following: A proper prior must be
+specified that is a function of the parameters \emph{and} the
+dimensionality $K$; this is not only difficult, arbitrary
+specification can lead to spurious results.  That is, the prior needs
+to be not just proper but in fact \emph{justified} or properly
+informative.  Evidence calculations require (in principle) integration
+over the entire permitted model space, which is enormous in this case;
+these integrals are rarely possible.  Furthermore, even done
+correctly, the evidence integral gives the relative probabilities of
+the models, but that does not suffice for model selection, which
+requires a specified utility.
+
+For all these reasons, we recommend leave-one-out cross-validation
+(CITE) or some similar kind of train-and-test framework.  In this
+method, the model is fit to all but a ``left out'' subset of the data,
+and then the best-fit model is used to predict or model the left-out
+subset.  If $K$ is too small, the model doesn't have enough freedom to
+fit even the training set well, and if $K$ is too large, the model
+over-fits the training set and does worse on the test set.  That is,
+we recommend choosing the dimensionality $K$ where the model does the
+best at predicting new or left-out data.  This is a good,
+scientifically motivated utility.  Also, typically, running $L$ trials
+of leave-one-out usually takes less than or of order $L$ times as long
+as the original optimization of the model, so it is not expensive.
+Finally, we find in practice that the cross-validation-optimal model
+complexity seems reasonable intuitively.
+
+When the smoothness regularization of
+\equationname~(\ref{eq:smoothness}) is turned on, the smoothness
+parameter $\epsilon$ is also a model-complexity parameter; if
+$\epsilon$ is set near zero the model has the full bi-linear freedom;
+if $\epsilon$ is set large, the model cannot easily explore ``spiky''
+parts of the parameter space.  This continuous model-complexity
+parameter doesn't fit into the AIC or BIC framework (which needs a
+clearly stated \emph{number} of degrees of freedom to operate); this
+parameter must be set by a Bayesian-evidence or cross-validation
+methods.  Once again, we advocate cross validation.
+
+All that said, there is no need to set the model-complexity parameters
+$K$ and $\epsilon$ by any objective model-selection test.  For many
+purposes, there will be clear limits to what is possible from hardware
+and computer-time constraints, or ball-park estimates of what makes
+sense that are good enough.  Indeed, our cross-validation tests
+suggest that in most scientific situations, the quality of the model
+is a very slow function of $K$ and $\epsilon$.  Arbitrary setting of
+$K$ and $\epsilon$ is therefore legitimate in many or most situations.
 
 \section{Optimization}\label{sec:optimization}
 
