@@ -147,6 +147,7 @@ in general, that represent spectra with completely unphysical
 properties (such as negative emission lines and the like).
 
 HOGG: INSERT HERE PARAGRAPH ABOUT K-MEANS, ICA, and FACTOR ANALYSIS.
+Cite Roweis review.
 
 In this \documentname, we introduce a new data-driven
 technique---heteroscedastic matrix factorization (HMF)---for modeling
@@ -293,15 +294,16 @@ that we have, at fixed coefficients $a_{ik}$ the globally optimal
 basis functions $g_k(\lambda)$ and that we have, at fixed basis
 functions $g_k(\lambda)$ the globally optimal coefficients $a_{ik}$.
 
+\paragraph{Regularization:}
 The second adjustment is that we sometimes choose to impose a
 regularization to improve the performance or realism of the model.
 The first kind of regularization we can impose is a smoothness prior
 that improves performance at (rest-frame) wavelengths at which we have
 very few data. In practice, we implement this prior by constructing
-the basis functions $g_k(\lambda)$ on a grid of $M$ rest
-wavelengths $\lambda_j$ and penalizing quadratically large
-pixel-to-pixel variations. That is, we optimize not the pure $\chi^2$
-above but a modified scalar $\chi_{\epsilon}^2$
+the basis functions $g_k(\lambda)$ on a grid of $M$ rest wavelengths
+$\lambda_j$ and penalizing quadratically large pixel-to-pixel
+variations. That is, we optimize not the pure $\chi^2$ above but a
+modified scalar $\chi_{\epsilon}^2$
 \begin{equation}\label{eq:smoothness}
 \chi_{\epsilon}^2 \equiv \chi^2
  + \epsilon\,\sum_{k=1}^K \sum_{j=2}^{M}
@@ -328,6 +330,19 @@ This can lead to solutions that are much more physically meaningful,
 especially when the objects of study are the spectra, particularly if
 they are the spectra of objects (like early-type galaxies) that are
 optically thin.
+
+\paragraph{Model complexity:}
+The model has $[N\,K + M\,K]$ free parameters, where $N$ is the number
+of data points (set by the size of the data set), $M$ is the number of
+wavelengths (set by the size of each data point), and $K$ is the
+number of components permitted, or the dimensionality of the model
+space.  The dimension $K$ has to be chosen either arbitrarily by the
+investigator, or else by a process of model selection.
+
+HOGG: quickly bash AIC, BIC, and Bayes integral; praise cross-validation.
+
+HOGG: Note that epsilon is also a model complexity parameter; explain
+why and praise cross-validation.
 
 \section{Optimization}\label{sec:optimization}
 
