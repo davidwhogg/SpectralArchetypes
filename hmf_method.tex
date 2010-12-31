@@ -10,6 +10,7 @@
 % -----
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
+% - do we need to say that the specific components don't matter as much as the space they span?
 
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
@@ -447,15 +448,15 @@ g_{kj} & \equiv & g_k(\lambda_j) \nonumber\\
 where $\lambda_0$ is the minimum wavelength under consideration, and
 $\Delta$ is a logarithmic wavelength interval.  The basis spectrum
 $g_k(\lambda)$ is defined to be the cubic-spline interplation in
-logarithmic wavelength $\ln\lambda$ from the control points at the
-$\lambda_j$ to the wavelength of interest $\lambda$.  In what follows,
-much of the fitting is in rest-frame wavelengths, given observations
-in observed-frame wavelengths.  The logarithmic wavelength grid and
-cubic spline interpolation makes redshift transformations simple and
-fast.  It is also the case the \sdss\ spectra are extracted on a
-logarithmic cubic-spline basis of this kind.  In detail, we will have
-to put all the input data and basis spectra on the same wavelength
-grid.
+logarithmic wavelength $\ln\lambda$ between the control points
+$g_{kj}$ at wavelengths $\lambda_j$ to the wavelength of interest
+$\lambda$.  In what follows, much of the fitting is in rest-frame
+wavelengths, given observations in observed-frame wavelengths.  The
+logarithmic wavelength grid and cubic spline interpolation makes
+redshift transformations simple and fast.  It is also the case the
+\sdss\ spectra are extracted on a logarithmic cubic-spline basis of
+this kind.  In detail, we will have to put all the input data and
+basis spectra on the same wavelength grid.
 
 From any initialization, we can descend to a local minimum using
 iterated least squares.  To begin, consider the unregularized case,
@@ -597,7 +598,6 @@ properties of the data and its associated noise variances, and the
 magnitudes of $N$, $M$, and $K$.
 
 \paragraph{Optimization with non-negative constraints:}
-
 If the non-negative constraint of
 \equationname~(\ref{eq:non-negative}) is applied, normal weighted
 least-squares techniques cannot be used; these know nothing about
@@ -1126,17 +1126,19 @@ specific to spectral data.  HOGG: Also worth noting that the
 delta-function or control-point bases are not the only choices;
 re-cite Blanton.
 
-\acknowledgments It is with great regret that we thank Sam Roweis
-(deceased), who initiated this work by suggesting the model and all
-the optimization strategies.  It is a pleasure to thank Mike Blanton
+\acknowledgments It is with great regret that we thank our deceased
+colleague Sam Roweis (Toronto, NYU), who initiated this work by
+suggesting the model and all the optimization strategies.  It is a
+pleasure to thank Iain Murray (Edinburgh), who helped out with the
+engineering and statistics literature.  We also thank Mike Blanton
 (NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA),
-Dustin Lang (Princeton), Iain Murray (Edinburgh), and Hans-Walter Rix
-(MPIA) for valuable discussions.  Partial funding for this project was
-provided by NASA (grant NNX08AJ48G), the NSF (grant AST-0908357), and
-the Alexander von Humboldt Foundation.  This research made use of the
-SAO/NASA \project{Astrophysics Data System} and the \project{R}
-Project for Statistical Computing.  All the code used in this project
-is available from the authors upon request.
+Dustin Lang (Princeton), and Hans-Walter Rix (MPIA) for valuable
+discussions.  Partial funding for this project was provided by NASA
+(grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
+Humboldt Foundation.  This research made use of the SAO/NASA
+\project{Astrophysics Data System} and the \project{R} Project for
+Statistical Computing.  All the code used in this project is available
+from the authors upon request.
 
 VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU?
 
