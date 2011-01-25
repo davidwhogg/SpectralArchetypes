@@ -177,10 +177,11 @@ most important outliers found in the \sdss\ data (CITE) are
 double-redshift objects.  Indeed, the set of luminous red galaxies
 that show evidence for a second (higher) redshift in their spectra
 include as a subset a significant fraction of all known gravitational
-lenses (CITE).  Other valuable double-redshift sources include merging
+lenses \citep{bolton}.  Other valuable double-redshift sources include merging
 galaxies, binary stars, and binary quasars.  In the latter category,
 there are very few known examples where the best explanation for a
-spectrum is a bound pair of super-massive black holes (CITES).  In both
+spectrum is a bound pair of super-massive black holes (\citealp{komossa}; 
+\citealp{shields}: \citealp{boroson}; \citealp{decarli}).  In both
 cases---gravitational lenses and binary black holes---the best
 candidates have been found with heuristic searches.  These searches
 involve (in the case of gravitational lenses) looking for isolated
@@ -351,7 +352,9 @@ arbitrarily by the investigator, or else by a process of model
 selection.
 
 Standard frequentist model selection methods (for example, the AIC
-CITE or the BIC CITE) compares the objective $\chi^2$ of
+\citep{aic} (VVcom:here maybe you wanted to mention papers in 
+astronomy that use AIC/BIC like Conolly et al. 2000?) or the BIC \citep{bic}) 
+compares the objective $\chi^2$ of
 \equationname~(\ref{eq:chi-squared}) to some re-scaling of the
 \emph{number of degrees of freedom}, which is the number of independent
 data measurements ($[N\,M]$ in this case) minus the number of free
@@ -451,7 +454,7 @@ g_{kj} & \equiv & g_k(\lambda_j) \nonumber\\
 \end{eqnarray}
 where $\lambda_0$ is the minimum wavelength under consideration, and
 $\Delta$ is a logarithmic wavelength interval.  The basis spectrum
-$g_k(\lambda)$ is defined to be the cubic-spline interplation in
+$g_k(\lambda)$ is defined to be the cubic-spline interpolation in
 logarithmic wavelength $\ln\lambda$ between the control points
 $g_{kj}$ at wavelengths $\lambda_j$ to the wavelength of interest
 $\lambda$.  In what follows, much of the fitting is in rest-frame
@@ -524,18 +527,25 @@ minimum.  These steps must be modified when smoothness
 (\equationname~\ref{eq:non-negative}) regularizations are applied, as
 we discuss next.
 
-VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD?
+VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD? (VVcom: I did some 
+changes here I hope that now it is correct)
 For any $K$-dimensional linear subspace, there are many choices for
 the components $g_k$: The components can be reordered, multiplied by
 scalars, or replaced with linear combinations of themselves.  We don't
 try to break all of these degeneracies, but we do enforce the
-$K$ constraints that the $\vec{g}_k\cdot\vec{g}_k=1$, where the inner
-product is taken with the trivial (identity) metric in the spectrum
-space. Additionally we rotate the system of the basis functions and
-reorder the components according to the variance they include:
-\begin{equation}\label{eq:ordering}
-\sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
-\end{equation}
+$K$ constraints that the $\vec{g}_k\cdot\vec{g}_k=1$, (VVcom: as the code 
+is now the dot product is equal to M and not to 1 because we normalize each $g_k$ with 
+the mean of the $g_{kj}^2$, I can very easily change that in the functions.R). 
+Additionally, in a way analogous to the PCA,  we orthogonalize the system of the basis 
+functions and reorder the components according to the variance they include 
+by diagonalize the squared matrix of their coefficients when fit to the data.
+More specifically we use the $K\times K$ matrix U that includes the eigenvectors 
+of the $A^TA$ matrix to define the new components and coefficients as follows:
+
+\begin{eqnarray}\label{eq:ordering}
+a_{ik}=\sum_{k'=1}^{K}a_{ik'}u_{k'k} \nonumber\\
+g_{kj}=\sum_{k'=1}^{K}u_{kk'}g_{k'j}
+\end{eqnarray}
 
 \paragraph{Optimization with smoothness prior:}
 
@@ -564,7 +574,9 @@ small changes need to be made at $j=1$ and $j=M$:
 \end{eqnarray}
 This new g-step is justified by seeing the neighboring $g_{kj}$ pixels
 as ``data'' that constrain the model with inverse variance $\epsilon$.
-VIVI: CAN YOU CHECK THAT THESE ARE THE EQUATIONS WE ACTUALLY USED?
+VIVI: CAN YOU CHECK THAT THESE ARE THE EQUATIONS WE ACTUALLY USED? 
+(VVcom: Yes, all these seem right. Should we also mention that the $g_{k[j-1]}$ 
+and $g_{k[j+1]}$ used here are the ones from the previous iterations?)
 
 Because the smoothness constraint makes the system less sparse, it
 might become sensible to use conjugate gradient method \citep[for
@@ -581,15 +593,19 @@ R_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{r_{ik}\,g_{kj}}{\sigma^2_{ij}}
 \end{eqnarray}
 and a new \emph{conjugate-gradient g-step}:
 \begin{eqnarray}\label{eq:gstep_conj}\displaystyle
-g_{kj} & \gets & g_{kj}+\beta\,q_{ik} \quad \mbox{where} \nonumber\\
-q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
+g_{kj} & \gets & g_{kj}+\beta\,q_{kj} \quad \mbox{where} \nonumber\\
+q_{kj} & = & \sum_{i=1}^{N}a_{ki}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
 \beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{kj}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
-Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
+Q_{kj} & = & \sum_{i=1}^{N}a_{ki}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
 \quad .
 \end{eqnarray}
 (VIVI, CAN YOU CHECK THE ABOVE?  I ADDED SOME SUMMATIONS THAT I
 THOUGHT WERE MISSING.  ALSO I AM CONCERNED BY THE $q_{kj}$ in the
-$Q_{kj}$ line.)  In our limited tests in the \project{R} language, we
+$Q_{kj}$ line.) (VVcom: I just replaced $q_{ik}$ with $q_{kj}$ in 
+the first line and the first $a_{ik}$ in the 2nd and 4th equation 
+with $a_{ki}$ because we have used $A^T$ in these equations. If my 
+understanding of the gstepgd() in fuctions.R is correct the $q_{kj}$ in the
+$Q_{kj}$ line are needed.) In our limited tests in the \project{R} language, we
 found that conjugate gradient was much faster per iteration than the
 block-diagonal method but required many more iterations to converge to
 the same precision.  We therefore used the block-diagonal a-step and
@@ -661,7 +677,8 @@ sensible way; at best they can be re-scaled to ensure
 \sum_{j=1}^{M}g_{kj}^2 = 1
 \quad ,
 \end{equation}
-and ordered in decreasing variance order such that
+and ordered in decreasing variance order such that (VVcom: even though we could reorder the 
+components for the non-negative case we did not do it in the code.)
 \begin{equation}\label{eq:nnordering}
 \sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
 \quad .
@@ -1134,9 +1151,9 @@ re-cite Blanton.
 colleague Sam Roweis (Toronto, NYU), who initiated this work by
 suggesting the model and all the optimization strategies.  It is a
 pleasure to thank Iain Murray (Edinburgh), who helped out with the
-engineering and statistics literature.  We also thank Mike Blanton
-(NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA),
-Dustin Lang (Princeton), and Hans-Walter Rix (MPIA) for valuable
+engineering and statistics literature.  We also thank Coryn Bailer-Jones (MPIA), 
+Mike Blanton (NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA),
+Dustin Lang (Princeton), Hans-Walter Rix (MPIA) and Kester Smith (MPIA) for valuable
 discussions.  Partial funding for this project was provided by NASA
 (grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
 Humboldt Foundation.  This research made use of the SAO/NASA
@@ -1144,7 +1161,9 @@ Humboldt Foundation.  This research made use of the SAO/NASA
 Statistical Computing.  All the code used in this project is available
 from the authors upon request.
 
-VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU?
+VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU? (VVcom: I added 
+two people in the list. I think I don't have to acknowledge any grant 
+but I will ask Coryn to make sure.)
 
 Funding for the Sloan Digital Sky Survey (SDSS) has been provided by
 the Alfred P. Sloan Foundation, the Participating Institutions, the
@@ -1163,12 +1182,23 @@ Princeton University, the United States Naval Observatory, and the
 University of Washington.
 
 \begin{thebibliography}{}
+\bibitem[Akaike(1974)]{aic}
+Akaike,~H. 1974, IEEE Transactions on Automatic Control, 19, 716
+
 \bibitem[Blanton \& Roweis(2007)]{blanton}
 Blanton,~M.~R. \& Roweis,~S. 2007, AJ, 133, 734
 
-\bibitem[Bolton \etal(2007)]{bolton}
+\bibitem[Bolton \etal(2008)]{bolton}
 Bolton,~A.~S., Burles,~S., Koopmans,~L.~V.~E., Treu,~T., Gavazzi,~R.,
 Moustakas,~L.,~A., Wayth,~R., Schlegel,~D.~J. 2008, ApJ, 682, 964
+
+\bibitem[Decarli \etal(2010)]{decarli}
+Decarli, R., Dotti, M., Montuori, C., Liimets, T., Ederoclite, A. 2010, ApJ, 720L, 93
+
+\bibitem[Komossa \etal(2008)]{komossa}
+Komossa,~S., Zhou,~H., Lu,~H. 2008, ApJ, 678, 81
+
+\bibitem[Boroson \& Lauer(2009)]{boroson} Boroson,~T.~A. \& Lauer,~T.~R. 2009, Natur, 458, 53
 
 \bibitem[Eisenstein \etal(2001)]{eisenstein}
 Eisenstein~D.~J., \etal, 2001, AJ, 122, 2267
@@ -1181,9 +1211,14 @@ Series, Lecture Notes in Statistics 116 (Springer)
 Rasmussen,~C.~E. \& Williams,~C., 2006, Gaussian Processes for Machine
 Learning (MIT Press)
 
+\bibitem[Schwarz (1978)]{bic}
+Schwarz,~G.~E. 1978, Annals of Statistics, 6, 461
+
 \bibitem[Shewchuk(1994)]{shewchuk}
 Shewchuk,~J.~R. 1994,
 http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gradient.pdf
+
+\bibitem[Shields \etal(2009)]{shields} Shields,~G.~A., Rosario,~D.~J., Smith,~K.~L., Bonning,~E.~W., Salviander,~S., Kalirai,~J.~S., Strickler,~R., Ramirez-Ruiz,~E., Dutton,~A.~A., Treu,~T., Marshall,~P.~J. 2009, ApJ, 707, 936
 
 \bibitem[Wentzell \etal(1997)]{mlpca}
 Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
