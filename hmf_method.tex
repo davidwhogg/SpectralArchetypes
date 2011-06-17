@@ -16,7 +16,7 @@
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2010-12-29 / not ready for distribution}}
+\slugcomment{\texttt{draft 2011-06-14 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -751,7 +751,7 @@ second object is present we expect the fit to be improved when we use
 two sets of components, one at the redshift of SDSS and one at that of
 the second object. In the examples that follow we will demonstrate
 this using the SLACS sample of gravitational lenses \citep{bolton} and
-the four known candidates of Supermassive Black Hole Binaries (SMBHBs)
+the four known candidates of massive Black Hole Binaries (BHBs)
 (\textbf{ref}).
 
 \subsection{Training}\label{sec:training}
@@ -900,7 +900,7 @@ additional smoothing constraint.
 
 Based on the results presented here and an additional test to select
 the optimum number of components by checking how many are needed in
-order to detect the second redshifts in the SLACS and SMBHB candidate
+order to detect the second redshifts in the SLACS and BHB candidate
 samples, we have decided to fit the SDSS spectra using the 14, 7 and
 14 components that were produced by our method for galaxy, LRG and QSO
 sources after 16 iterations and using $\epsilon$=3, 30 and 10
@@ -910,56 +910,23 @@ ones. This is expected, since the LRG spectra have less variation. A
 more detailed description of the fitting and its results is presented
 below.
 
-\subsection{Hypothesis test}
-In order to detect the presence of a second redshift in the SDSS
-spectra for each spectrum $i$, we generate $Z+1$ mutually exclusive
-hypotheses: The null hypothesis $S_i$ that spectrum $i$ only has
-significant flux coming from a single redshift $z_i$ determined by the
-\facility{SDSS} pipeline, and $Z$ hypotheses $D_{im}$ that spectrum
-$i$ has significant flux coming from two redshifts, $z_m$ and another
-redshift $z_m>z_i+\epsilon$.  In the context of this very restricted
-universe of hypotheses, the odds ratio $\Omega_i$ for the null
-hypothesis is
-\begin{equation}\label{eq:odds}
-\Omega_i = \frac{\sum_{m=1}^Z p(D_{im}|\vec{f}_i,I)}{p(S_i|\vec{f}_i,I)}
- = \sum_{m=1}^Z \left[\frac{p(\vec{f}_i|D_{im},I)}{p(\vec{f}_i|S_i,I)}
- \,\frac{p(D_{im}|I)}{p(S_i|I)}\right] = \sum_{m=1}^Z\Omega_{im}\quad,
-\end{equation}
-where the spectral flux data are represented by the vector $\vec{f}_i$, the symbol $I$ represents all of the prior information in the problem, including but not limited to the hypothesis specification, the wavelengths and uncertainties associated with the spectral flux data, and any other knowledge that the investigator might have about the hypotheses prior to any data analysis. We have implicitly defined an individual-hypothesis odds ratio
-\begin{equation}
-\Omega_{im} = \frac{p(\vec{f}_i|D_{im},I)}{p(\vec{f}_i|S_i,I)}
-  \,\frac{p(D_{im}|I)}{p(S_i|I)}\quad.
-\end{equation}
-Because an individual spectrum is unlikely a priori to show two redshifts, the prior probabilities will have the asymmetry
-\begin{equation}
-\sum_{m=1}^Z p(D_{im}|I) \ll p(S_i|I) \quad,
-\end{equation}
-and it remains for us to decide how to set the relative prior probabilities among the $Z$ hypotheses $D_{im}$.
+\subsection{Two-redshift models}\label{sec:tworedshifts}
+In order to detect the presence of a second redshift in the SDSS spectra we test the improvement of the fitting when a spectrum is fitted with two sets of componets at two different redshifts (i.e. the one estimated by SDSS and another redshift) instead of only one set of components at the redshift provided by SDSS. This second redshift is scanning a regular grid of values selected to be uniform in a logarithmic scale, i.e. in the same way as the wavelengths in SDSS. In this way moving to the next value of the redshift grid is equivalent to shifting the spectrum by one pixel. In practice the improvement of the fitting can be estimated by measuring the $\chi^2$ difference between the two fits ($\Delta\chi_{in}^2$):
 
-We have split the sum in the odds $\Omega_i$ into a sum of individual odds ratios $\Omega_{im}$ because, as we will see, we need to estimate the ratio for each $m$ individually; we can't just evaluate the total numerator and denominator of $\Omega_i$ independently.  The reason for this is the all-important spectral coverage.  Each setting of the pair $(z_i,z_m)$ limits differently the spectral range over which the eigenspectra are both well determined. Imagine that one of the hypotheses $D_{im}$ is only testable in some particular spectral range $[\lambda_{\min},\lambda_{\max}]$.  The data in this spectral range can be used to estimate the single-hypothesis odds ratio $\Omega_{im}$ of hypothesis $D_{im}$ to the null hypothesis $S_i$. Clearly hypotheses $D_{im}$ that are testable with larger spectral ranges will be better tested, but the fact that different hypotheses are subject to tests of different strengths merely weakens---does not invalidate---the total hypothesis test.
+\begin{eqnarray}\label{eq:deltachi-squared}\displaystyle
+\Delta\,\chi_{in}^2 & = & \sum_{j=m}^{M'}
+             \frac{\left[f_{ij}-\sum_{k=1}^K a_{ik}
+                      \,g_k(\lambda_j/[1+z_i])\right]^2}
+{\sigma^2_{ij}} - \nonumber\\ 
+& - & \sum_{j=m}^{M'}
+             \frac{\left[f_{ij}-\sum_{k=1}^K a'_{ik}
+                      \,g_k(\lambda_j/[1+z_i])-\sum_{k=1}^K \beta_{ik}
+                      \,g_k(\lambda_j/[1+z_n])\right]^2}
+{\sigma^2_{ij}}
+\quad ,
+\end{eqnarray}
 
-The SDSS spectra have near-Gaussian uncertainties. Therefore, for each hypothesis $D_{im}$ we can perform least-square fitting ($\chi^2$ minimization) on the subset of $N_{im}$ pixels in the flux vector $\vec{f}_i$ that overlap the eigenspectra spectral ranges for both redshifts $z_i$ and $z_m$.  If we perform the least-square fit with $n$ eigenspectra at each redshift, then the odds ratio can be approximated by a modified difference in $\chi^2$:
-\begin{equation}
-\ln\Omega_{im}= \frac{1}{2}\,\left[\chi^2_i-\chi^2_{im}-n\right]
- +\ln\frac{p(D_{im}|I)}{p(S_i|I)} \quad,
-\end{equation}
-where we have taken the natural logarithm to simplify things,
-$\chi^2_i$ is the minimum $\chi^2$ under hypothesis $S_i$,
-$\chi^2_{im}$ is the minimum $\chi^2$ under hypothesis $D_{ij}$, the
-adjustment of $-n$ accounts for the fact that the $S_i$ fit has $n$
-fewer parameters than the $D_{im}$ fit, and the last term is the prior
-ratio. Importantly, in this odds-ratio expression, the $\chi^2$ fits
-for hypotheses $S_i$ and $D_{im}$ must have been performed over the
-same $N_{im}$ pixels in both cases. Even then, the expression is
-something of an approximation, because it effectively assumes that the
-data are affected by perfectly known, perfectly Gaussian noise and
-that one of the two hypotheses is capable of providing a good fit to
-the data.
-
-In the section that follows we apply this hypothesis test to the
-spectra of known double redshift sources in SDSS using as basis
-functions for the fitting, the components extracted in
-\sectionname~\ref{sec:training} for each type of object.
+where $m$ and $M'$ are the first and last common pixels between the components when moved to the SDSS and the second redshift ($z_i$ and $z_n$ respectively). By definition an improvement of the fitting when using an additional set of components will result to a positive value of $\Delta\chi_{in}^2$. In the case that the spectrum has significant flux coming from a second object we expect that there will be a peak in $\Delta\chi_{in}^2$ at a second redshift equal to the one of that object. The strength of the peak depends on the brightness and therefore the distance of the second object, the presence of emission lines in its spectrum and to some extent to the spectral coverage. As it is obvious the use of an additional set of componets always improves the fitting of the spectrum. However, this improvement is not significant and does not vary a lot for different values of the second redshift in the cases that the signature of a second object is not present in the spectrum. Finally, by performing our search using the difference of the $\chi^2$ values between the two fits, values of $\Delta\chi_{in}^2$ that correspond to different second redshifts are directly comparable, despite the fact that they might correspond to different number of pixels in the fits.
 
 \subsection{Testing}
 
@@ -969,24 +936,20 @@ gravitational lens candidates, selected by the presence of higher
 redshift emission lines and lower redshift continuum. Using the
 components extracted by the method presented here
 (\sectionname~\ref{sec:training}) for galaxy and LRG SDSS spectra we
-try to apply the hypothesis test described above and reproduce the
+try to apply the test described above (\sectionname~\ref{sec:twomodels}) and reproduce the
 results of the SLACS survey for the second redshift.
 
 As a first step we applied the test using the 14 galaxy components of
 \sectionname~\ref{sec:training} for both the foreground and the
-background object. Each spectrum of the SLACS survey was fitted once
-with the components at the SDSS redshift and the $\chi^2$ value of the
-fit was calculated. Then the spectrum was fitted again with one set of
-components at the SDSS redshift and one set of components at a
-redshift scanning a regular grid of values. The difference between the
-two $\chi^2$ values (with one and two sets of components) was used to
-search for peaks in the second redshift. For the case that both sets
-of components used correspond to galaxy spectra, we detected peaks for
-120 SLACS spectra at the same redshifts as in the SLACS survey
-(\figurename~\ref{fig:6}). An additional criterium that we used was
-that the peaks (if present) should correspond to fits that did not
-produce negative OIII lines if they were included in the spectral
-range of the fit.
+background object. For each spectrum of the SLACS survey we used 
+the proceedure described in (\sectionname~\ref{sec:tworedshifts}) to
+search for peaks of the $\Delta\,\chi_{in}^2$ in the second redshift. 
+For the case that both sets of components used correspond to galaxy 
+spectra, we detected peaks for 120 SLACS spectra at the same redshifts 
+as in the SLACS survey (\figurename~\ref{fig:6}). An additional 
+criterium that we used was that the peaks (if present) should 
+correspond to fits that did not produce negative OIII lines if 
+they were included in the spectral range of the fit.
 
 For the remaining 11 cases we applied the same proceedure but this
 time using the LRG components to fit the foreground object and the
@@ -997,7 +960,7 @@ survey for 6 of those spectra (\figurename~\ref{fig:7}).
 For the 5 remaining spectra we detect a different second redshift than
 the one provided by \cite{bolton}. For those objects we applied once
 again our method but this time assuming the presence of three objects
-instead of two. More specifically we fit the spectrum using a set of
+instead of two. More specifically, we fit the spectrum using a set of
 components (LRG or galaxy) at the SDSS redshift, a set of components
 (galaxy) at the second redshift to which was given the highest
 probability according to our method, and a set of components (galaxy)
@@ -1008,7 +971,7 @@ to predict the SLACS second redshift for 3 additional objects
 For only 2 out of the 131 spectra tested here were we not able to
 detect their second redshift. The results for these spectra as well as
 the fitting at the second redshift given by SLACS are shown in
-\figurename~\ref{fig:9}. From this \figurename we see that this is a
+\figurename~\ref{fig:9}. From this \figurename  we see that this is a
 weak detection with no obvious signature of an additional object at
 the second redshift.
 
@@ -1017,14 +980,16 @@ survey are very promising. Our goal is to apply this method to the
 whole SDSS spectroscopic sample in order to detect new gravitational
 lens candidates.
 
-\subsubsection{The known sample of SMBHB candidates}
+\subsubsection{The known sample of BHB candidates}
 Another type of object that can be detected by the presence of two
-redshifts in its spectrum is the SMBHBs. In the case of SMBHBs we
+redshifts in its spectrum is the BHBs. In the case of BHBs we
 expect the presence of two sets of emission lines (one broad and one
 narrow) with a small separation between them, caused by the rotation
 of the less massive black hole around the more massive one that is
 located at the center of the system. Only four spectra in SDSS have
-been selected to be SMBHB candidates (\textbf{ref}). By applying our
+been selected to be BHB candidates\footnote{a new candidate by 
+\cite{barrows11} appeared in the literature only after the complition of this work.} 
+\citep{komossa,bogdanovic09,dotti09,boroson,shields,decarli}. By applying our
 method to those spectra we followed the same procedure as in the case
 of gravitational lenses in order to test if we can detect the second
 redshift. However, since in this case the separation between the two
@@ -1041,9 +1006,11 @@ presented in \figurename~\ref{fig:6a} where we can see that we are
 able to detect all of the four second redshifts that are given in the
 literature.
 
-In the future we plan to apply this method to the whole sample of QSO
-spectra in SDSS in order to detect more candidates of this type of
-object.
+This method was applied to spectra of 54586 and 3929 objects classified 
+as QSOs and galaxies respectively in SDSS DR7, with 0.1$<$z$<$1.5 in order 
+to detect more candidates of this type of object (\citealp{tsalmantza}). The search resulted to 
+32 objects with peculiar spectra, nine of which can be interpreted as 
+BHB candidates.
 
 \section{Discussion}\label{sec:discussion}
 We have developed a new technique based on iterative least-square
@@ -1128,7 +1095,7 @@ components at a redshift scanning a regular grid of values. The
 maximum improvement of the fitting when two sets of components at
 different redshifts were used instead of one set at the SDSS redshift,
 occurred at the redshift predicted by SLACS for the second
-object. Similar were the results for the case of the four known SMBHBs
+object. Similar were the results for the case of the four known BHBs
 candidates where we were able to reproduce all of them. In the future
 we will perform an automatic search for objects of these types in all
 the SDSS spectroscopic data. For the case of gravitational lens
@@ -1151,9 +1118,15 @@ re-cite Blanton.
 colleague Sam Roweis (Toronto, NYU), who initiated this work by
 suggesting the model and all the optimization strategies.  It is a
 pleasure to thank Iain Murray (Edinburgh), who helped out with the
+<<<<<<< .mine
+engineering and statistics literature.  We also thank Coryn Bailer-Jones (MPIA), 
+Mike Blanton (NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA), Massimo Dotti (MPA),
+Dustin Lang (Princeton), Hans-Walter Rix (MPIA) and Kester Smith (MPIA) for valuable
+=======
 engineering and statistics literature.  We also thank Coryn Bailer-Jones (MPIA), 
 Mike Blanton (NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA),
 Dustin Lang (Princeton), Hans-Walter Rix (MPIA) and Kester Smith (MPIA) for valuable
+>>>>>>> .r18702
 discussions.  Partial funding for this project was provided by NASA
 (grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
 Humboldt Foundation.  This research made use of the SAO/NASA
@@ -1182,9 +1155,18 @@ Princeton University, the United States Naval Observatory, and the
 University of Washington.
 
 \begin{thebibliography}{}
+<<<<<<< .mine
 \bibitem[Akaike(1974)]{aic}
 Akaike,~H. 1974, IEEE Transactions on Automatic Control, 19, 716
 
+\bibitem[Barrows \etal(2011)]{barrows11} 
+Barrows,~R.~S., Lacy,~C.~H.~S., Kennefick,~D., Kennefick,~J., Seigar,~M.~S. 2011, NewA, 16, 122
+
+=======
+\bibitem[Akaike(1974)]{aic}
+Akaike,~H. 1974, IEEE Transactions on Automatic Control, 19, 716
+
+>>>>>>> .r18702
 \bibitem[Blanton \& Roweis(2007)]{blanton}
 Blanton,~M.~R. \& Roweis,~S. 2007, AJ, 133, 734
 
@@ -1192,6 +1174,20 @@ Blanton,~M.~R. \& Roweis,~S. 2007, AJ, 133, 734
 Bolton,~A.~S., Burles,~S., Koopmans,~L.~V.~E., Treu,~T., Gavazzi,~R.,
 Moustakas,~L.,~A., Wayth,~R., Schlegel,~D.~J. 2008, ApJ, 682, 964
 
+<<<<<<< .mine
+\bibitem[Bogdanovic, Eracleous \& Sigurdsson(2009)]{bogdanovic09} 
+Bogdanovic,~T., Eracleous,~M., Sigurdsson,~S. 2009, ApJ, 697, 288
+
+\bibitem[Boroson \& Lauer(2009)]{boroson} 
+Boroson,~T.~A., Lauer,~T.~R. 2009, Nature, 458, 53
+
+\bibitem[Decarli \etal(2010)]{decarli}
+Decarli,~R., Dotti,~M., Montuori,~C., Liimets,~T., Ederoclite,~A. 2010, ApJ, 720L, 93
+
+\bibitem[Dotti \etal(2009)]{dotti09} 
+Dotti,~M., Montuori,~C., Decarli,~R., Volonteri,~M., Colpi,~M., Haardt,~F. 2009, MNRAS Letters, 398, 73
+
+=======
 \bibitem[Decarli \etal(2010)]{decarli}
 Decarli, R., Dotti, M., Montuori, C., Liimets, T., Ederoclite, A. 2010, ApJ, 720L, 93
 
@@ -1200,12 +1196,16 @@ Komossa,~S., Zhou,~H., Lu,~H. 2008, ApJ, 678, 81
 
 \bibitem[Boroson \& Lauer(2009)]{boroson} Boroson,~T.~A. \& Lauer,~T.~R. 2009, Natur, 458, 53
 
+>>>>>>> .r18702
 \bibitem[Eisenstein \etal(2001)]{eisenstein}
 Eisenstein~D.~J., \etal, 2001, AJ, 122, 2267
 
 \bibitem[Kitagawa \& Gersch(1996)]{smoothness}
 Kitagawa,~G. \& Gersch,~W., 1996, Smoothness Priors Analysis of Time
 Series, Lecture Notes in Statistics 116 (Springer)
+
+\bibitem[Komossa \etal(2008)]{komossa}
+Komossa,~S., Zhou,~H., Lu,~H. 2008, ApJ, 678, 81
 
 \bibitem[Rasmussen \& Williams(2006)]{Rasmussen06a}
 Rasmussen,~C.~E. \& Williams,~C., 2006, Gaussian Processes for Machine
@@ -1218,8 +1218,16 @@ Schwarz,~G.~E. 1978, Annals of Statistics, 6, 461
 Shewchuk,~J.~R. 1994,
 http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gradient.pdf
 
+<<<<<<< .mine
 \bibitem[Shields \etal(2009)]{shields} Shields,~G.~A., Rosario,~D.~J., Smith,~K.~L., Bonning,~E.~W., Salviander,~S., Kalirai,~J.~S., Strickler,~R., Ramirez-Ruiz,~E., Dutton,~A.~A., Treu,~T., Marshall,~P.~J. 2009, ApJ, 707, 936
 
+\bibitem[Tsalmantza \etal(2011)]{tsalmantza} 
+Tsalmantza,~P., Decarli,~R., Dotti,~M., Hogg,~D.~W. 2011, ApJ, in press (arXiv:1106.1180v1)
+
+=======
+\bibitem[Shields \etal(2009)]{shields} Shields,~G.~A., Rosario,~D.~J., Smith,~K.~L., Bonning,~E.~W., Salviander,~S., Kalirai,~J.~S., Strickler,~R., Ramirez-Ruiz,~E., Dutton,~A.~A., Treu,~T., Marshall,~P.~J. 2009, ApJ, 707, 936
+
+>>>>>>> .r18702
 \bibitem[Wentzell \etal(1997)]{mlpca}
 Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \& Kowalski,~B.~R., 1997, Journal of Chemometrics, 11, 339
@@ -1284,7 +1292,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/2qq}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/3qq}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/4qq}
-\caption{The four known SMBHB candidates. \textsl{Top panel:} The
+\caption{The four known BHB candidates. \textsl{Top panel:} The
   $\chi^2$ difference between the fitting of the spectrum with 1 and 2
   sets of components. The green and blue lines represent the SDSS
   redshift and the one with the largest $\chi^2$
