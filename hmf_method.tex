@@ -8,15 +8,16 @@
 
 % to-do
 % -----
-% - intro needs to cite \cite{mlpca}.
+% - intro needs to cite \cite{mlpca}
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
 % - do we need to say that the specific components don't matter as much as the space they span?
+% - make sure we cite the relevant robusty-PCA methods (Wild, Budavari, others)
 
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2011-06-14 / not ready for distribution}}
+\slugcomment{\texttt{draft 2011-06-20 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -352,7 +353,7 @@ arbitrarily by the investigator, or else by a process of model
 selection.
 
 Standard frequentist model selection methods (for example, the AIC
-\citep{aic} (VVcom:here maybe you wanted to mention papers in 
+\citep{aic} (HOGG: here maybe you wanted to mention papers in 
 astronomy that use AIC/BIC like Conolly et al. 2000?) or the BIC \citep{bic}) 
 compares the objective $\chi^2$ of
 \equationname~(\ref{eq:chi-squared}) to some re-scaling of the
@@ -527,20 +528,17 @@ minimum.  These steps must be modified when smoothness
 (\equationname~\ref{eq:non-negative}) regularizations are applied, as
 we discuss next.
 
-VIVI: THIS PARAGRAPH IS WRONG, NO; DON'T WE DO AN SVD? (VVcom: I did some 
-changes here I hope that now it is correct)
 For any $K$-dimensional linear subspace, there are many choices for
 the components $g_k$: The components can be reordered, multiplied by
 scalars, or replaced with linear combinations of themselves.  We don't
-try to break all of these degeneracies, but we do enforce the
-$K$ constraints that the $\vec{g}_k\cdot\vec{g}_k=1$, (VVcom: as the code 
-is now the dot product is equal to M and not to 1 because we normalize each $g_k$ with 
-the mean of the $g_{kj}^2$, I can very easily change that in the functions.R). 
-Additionally, in a way analogous to the PCA,  we orthogonalize the system of the basis 
-functions and reorder the components according to the variance they include 
-by diagonalize the squared matrix of their coefficients when fit to the data.
-More specifically we use the $K\times K$ matrix U that includes the eigenvectors 
-of the $A^TA$ matrix to define the new components and coefficients as follows:
+try to break all of these degeneracies, but we do enforce the $K$
+constraints that the $\vec{g}_k\cdot\vec{g}_k=1$ or $M$ or equivalent.
+Additionally, in a way analogous to the PCA, we orthogonalize the
+system of the basis functions and reorder the components according to
+the variance they include by diagonalize the squared matrix of their
+coefficients when fit to the data.  More specifically we use the
+$K\times K$ matrix U that includes the eigenvectors of the $A^TA$
+matrix to define the new components and coefficients as follows:
 
 \begin{eqnarray}\label{eq:ordering}
 a_{ik}=\sum_{k'=1}^{K}a_{ik'}u_{k'k} \nonumber\\
@@ -574,8 +572,8 @@ small changes need to be made at $j=1$ and $j=M$:
 \end{eqnarray}
 This new g-step is justified by seeing the neighboring $g_{kj}$ pixels
 as ``data'' that constrain the model with inverse variance $\epsilon$.
-VIVI: CAN YOU CHECK THAT THESE ARE THE EQUATIONS WE ACTUALLY USED? 
-(VVcom: Yes, all these seem right. Should we also mention that the $g_{k[j-1]}$ 
+
+(HOGG: Should we also mention that the $g_{k[j-1]}$ 
 and $g_{k[j+1]}$ used here are the ones from the previous iterations?)
 
 Because the smoothness constraint makes the system less sparse, it
@@ -594,19 +592,13 @@ R_{ik} & = & \sum_{j=1}^{M}g_{jk}\,\frac{r_{ik}\,g_{kj}}{\sigma^2_{ij}}
 and a new \emph{conjugate-gradient g-step}:
 \begin{eqnarray}\label{eq:gstep_conj}\displaystyle
 g_{kj} & \gets & g_{kj}+\beta\,q_{kj} \quad \mbox{where} \nonumber\\
-q_{kj} & = & \sum_{i=1}^{N}a_{ki}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
+q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{f_{ij}-\sum_{k=1}^{K}a_{ik}\,g_{kj}}{\sigma^2_{ij}}+\epsilon\,[g_{k(j+1)}-g_{kj}]+\epsilon\,[g_{k(j-1)}-g_{kj}] \nonumber\\
 \beta & = & \frac{\sum_{k=1}^{K}\sum_{j=1}^{M}q^2_{kj}}{\sum_{k=1}^{K}\sum_{j=1}^{M}q_{kj}\,Q_{kj}} \nonumber\\
-Q_{kj} & = & \sum_{i=1}^{N}a_{ki}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
+Q_{kj} & = & \sum_{i=1}^{N}a_{ik}\,\frac{a_{ik}\,q_{kj}}{\sigma^2_{ij}}-\epsilon\,[q_{k(j+1)}-q_{kj}]-\epsilon\,[q_{k(j-1)}-q_{kj}]
 \quad .
 \end{eqnarray}
-(VIVI, CAN YOU CHECK THE ABOVE?  I ADDED SOME SUMMATIONS THAT I
-THOUGHT WERE MISSING.  ALSO I AM CONCERNED BY THE $q_{kj}$ in the
-$Q_{kj}$ line.) (VVcom: I just replaced $q_{ik}$ with $q_{kj}$ in 
-the first line and the first $a_{ik}$ in the 2nd and 4th equation 
-with $a_{ki}$ because we have used $A^T$ in these equations. If my 
-understanding of the gstepgd() in fuctions.R is correct the $q_{kj}$ in the
-$Q_{kj}$ line are needed.) In our limited tests in the \project{R} language, we
-found that conjugate gradient was much faster per iteration than the
+In our limited tests in the \project{R} language, we found that
+conjugate gradient was much faster per iteration than the
 block-diagonal method but required many more iterations to converge to
 the same precision.  We therefore used the block-diagonal a-step and
 g-step in everything that follows with the smoothness regularization.
@@ -677,8 +669,7 @@ sensible way; at best they can be re-scaled to ensure
 \sum_{j=1}^{M}g_{kj}^2 = 1
 \quad ,
 \end{equation}
-and ordered in decreasing variance order such that (VVcom: even though we could reorder the 
-components for the non-negative case we did not do it in the code.)
+and ordered in decreasing variance order such that
 \begin{equation}\label{eq:nnordering}
 \sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
 \quad .
@@ -757,25 +748,26 @@ the four known candidates of massive Black Hole Binaries (BHBs)
 \subsection{Training}\label{sec:training}
 In order to detect the presence of two objects at different redshifts
 in the SDSS spectra, we need to be able to model the spectra of all
-types of objects that have been observed by the survey (galaxies, LRGs
-and QSOs). To do so, we have to train our method separately for each
-class. For this purpose we selected a small random sample of spectra
-for each type of object (approximately 5000 for galaxies and LRGs and
-10000 for QSOs, the numbers were selected as such in order to make
-sure that we have at least as many objects as number of pixels, which
-was needed for some of the tests we performed using PCA). The spectra
-were taken from the 7th Data Release (DR7) of SDSS (\textbf{ref}). The
-values of redshift were selected to be in the ranges of 0.01-0.06,
-0.20-0.50 and 0.10-1.50 for galaxies, LRGs and QSOs respectively.
+types of objects that have been observed by the survey (the primary
+sample of ``Main Galaxies'', the luminous red galaxy sample or
+``LRGs'', and color-selected QSOs). To do so, we have to train our
+method separately for each class. For this purpose we selected a small
+random sample of spectra for each type of object (approximately 5000
+for Main Galaxies and LRGs and 10000 for QSOs, the numbers were selected as
+such in order to make sure that we have at least as many objects as
+number of pixels, which was needed for some of the tests we performed
+using PCA). The spectra were taken from the 7th Data Release (DR7) of
+SDSS (\textbf{ref}). The values of redshift were selected to be in the
+ranges of 0.01-0.06, 0.20-0.50 and 0.10-1.50 for Main Galaxies, LRGs and
+QSOs respectively.
 
 For the selection of the LRG sample used in this study we followed the
 target selection of the LRG sample in SDSS which is based on 2 cuts,
 defined using magnitudes, colors and surface brightness criteria
 \citep{eisenstein}. Cut I is suitable for selecting LRGs with z$<$0.4
-and CUT II for LRGs with z$>$0.4. According to \cite{eisenstein} these
-criteria are suitable for redshifts in the range of values greater
-than 0.15 and less than 0.55. The number of galaxies fulfilling these
-criteria is expected to be about 100,000 by the end of the survey. The
+and CUT II for LRGs with z$>$0.4.  These criteria are suitable for
+redshifts in the range of values greater than 0.15 and less than 0.55;
+about 100,000 galaxies in the survey meet these criteria. The
 primTarget field that is provided in the SpecObjAll table of SDSS is
 set to GALAXY\_RED if the LRG passes either CUT I or CUTII and to
 GALAXY\_RED\_II if it passes CUTII but not CUTI. For this study we
@@ -784,7 +776,31 @@ either GALAXY\_RED and GALAXY\_RED\_II and only GALAXY\_RED (since if
 the primTarget is set as GALAXY\_RED\_II it is by default set as
 GALAXY\_RED as well).
 
-The sample was used to determine the maximum wavelength coverage, i.e. a wavelength area for which at least 10 sources have valid data at the beginning and the end of the spectrum. In this way we are able to fit the part of the spectrum that is produced by the second object for a large range of redshift values. During this procedure, pixels with any of the flags: SP\_MASK\_FULLREJECT, SP\_MASK\_NODATA, SP\_MASK\_BRIGHTSKY, SP\_MASK\_NOSKY or pixels that correspond to zero noise were treated as masked. All the spectra and their noise were moved to the rest-frame by keeping the energy constant in each spectral bin while relabeling the wavelength axis.  The final wavelength coverage for each object is: 3580.964-9109.615 \AA\ for galaxies, 2544.486-7615.528 \AA\ for LRGs and 1522.299-8352.183 \AA\ for QSOs, corresponding to 4056, 4762 and 7394 pixels respectively. Since only 10 spectra include data at the bluest and reddest wavelengths, missing data is present in almost all the spectra of our sample. To deal with this problem we have set the fluxes at those areas equal to the first or the last non-masked pixel of the spectrum and we have set the noise of those pixels to a very high value ($10^{-12} erg/sec/cm^2/$\AA), so that they will not be taken into account by the method. As a last step before the application of the method all spectra were interpolated to the wavelengths selected for each type of source using cubic splines. The selected wavelengths are uniformly distributed in log space as in the case of the original SDSS wavelengths. For the resulting spectra we interpolated linearly the values of the masked pixels.
+The sample was used to determine the maximum wavelength coverage,
+i.e. a wavelength area for which at least 10 sources have valid data
+at the beginning and the end of the spectrum. In this way we are able
+to fit the part of the spectrum that is produced by the second object
+for a large range of redshift values. During this procedure, pixels
+with any of the flags: SP\_MASK\_FULLREJECT, SP\_MASK\_NODATA,
+SP\_MASK\_BRIGHTSKY, SP\_MASK\_NOSKY or pixels that correspond to zero
+noise were treated as masked. All the spectra and their noise were
+moved to the rest-frame by keeping the energy constant in each
+spectral bin while relabeling the wavelength axis.  The final
+wavelength coverage for each object is: 3580.964-9109.615 \AA\ for
+Main Galaxies, 2544.486-7615.528 \AA\ for LRGs and 1522.299-8352.183
+\AA\ for QSOs, corresponding to 4056, 4762 and 7394 pixels
+respectively. Since only 10 spectra include data at the bluest and
+reddest wavelengths, missing data is present in almost all the spectra
+of our sample. To deal with this problem we have set the fluxes at
+those areas equal to the first or the last non-masked pixel of the
+spectrum and we have set the noise of those pixels to a very high
+value ($10^{-12} erg/sec/cm^2/$\AA), so that they will not be taken
+into account by the method. As a last step before the application of
+the method all spectra were interpolated to the wavelengths selected
+for each type of source using cubic splines. The selected wavelengths
+are uniformly distributed in log space as in the case of the original
+SDSS wavelengths. For the resulting spectra we interpolated linearly
+the values of the masked pixels.
 
 HOGG: THIS PARAGRAPH NEEDS TO BE MASSAGED IN: Importantly in the training,
 the wavelengths $\lambda_j$ are rest-frame wavelengths, and because
@@ -902,17 +918,26 @@ Based on the results presented here and an additional test to select
 the optimum number of components by checking how many are needed in
 order to detect the second redshifts in the SLACS and BHB candidate
 samples, we have decided to fit the SDSS spectra using the 14, 7 and
-14 components that were produced by our method for galaxy, LRG and QSO
-sources after 16 iterations and using $\epsilon$=3, 30 and 10
+14 components that were produced by our method for Main Galaxy, LRG
+and QSO sources after 16 iterations and using $\epsilon$=3, 30 and 10
 respectively. It is interesting that fewer components are needed in
-order to fit well the LRG SDSS spectra than the galaxy and QSO
-ones. This is expected, since the LRG spectra have less variation. A
-more detailed description of the fitting and its results is presented
-below.
+order to fit well the LRG SDSS spectra than are needed for the Main
+Galaxy and QSO spectra.  This is expected, since the LRG spectra show
+very little variation \citep{eishogg}. A more detailed description of
+the fitting and its results is presented below.
 
 \subsection{Two-redshift models}\label{sec:tworedshifts}
-In order to detect the presence of a second redshift in the SDSS spectra we test the improvement of the fitting when a spectrum is fitted with two sets of componets at two different redshifts (i.e. the one estimated by SDSS and another redshift) instead of only one set of components at the redshift provided by SDSS. This second redshift is scanning a regular grid of values selected to be uniform in a logarithmic scale, i.e. in the same way as the wavelengths in SDSS. In this way moving to the next value of the redshift grid is equivalent to shifting the spectrum by one pixel. In practice the improvement of the fitting can be estimated by measuring the $\chi^2$ difference between the two fits ($\Delta\chi_{in}^2$):
-
+In order to detect the presence of a second redshift in the SDSS
+spectra we test the improvement of the fitting when a spectrum is
+fitted with two sets of componets at two different redshifts (i.e. the
+one estimated by SDSS and another redshift) instead of only one set of
+components at the redshift provided by SDSS. This second redshift is
+scanning a regular grid of values selected to be uniform in a
+logarithmic scale, i.e. in the same way as the wavelengths in SDSS. In
+this way moving to the next value of the redshift grid is equivalent
+to shifting the spectrum by one pixel. In practice the improvement of
+the fitting can be estimated by measuring the $\chi^2$ difference
+between the two fits ($\Delta\chi_{in}^2$):
 \begin{eqnarray}\label{eq:deltachi-squared}\displaystyle
 \Delta\,\chi_{in}^2 & = & \sum_{j=m}^{M'}
              \frac{\left[f_{ij}-\sum_{k=1}^K a_{ik}
@@ -925,8 +950,25 @@ In order to detect the presence of a second redshift in the SDSS spectra we test
 {\sigma^2_{ij}}
 \quad ,
 \end{eqnarray}
-
-where $m$ and $M'$ are the first and last common pixels between the components when moved to the SDSS and the second redshift ($z_i$ and $z_n$ respectively). By definition an improvement of the fitting when using an additional set of components will result to a positive value of $\Delta\chi_{in}^2$. In the case that the spectrum has significant flux coming from a second object we expect that there will be a peak in $\Delta\chi_{in}^2$ at a second redshift equal to the one of that object. The strength of the peak depends on the brightness and therefore the distance of the second object, the presence of emission lines in its spectrum and to some extent to the spectral coverage. As it is obvious the use of an additional set of componets always improves the fitting of the spectrum. However, this improvement is not significant and does not vary a lot for different values of the second redshift in the cases that the signature of a second object is not present in the spectrum. Finally, by performing our search using the difference of the $\chi^2$ values between the two fits, values of $\Delta\chi_{in}^2$ that correspond to different second redshifts are directly comparable, despite the fact that they might correspond to different number of pixels in the fits.
+where $m$ and $M'$ are the first and last common pixels between the
+components when moved to the SDSS and the second redshift ($z_i$ and
+$z_n$ respectively). By definition an improvement of the fitting when
+using an additional set of components will result to a positive value
+of $\Delta\chi_{in}^2$. In the case that the spectrum has significant
+flux coming from a second object we expect that there will be a peak
+in $\Delta\chi_{in}^2$ at a second redshift equal to the one of that
+object. The strength of the peak depends on the brightness and
+therefore the distance of the second object, the presence of emission
+lines in its spectrum and to some extent to the spectral coverage. As
+it is obvious the use of an additional set of componets always
+improves the fitting of the spectrum. However, this improvement is not
+significant and does not vary a lot for different values of the second
+redshift in the cases that the signature of a second object is not
+present in the spectrum. Finally, by performing our search using the
+difference of the $\chi^2$ values between the two fits, values of
+$\Delta\chi_{in}^2$ that correspond to different second redshifts are
+directly comparable, despite the fact that they might correspond to
+different number of pixels in the fits.
 
 \subsection{Testing}
 
@@ -935,25 +977,26 @@ The SLACS survey \citep{bolton} includes 131 strong galaxy-galaxy
 gravitational lens candidates, selected by the presence of higher
 redshift emission lines and lower redshift continuum. Using the
 components extracted by the method presented here
-(\sectionname~\ref{sec:training}) for galaxy and LRG SDSS spectra we
-try to apply the test described above (\sectionname~\ref{sec:twomodels}) and reproduce the
-results of the SLACS survey for the second redshift.
+(\sectionname~\ref{sec:training}) for Main Galaxy and LRG SDSS spectra
+we try to apply the test described above
+(\sectionname~\ref{sec:tworedshifts}) and reproduce the results of the
+SLACS survey for the second redshift.
 
-As a first step we applied the test using the 14 galaxy components of
+As a first step we applied the test using the 14 Main Galaxy components of
 \sectionname~\ref{sec:training} for both the foreground and the
 background object. For each spectrum of the SLACS survey we used 
 the proceedure described in (\sectionname~\ref{sec:tworedshifts}) to
 search for peaks of the $\Delta\,\chi_{in}^2$ in the second redshift. 
-For the case that both sets of components used correspond to galaxy 
+For the case that both sets of components used correspond to Main Galaxy 
 spectra, we detected peaks for 120 SLACS spectra at the same redshifts 
-as in the SLACS survey (\figurename~\ref{fig:6}). An additional 
-criterium that we used was that the peaks (if present) should 
+as those found in the SLACS survey (\figurename~\ref{fig:6}). An additional 
+criterion that we used was that the peaks (if present) should 
 correspond to fits that did not produce negative OIII lines if 
 they were included in the spectral range of the fit.
 
 For the remaining 11 cases we applied the same proceedure but this
 time using the LRG components to fit the foreground object and the
-galaxy components to fit the background one. The results show that
+Main Galaxy components to fit the background one. The results show that
 using our method we are extracting the same results as the SLACS
 survey for 6 of those spectra (\figurename~\ref{fig:7}).
 
@@ -961,9 +1004,9 @@ For the 5 remaining spectra we detect a different second redshift than
 the one provided by \cite{bolton}. For those objects we applied once
 again our method but this time assuming the presence of three objects
 instead of two. More specifically, we fit the spectrum using a set of
-components (LRG or galaxy) at the SDSS redshift, a set of components
-(galaxy) at the second redshift to which was given the highest
-probability according to our method, and a set of components (galaxy)
+components (LRG or Main Galaxy) at the SDSS redshift, a set of components
+(Main Galaxy) at the second redshift to which was given the highest
+probability according to our method, and a set of components (Main Galaxy)
 at a redshift scanning a regular grid of values. This time we managed
 to predict the SLACS second redshift for 3 additional objects
 (\figurename~\ref{fig:8}).
@@ -1006,11 +1049,12 @@ presented in \figurename~\ref{fig:6a} where we can see that we are
 able to detect all of the four second redshifts that are given in the
 literature.
 
-This method was applied to spectra of 54586 and 3929 objects classified 
-as QSOs and galaxies respectively in SDSS DR7, with 0.1$<$z$<$1.5 in order 
-to detect more candidates of this type of object (\citealp{tsalmantza}). The search resulted to 
-32 objects with peculiar spectra, nine of which can be interpreted as 
-BHB candidates.
+This method was applied to spectra of 54586 and 3929 objects
+spectroscopically classified as QSOs and galaxies respectively in SDSS
+DR7, with 0.1$<$z$<$1.5 in order to detect more candidates of this
+type of object (\citealp{tsalmantza}). The search resulted to 32
+objects with peculiar spectra, nine of which can be interpreted as BHB
+candidates.
 
 \section{Discussion}\label{sec:discussion}
 We have developed a new technique based on iterative least-square
@@ -1088,7 +1132,7 @@ The results of the method were applied to the problem of confirming
 double redshift objects in SDSS. From the 131 galaxy-galaxy
 gravitational lenses in the SLACS survey we were able to automatically
 detect 129, using the components extracted by the method when trained
-with galaxy and LRG SDSS spectra, to fit the candidates. The
+with SDSS Main Galaxy and LRG spectra, to fit the candidates. The
 confirmation was made by fitting the spectra once with a set of
 components at the SDSS redshift and once with an additional set of
 components at a redshift scanning a regular grid of values. The
@@ -1127,10 +1171,6 @@ Humboldt Foundation.  This research made use of the SAO/NASA
 \project{Astrophysics Data System} and the \project{R} Project for
 Statistical Computing.  All the code used in this project is available
 from the authors upon request.
-
-VIVI: PEOPLE TO ACK?  GRANTS AND GRANT NUMBERS FOR YOU? (VVcom: I added 
-two people in the list. I think I don't have to acknowledge any grant 
-but I will ask Coryn to make sure.)
 
 Funding for the Sloan Digital Sky Survey (SDSS) has been provided by
 the Alfred P. Sloan Foundation, the Participating Institutions, the
@@ -1177,6 +1217,9 @@ Dotti,~M., Montuori,~C., Decarli,~R., Volonteri,~M., Colpi,~M., Haardt,~F. 2009,
 \bibitem[Eisenstein \etal(2001)]{eisenstein}
 Eisenstein~D.~J., \etal, 2001, AJ, 122, 2267
 
+\bibitem[Eisenstein et al.(2003)]{eishogg}
+Eisenstein,~D.~J., \etal, 2003, ApJ, 585, 694 
+
 \bibitem[Kitagawa \& Gersch(1996)]{smoothness}
 Kitagawa,~G. \& Gersch,~W., 1996, Smoothness Priors Analysis of Time
 Series, Lecture Notes in Statistics 116 (Springer)
@@ -1220,7 +1263,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig2}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig3}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig4}
-\caption{The first 7 components for each type of object (galaxies, LRGS and QSOs) as estimated by the PCA (grey lines) and the method presented here (black lines).}
+\caption{The first 7 components for each type of object (Main Galaxies, LRGS and QSOs) as estimated by the PCA (grey lines) and the method presented here (black lines).}
 \label{fig:2}
 \end{figure}
 
@@ -1229,7 +1272,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig5}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
   of spectra by the components produced by the method vs. the number
-  of components for each type of object (rows: galaxies, LRGs and QSOs
+  of components for each type of object (rows: Main Galaxies, LRGs and QSOs
   respectively). The different types of lines represent the different
   values of $\epsilon$ used in each case.}
 \label{fig:3}
@@ -1239,7 +1282,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \begin{figure}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig6}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
-  of galaxy spectra by the components produced by the method vs. the
+  of Main Galaxy spectra by the components produced by the method vs. the
   number of components. The different types of lines represent the
   different initializations used (PCA, K-means, random spectra and sin
   and cosin functions).}
@@ -1251,7 +1294,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig7}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig8}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig9}
-\caption{The first 7 components for each type of object (galaxies,
+\caption{The first 7 components for each type of object (Main Galaxies,
   LRGs and QSOs) as estimated by the PCA (grey lines) and the method
   presented here (black lines) when non-negative constraints were
   applied.}
@@ -1283,7 +1326,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/2gg}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/3gg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
-  that were fitted with two sets of galaxy components.}
+  that were fitted with two sets of Main Galaxy components.}
 \label{fig:6}
 \end{figure}
 
@@ -1294,7 +1337,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/55lg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
   that were fitted with one set of LRG components and one set of
-  galaxy components.}
+  Main Galaxy components.}
 \label{fig:7}
 \end{figure}
 
@@ -1304,7 +1347,7 @@ Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/59lgg}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/68lgg}
 \caption{As \figurename~\ref{fig:6a} for the case of SLACS candidates
-  that were fitted with three sets of components (galaxies and
+  that were fitted with three sets of components (Main Galaxies and
   LRGs). The bottom pannel shows the fitting of the residuals by two
   sets of components.}
 \label{fig:8}
