@@ -8,7 +8,6 @@
 
 % to-do
 % -----
-% - intro needs to cite \cite{mlpca}
 % - intro needs a citation to Blanton \& Roweis as having priority
 % - intro needs to introduce SDSS, or it needs to be introduced somewhere
 % - do we need to say that the specific components don't matter as much as the space they span?
@@ -83,8 +82,8 @@ Data-driven models are necessary for many applications: It is rare
 that theoretical models are specific enough, accurate enough, or rich
 enough to generate all of the features of a data set.  Common examples
 in astronomy come in the study and analysis of spectra.  Redshift
-determination (CITE), emission-line measurements (CITE), and
-decomposition into different stellar populations (CITE) can all in
+determination (HOGG CITE), emission-line measurements (HOGG CITE), and
+decomposition into different stellar populations (HOGG CITE) can all in
 principle be performed with theory-based spectral models, but rarely
 are the spectral models accurate enough or detailed enough to make
 measurements as precise as contemporary data permit.  In addition to
@@ -95,7 +94,7 @@ uncertainties---uncertainties about model assumptions and
 computational approximations---that inevitably propagate into results.
 For these reasons, the highest-performing redshift determination
 systems, for example, use data-driven models that involve principal
-components analysis (PCA) or similar approaches (DWH CITE SDSS).
+components analysis (PCA) or similar approaches (HOGG CITE SDSS).
 
 Data-driven models like PCA are excellent for describing the range of
 the data---the subspace of the (usually enormous) data space in which
@@ -150,7 +149,8 @@ in general, that represent spectra with completely unphysical
 properties (such as negative emission lines and the like).
 
 HOGG: INSERT HERE PARAGRAPH ABOUT K-MEANS, ICA, and FACTOR ANALYSIS.
-Cite Roweis review.
+Cite Roweis review.  Mention also Robust PCA and outliers.  Also
+mention Wild type things that patch PCA heuristically; criticise them.
 
 In this \documentname, we introduce a new data-driven
 technique---heteroscedastic matrix factorization (HMF)---for modeling
@@ -168,13 +168,14 @@ responsibly and correctly with missing data.  HMF does not directly
 address the linearity and prior problems with PCA.  However, because
 the objective function has a direct likelihood interpretation, it
 becomes possible to incorporate its work into a Bayesian inference
-with proper prior information.  We give some examples of this below.
+with proper prior information.  We give some examples of this below
+(VIVI: DO WE?).
 
 Hogg: Mention maximum-likelihood PCA \citep{mlpca}, that we extend it,
 and bring it out of the chemistry domain.
 
 At the beginning, we mentioned outlier identification.  Some of the
-most important outliers found in the \sdss\ data (CITE) are
+most important outliers found in the \sdss\ data (HOGG CITE) are
 double-redshift objects.  Indeed, the set of luminous red galaxies
 that show evidence for a second (higher) redshift in their spectra
 include as a subset a significant fraction of all known gravitational
@@ -390,7 +391,7 @@ the models, but that does not suffice for model selection, which
 requires a specified utility.
 
 For all these reasons, we recommend leave-one-out cross-validation
-(CITE) or some similar kind of train-and-test framework.  In this
+(HOGG CITE) or some similar kind of train-and-test framework.  In this
 method, the model is fit to all but a ``left out'' subset of the data,
 and then the best-fit model is used to predict or model the left-out
 subset.  If $K$ is too small, the model doesn't have enough freedom to
