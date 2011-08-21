@@ -629,7 +629,7 @@ a_{ik} \gets a_{ik}\,\left[\sum_{j=1}^{M}\frac{1}{\sigma^2_{ij}}\,f_{ij}\,g_{kj}
 \end{equation}
 and the \emph{non-negative g-step} is
 \begin{equation}\label{eq:gstep_nonneg}
-g_{kj} \gets g_{kj}\,\left[\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,f_{ij}\,a_{ik}\right]\left[\sum_{n=1}^{K}\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,a_{ik}\,g_{in}\,g_{nj}\right]^{-1}
+g_{kj} \gets g_{kj}\,\left[\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,f_{ij}\,a_{ik}\right]\left[\sum_{n=1}^{K}\sum_{i=1}^{N}\frac{1}{\sigma^2_{ij}}\,a_{ik}\,a_{in}\,g_{nj}\right]^{-1}
 \quad ,
 \end{equation}
 where in both cases the ``inverse'' is just a scalar inverse of each
@@ -1163,15 +1163,16 @@ re-cite Blanton.
 colleague Sam Roweis (Toronto, NYU), who initiated this work by
 suggesting the model and all the optimization strategies.  It is a
 pleasure to thank Iain Murray (Edinburgh), who helped out with the
-engineering and statistics literature.  We also thank Coryn Bailer-Jones (MPIA), 
-Mike Blanton (NYU), Jo Bovy (NYU), Adam Bolton (Utah), Roberto Decarli (MPIA), Massimo Dotti (MPA),
-Dustin Lang (Princeton), Hans-Walter Rix (MPIA) and Kester Smith (MPIA) for valuable
-discussions.  Partial funding for this project was provided by NASA
-(grant NNX08AJ48G), the NSF (grant AST-0908357), and the Alexander von
-Humboldt Foundation.  This research made use of the SAO/NASA
-\project{Astrophysics Data System} and the \project{R} Project for
-Statistical Computing.  All the code used in this project is available
-from the authors upon request.
+engineering and statistics literature.  We also thank Coryn
+Bailer-Jones (MPIA), Mike Blanton (NYU), Jo Bovy (NYU), Adam Bolton
+(Utah), Roberto Decarli (MPIA), Massimo Dotti (MPA), Dustin Lang
+(Princeton), Hans-Walter Rix (MPIA), Kester Smith (MPIA), and Ben
+Weaver (NYU) for valuable comments and discussions.  Partial funding
+for this project was provided by NASA (grant NNX08AJ48G), the NSF
+(grant AST-0908357), and the Alexander von Humboldt Foundation.  This
+research made use of the SAO/NASA \project{Astrophysics Data System}
+and the \project{R} Project for Statistical Computing.  All the code
+used in this project is available from the authors upon request.
 
 Funding for the Sloan Digital Sky Survey (SDSS) has been provided by
 the Alfred P. Sloan Foundation, the Participating Institutions, the
