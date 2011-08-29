@@ -82,8 +82,12 @@ Data-driven models are necessary for many applications: It is rare
 that theoretical models are specific enough, accurate enough, or rich
 enough to generate all of the features of a data set.  Common examples
 in astronomy come in the study and analysis of spectra.  Redshift
-determination (HOGG CITE), emission-line measurements (HOGG CITE), and
-decomposition into different stellar populations (HOGG CITE) can all in
+determination (\citealp{glazebrook}; 
+\citealp{budavari}), emission-line measurements and properties of objects (\citealp{allen}; 
+\citealp{borosona}; \citealp{wild}; \citealp{borosonc}), 
+decomposition into different stellar populations (\citealp{chen}; 
+\citealp{ferreras}; \citealp{nolan}) and outlier indedification and classification of sources (\citealp{suzuki}; 
+\citealp{francis}; \citealp{yip}; \citealp{yipb}; \citealp{connolly}; \citealp{connolly}; \citealp{borosona}) can all in
 principle be performed with theory-based spectral models, but rarely
 are the spectral models accurate enough or detailed enough to make
 measurements as precise as contemporary data permit.  In addition to
@@ -766,16 +770,17 @@ For the selection of the LRG sample used in this study we followed the
 target selection of the LRG sample in SDSS which is based on 2 cuts,
 defined using magnitudes, colors and surface brightness criteria
 \citep{eisenstein}. Cut I is suitable for selecting LRGs with z$<$0.4
-and CUT II for LRGs with z$>$0.4.  These criteria are suitable for
-redshifts in the range of values greater than 0.15 and less than 0.55;
-about 100,000 galaxies in the survey meet these criteria. The
-primTarget field that is provided in the SpecObjAll table of SDSS is
+and CUT II for LRGs with z$>$0.4. These criteria are suitable for
+redshifts in the range of values greater than 0.15 and less than 0.55. For 
+this study we selected galaxies that meet these criteria in the redshift range 
+from 0.2 to 0.5 (95,833 sources). To do that we used the 
+primTarget field that is provided in the SpecObjAll table of SDSS, which is
 set to GALAXY\_RED if the LRG passes either CUT I or CUTII and to
-GALAXY\_RED\_II if it passes CUTII but not CUTI. For this study we
+GALAXY\_RED\_II if it passes CUTII but not CUTI. We
 downloaded the data for the LRGs that had their primTarget equal to
 either GALAXY\_RED and GALAXY\_RED\_II and only GALAXY\_RED (since if
 the primTarget is set as GALAXY\_RED\_II it is by default set as
-GALAXY\_RED as well).
+GALAXY\_RED as well) and made sure that they meet the criteria of \citep{eisenstein}.
 
 The sample was used to determine the maximum wavelength coverage,
 i.e. a wavelength area for which at least 10 sources have valid data
@@ -1194,6 +1199,9 @@ University of Washington.
 \bibitem[Akaike(1974)]{aic}
 Akaike,~H. 1974, IEEE Transactions on Automatic Control, 19, 716
 
+\bibitem[Allen \etal(2011)]{allen}
+Allen,~J.~T., Hewett,~P.~C., Maddox,~N., Richards,~G.~T., Belokurov,~V. 2011, MNRAS, 410, 860
+
 \bibitem[Barrows \etal(2011)]{barrows11} 
 Barrows,~R.~S., Lacy,~C.~H.~S., Kennefick,~D., Kennefick,~J., Seigar,~M.~S. 2011, NewA, 16, 122
 
@@ -1207,8 +1215,23 @@ Moustakas,~L.,~A., Wayth,~R., Schlegel,~D.~J. 2008, ApJ, 682, 964
 \bibitem[Bogdanovic, Eracleous \& Sigurdsson(2009)]{bogdanovic09} 
 Bogdanovic,~T., Eracleous,~M., Sigurdsson,~S. 2009, ApJ, 697, 288
 
+\bibitem[Boroson \& Lauer(2010)]{borosona} 
+Boroson,~T.~A., Lauer,~T.~R. 2010, AJ, 140, 390
+
 \bibitem[Boroson \& Lauer(2009)]{boroson} 
 Boroson,~T.~A., Lauer,~T.~R. 2009, Nature, 458, 53
+
+\bibitem[Boroson \& Green(2009)]{borosonc} 
+Boroson,~T.~A., Green,~R.~F. 1992, ApJS, 80, 109
+
+\bibitem[Budav\'ari \etal(2000)]{budavari} 
+Budav\'ari,~T., Szalay,~A.~S., Connolly,~A.~J., Csabai,~I., Dickinson,~M. 2000, AJ, 120, 1588
+
+\bibitem[Chen \etal(2009)]{chen}
+Chen,~Y.-M., Wild,~V., Kauffmann,~G., Blaizot,~J., Davis,~M., Noeske,~K., Wang, J.-M., Willmer,~C. 2009, MNRAS, 393, 406
+
+\bibitem[Connolly \etal(2009)]{connolly}
+Connolly,~A.~J., Szalay,~A.~S., Bershady,~M.~A., Kinney,~A.~L., Calzetti,~D. 1995, AJ, 110, 1071
 
 \bibitem[Decarli \etal(2010)]{decarli}
 Decarli,~R., Dotti,~M., Montuori,~C., Liimets,~T., Ederoclite,~A. 2010, ApJ, 720L, 93
@@ -1222,12 +1245,27 @@ Eisenstein~D.~J., \etal, 2001, AJ, 122, 2267
 \bibitem[Eisenstein et al.(2003)]{eishogg}
 Eisenstein,~D.~J., \etal, 2003, ApJ, 585, 694 
 
+\bibitem[Ferreras et al.(2006)]{ferreras}
+Ferreras,~I., Pasquali,~A., de Carvalho,~R.~R., de la Rosa,~I.~G., Lahav,~O. 2006, MNRAS, 370, 828
+
+\bibitem[Francis et al.(1992)]{francis}
+Francis,~P.~J., Hewett,~P.~C., Foltz,~C.~B., Chaffee,~F.~H. 1992, ApJ, 398, 476
+
+\bibitem[Glazebrook et al.(1998)]{glazebrook}
+Glazebrook,~K., Offer,~A.~R., Deeley,~K. 1998, ApJ, 492, 98
+
 \bibitem[Kitagawa \& Gersch(1996)]{smoothness}
 Kitagawa,~G. \& Gersch,~W., 1996, Smoothness Priors Analysis of Time
 Series, Lecture Notes in Statistics 116 (Springer)
 
 \bibitem[Komossa \etal(2008)]{komossa}
 Komossa,~S., Zhou,~H., Lu,~H. 2008, ApJ, 678, 81
+
+\bibitem[Nolan \etal(2006)]{nolan}
+Nolan,~L.~A., Harva,~M.~O., Kab\'an,~A., Raychaudhury,~S. 2006, MNRAS, 366, 321
+
+\bibitem[Suzuki \etal(2006)]{suzuki}
+Suzuki,~N. 2006, ApJS, 163, 110
 
 \bibitem[Rasmussen \& Williams(2006)]{Rasmussen06a}
 Rasmussen,~C.~E. \& Williams,~C., 2006, Gaussian Processes for Machine
@@ -1243,11 +1281,21 @@ http://www.cs.cmu.edu/\~quake-papers/painless-conjugate-gradient.pdf
 \bibitem[Shields \etal(2009)]{shields} Shields,~G.~A., Rosario,~D.~J., Smith,~K.~L., Bonning,~E.~W., Salviander,~S., Kalirai,~J.~S., Strickler,~R., Ramirez-Ruiz,~E., Dutton,~A.~A., Treu,~T., Marshall,~P.~J. 2009, ApJ, 707, 936
 
 \bibitem[Tsalmantza \etal(2011)]{tsalmantza} 
-Tsalmantza,~P., Decarli,~R., Dotti,~M., Hogg,~D.~W. 2011, ApJ, in press (arXiv:1106.1180v1)
+Tsalmantza,~P., Decarli,~R., Dotti,~M., Hogg,~D.~W. 2011, ApJ, 738, 20
 
 \bibitem[Wentzell \etal(1997)]{mlpca}
 Wentzell,~P.~D., Andrews,~D.~T., Hamilton,~D.~C., Faber,~K.,
 \& Kowalski,~B.~R., 1997, Journal of Chemometrics, 11, 339
+
+\bibitem[Wild \etal(2007)]{wild}
+Wild,~V., Kauffmann,~G., Heckman,~T., Charlot,~S., Lemson,~G., Brinchmann,~J., Reichard,~T., Pasquali,~A. 2007, MNRAS, 381, 543
+
+\bibitem[Yip \etal(2004)]{yip}
+Yip,~C.~W., Connolly,~A.~J., Vanden Berk,~D.~E., Ma,~Z., Frieman,~J.~A., SubbaRao,~M., Szalay,~A.~S., Richards,~G.~T., Hall,~P.~B., Schneider,~D.~P., Hopkins,~A.~M., Trump,~J., Brinkmann,~J. 2004, AJ, 128, 2603
+
+\bibitem[Yip \etal(2004)]{yipb}
+Yip,~C.~W., Connolly,~A.~J., Szalay,~A.~S., Budavári,~T., SubbaRao,~M., Frieman,~J.~A., Nichol,~R.~C., Hopkins,~A.~M., York,~D.~G., Okamura,~S., Brinkmann,~J., Csabai,~I., Thakar,~A.~R., Fukugita,~M., Ivezi\'c,~Z. 2004, AJ, 128, 585
+
 \end{thebibliography}{}
 
 \clearpage
