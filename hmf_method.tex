@@ -16,7 +16,7 @@
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2011-06-20 / not ready for distribution}}
+\slugcomment{\texttt{draft 2011-09-08 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -647,9 +647,9 @@ reason, before we apply the method to the observed training set, all
 the negative fluxes and their corresponding errors are set to zero. In
 this way the data of those pixels is not taken into account when we
 use the non-negative a-step and g-step.  Strictly speaking, this step
-of removing negative fluxes is unjustified, but in practice very few
-pixels are usually affected, and the alternatives are substantially
-harder to implement.
+of removing negative fluxes is unjustified, but in most cases very few
+pixels are affected, and the alternatives are substantially harder to
+implement.
 
 The non-negative a-step and g-step are very fast, permitting large
 numbers of iterations ($\approx 10^3$), but that is good, because
@@ -712,11 +712,38 @@ out-performed random-spectrum and basis-function initializations.  For
 this reason we only consider PCA and K-means in what follows.
 
 \paragraph{PCA initialization}
-HOGG: We initialize the fitting with the output of a PCA on the
-spectra after each spectrum has been projected into a subspace
-orthogonal to the mean spectrum of the data set; the first guesses for
-the $g_{k}$ are set to the mean spectrum and the first $[K-1]$
-principal components.
+In what we describe as ``PCA initialization'' for $K$ basis spectra,
+we in fact generalize slightly the PCA to produce a mean spectrum and
+then the $[K-1]$ top eigenvectors \emph{orthogonal} to the mean
+spectrum.  That is, after we compute a mean spectrum, we subtract from
+each spectrum the best-fit (scaled) mean spectrum, and then
+\emph{project} the remaining residual into the orthogonal subspace
+before performing PCA.  The initialization we use is the mean spectrum
+and the top $[K-1]$ eigenvectors from the PCA in the orthogonal
+subspace.  This methodology is rarely followed, but it is the only
+method that makes sense if \textsl{(a)}~the mean is permitted to be
+non-zero, \textsl{(b)}~the mean spectrum is going to be considered an
+eigenspectrum or component for subsequent fitting, and
+\textsl{(c)}~linear independence is important, which it always is.
+
+In detail, we did one more ``conditioning'' step before any of this,
+which was to re-scale the $M$-dimensional space (the space in which
+the $\vec{f}_i$ live) so that the median [VIVI: MEDIAN?] of the $N$
+inverse variances (across spectra $i$) in each coordinate $j$ was
+equal.  That is, we ``isotropized'' the space from the point of view
+of the observational uncertainties.  We \emph{only} performed this
+isotropization for the PCA, \emph{not} for the HMF, because the HMF
+takes the observational uncertainties into account naturally and
+correctly.  After the mean-subtracted PCA was performed, we re-scaled
+the results back to the original $M$-dimensional space for use.  This
+scaling and re-scaling step is also rarely done, but must be if PCA is
+to return results that are not likely to be strongly affected by
+observational noise; this step effectively shrinks to small those
+dimensions where the variance in the sample are likely to have been
+dominated by measurement noise.
+
+In equations, this conditioning, mean determination, and projection to
+the orthogonal space look like this: [HOGG: EQUATIONS HERE]
 
 \paragraph{K-means initialization}
 HOGG: For the case that non-negative constraints are applied to the
