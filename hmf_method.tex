@@ -8,15 +8,16 @@
 
 % to-do
 % -----
-% - intro needs a citation to Blanton \& Roweis as having priority
-% - intro needs to introduce SDSS, or it needs to be introduced somewhere
+% - intro needs a citation to Blanton \& Roweis as having priority.
+% - intro needs to introduce SDSS, or it needs to be introduced somewhere.
 % - do we need to say that the specific components don't matter as much as the space they span?
-% - make sure we cite the relevant robusty-PCA methods (Wild, Budavari, others)
+% - make sure we cite the relevant robusty-PCA methods (Wild, Budavari, others).
+% - we ought to say that there are other optimization methods possible that take the full gradient (ie, not ones that iterate least-squares).
 
 \documentclass[12pt,preprint,pdftex]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2011-09-08 / not ready for distribution}}
+\slugcomment{\texttt{draft 2011-10-14 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -40,27 +41,27 @@
 
 \begin{abstract}
 We present a data-driven method---heteroscedastic matrix
-factorization---for modeling or performing dimensionality reduction on
-observed spectra.  The method uses an iterative
-inverse-variance-weighted least-squares minimization procedure to
-generate a best set of basis functions.  The method is similar to
-principal components analysis, but with the substantial advantage that
-it uses measurement uncertainties in a responsible way and accounts
-naturally for poorly measured and missing data; it models the variance
-in the noise-deconvolved data space.  A regularization can be applied,
-in the form of a smoothness prior (inspired by Gaussian processes) or
-a non-negative constraint, without making the method prohibitively
-slow.  Because the method optimizes a justified scalar (related to the
-logarithm of the likelihood), the basis provides a better fit to the
-data in a probabilistic sense than any PCA basis.  We test the method
-on \SDSS\ spectra, concentrating on spectra known to contain two
-redshift components: These are spectra of gravitational lens
-candidates and super-massive black-hole binaries. We apply a
-hypothesis test to compare one-redshift and two-redshift models for
-these spectra, utilizing the data-driven model trained on a random
-subset of all \SDSS\ spectra.  This test confirms 129 of the 131 lens
-candidates in our sample and all 4 of the known binary candidates, and
-turns up very few false positives.
+factorization, a kind of probabilistic factor analysis---for modeling
+or performing dimensionality reduction on observed spectra.  The
+method uses an iterative inverse-variance-weighted least-squares
+minimization procedure to generate a best set of basis functions.  The
+method is similar to principal components analysis, but with the
+substantial advantage that it uses measurement uncertainties in a
+responsible way and accounts naturally for poorly measured and missing
+data; it models the variance in the noise-deconvolved data space.  A
+regularization can be applied, in the form of a smoothness prior
+(inspired by Gaussian processes) or a non-negative constraint, without
+making the method prohibitively slow.  Because the method optimizes a
+justified scalar (related to the logarithm of the likelihood), the
+basis provides a better fit to the data in a probabilistic sense than
+any PCA basis.  We test the method on \SDSS\ spectra, concentrating on
+spectra known to contain two redshift components: These are spectra of
+gravitational lens candidates and super-massive black-hole
+binaries. We apply a hypothesis test to compare one-redshift and
+two-redshift models for these spectra, utilizing the data-driven model
+trained on a random subset of all \SDSS\ spectra.  This test confirms
+129 of the 131 lens candidates in our sample and all 4 of the known
+binary candidates, and turns up very few false positives.
 \end{abstract}
 
 \keywords{
@@ -82,10 +83,13 @@ Data-driven models are necessary for many applications: It is rare
 that theoretical models are specific enough, accurate enough, or rich
 enough to generate all of the features of a data set.  Common examples
 in astronomy come in the study and analysis of spectra.  Redshift
-determination (\citealp{budavari}; \citealp{glazebrook}), emission-line measurements and properties of objects (\citealp{allen}; 
-\citealp{borosona}; \citealp{borosonc}; \citealp{wild}), 
-decomposition into different stellar populations (\citealp{chen}; 
-\citealp{ferreras}; \citealp{nolan}) and outlier indedification and classification of sources (\citealp{borosona}; \citealp{connolly}; \citealp{francis}; \citealp{suzuki}; \citealp{yip}; \citealp{yipb}) can all in
+determination (\citealt{budavari}; \citealt{glazebrook}),
+emission-line measurements and properties of objects (\citealt{allen}; 
+\citealt{borosona}; \citealt{borosonc}; \citealt{wild}), 
+decomposition into different stellar populations (\citealt{chen}; 
+\citealt{ferreras}; \citealt{nolan}) and outlier indedification and
+classification of sources (\citealt{borosona}; \citealt{connolly};
+\citealt{francis}; \citealt{suzuki}; \citealt{yip}; \citealt{yipb}) can all in
 principle be performed with theory-based spectral models, but rarely
 are the spectral models accurate enough or detailed enough to make
 measurements as precise as contemporary data permit.  In addition to
@@ -150,31 +154,60 @@ amplitudes and the linear subspace therefore contains many quadrants,
 in general, that represent spectra with completely unphysical
 properties (such as negative emission lines and the like).
 
-HOGG: INSERT HERE PARAGRAPH ABOUT K-MEANS, ICA, and FACTOR ANALYSIS.
-Cite Roweis review.  Mention also Robust PCA and outliers.  Also
-mention Wild type things that patch PCA heuristically; criticise them.
+In this \documentname, we introduce a new---or at least new to
+astrophysics---data-driven technique, heteroscedastic matrix
+factorization (HMF), for modeling observed spectra that overcomes some
+(though not all) of the problems with PCA.  The principal advantage of
+HMF over PCA is that the method optimizes not squared error, but
+rather the justified probabilistic objective of chi-squared.  This
+leads to important differences with PCA: \textsl{(1)}~HMF builds a
+model of the variance in the data set \emph{not} introduced by
+observational noise.  That is, it returns a model of the
+noise-deconvolved spectral space, which is the space of interest to
+the scientific investigator.  \textsl{(2)}~HMF deals absolutely
+naturally with the completely generic problems of missing and badly
+measured data; no ``patching'' of the method or the input data is
+required to use HMF.
 
-In this \documentname, we introduce a new data-driven
-technique---heteroscedastic matrix factorization (HMF)---for modeling
-observed spectra that overcomes some---though not all---of the
-problems with PCA.  The principal advantage of HMF over PCA is that
-the method optimizes not squared error, but rather the justified
-probabilistic objective of chi-squared.  This leads to the important
-difference with PCA that HMF builds a model of the variance in the
-data set \emph{not} introduced by observational noise.  That is, it
-returns a model of the noise-deconvolved spectral space, which is the
-space of interest to the scientific investigator.
+For dimensionality reduction or data-driven modeling of spectra (or
+any other data), the investigator has an enormous number of options.
+There are PCA, K-means, ICA, and factor analysis to name just a few.
+HMF is an example of a probabilistic factor analysis (HOGG cite PFA
+paper); it is probabilistic because it optimizes an objective that
+(unlike the objective for PCA or K-means or ICA [HOGG CHECK]) is
+justified in terms of a likelihood; it is a factor analysis because it
+reduces the dimensionality of the data matrix to a product of two
+low-rank factors.  It is our view that if the output of a
+dimensionality reduction or data-driven model is going to be used in
+probabilistic inference, it ought to emerge from a probabilistically
+justified method.
 
-As a natural by-product and with no modifications, HMF also deals
-responsibly and correctly with missing data.  HMF does not directly
-address the linearity and prior problems with PCA.  However, because
-the objective function has a direct likelihood interpretation, it
-becomes possible to incorporate its work into a Bayesian inference
-with proper prior information.  We give some examples of this below
-(VIVI: DO WE?).
+Because these ideas are so wide-spread there is a lot of prior art;
+for a tour of the matrix factorization or dimensionality reduction
+methods and their relationships, excellent reviews exist (HOGG cite
+Roweis).  Very similar methods to the HMF presented here have been
+published in the computer vision literature (HOGG re-cite PFA) and in
+the chemistry literature (as ``maximum-likelihood PCA'';
+\citealt{mlpca}), although without the particular regularizations we
+propose.  The internal model of the \texttt{kcorrect} software
+\citep{blanton} is a version of HMF with non-negativity constraints
+applied; the optimization methods we use below for non-negative HMF
+are adapted from that source.
 
-Hogg: Mention maximum-likelihood PCA \citep{mlpca}, that we extend it,
-and bring it out of the chemistry domain.
+While it is relatively novel (in astrophysics) to be replacing the PCA
+objective function with one that is probabilistically justified, it is
+not new to be concerned about the missing-data problems with PCA.
+Along these lines, various investigators have developed ``patching''
+techniques to sensibly replace missing data (for example, HOGG cite
+Eisenstein, Bovy, Wild, Budavari, others?); these methods are
+heuristic and bias the results relative to any probabilistic treatment
+in unknown ways.
+
+HMF does not directly address the linearity and prior problems with
+PCA.  However, because the objective function has a direct likelihood
+interpretation, it becomes possible to incorporate the output of HMF
+into a Bayesian inference with properly informative prior information.
+We give some very limited examples of this below (VIVI: DO WE?).
 
 At the beginning, we mentioned outlier identification.  Some of the
 most important outliers found in the \sdss\ data (HOGG CITE) are
@@ -184,8 +217,8 @@ include as a subset a significant fraction of all known gravitational
 lenses \citep{bolton}.  Other valuable double-redshift sources include merging
 galaxies, binary stars, and binary quasars.  In the latter category,
 there are very few known examples where the best explanation for a
-spectrum is a bound pair of super-massive black holes (\citealp{komossa}; 
-\citealp{shields}: \citealp{boroson}; \citealp{decarli}).  In both
+spectrum is a bound pair of super-massive black holes (\citealt{komossa}; 
+\citealt{shields}: \citealt{boroson}; \citealt{decarli}).  In both
 cases---gravitational lenses and binary black holes---the best
 candidates have been found with heuristic searches.  These searches
 involve (in the case of gravitational lenses) looking for isolated
@@ -808,7 +841,7 @@ the primTarget is set as GALAXY\_RED\_II it is by default set as
 GALAXY\_RED as well) and made sure that they meet the criteria of \cite{eisenstein}.
 
 The sample was used to determine the maximum wavelength coverage,
-i.e. a wavelength area for which at least 10 sources have valid data
+that is, a wavelength area for which at least 10 sources have valid data
 at the beginning and the end of the spectrum. In this way we are able
 to fit the part of the spectrum that is produced by the second object
 for a large range of redshift values. During this procedure, pixels
@@ -856,7 +889,7 @@ our method. The method was run for a subset of approximately 1000
 spectra of each type for a different number of components and for 16
 iterations, which seems to be enough for the method to converge. This
 can be seen in \figurename~\ref{fig:1} in which we present the results of
-the fitting (total $\chi^2$, i.e. the sum of $\chi^2$ values over all
+the fitting (total $\chi^2$, that is, the sum of $\chi^2$ values over all
 wavelengths and all spectra) of the 1000 spectra of our sample with a
 different number of components. This test was also performed for four
 different values (1,3,10 and 30) of the smoothing factor $\epsilon$.
@@ -938,12 +971,12 @@ By comparing those results with the ones obtained without the
 non-negative constraint we see that the fitting is now worse. This was
 of course expected since this is a very strict constraint. On the
 other hand even if the components now seem to have a better physical
-meaning, i.e. they look more like spectra of particular types of
+meaning, that is, they look more like spectra of particular types of
 objects, in many cases there seems to be a problem at the edges of the
-spectra where they tend to start from exactly zero values (e.g. the
-components for LRG objects). At this point we should mention that when
-applying the method for the non-negative case we have not used an
-additional smoothing constraint.
+spectra where they tend to start from exactly zero values (for
+example, the components for LRG objects). At this point we should
+mention that when applying the method for the non-negative case we
+have not used an additional smoothing constraint.
 
 Based on the results presented here and an additional test to select
 the optimum number of components by checking how many are needed in
@@ -960,11 +993,11 @@ the fitting and its results is presented below.
 \subsection{Two-redshift models}\label{sec:tworedshifts}
 In order to detect the presence of a second redshift in the SDSS
 spectra we test the improvement of the fitting when a spectrum is
-fitted with two sets of componets at two different redshifts (i.e. the
+fitted with two sets of componets at two different redshifts (that is, the
 one estimated by SDSS and another redshift) instead of only one set of
 components at the redshift provided by SDSS. This second redshift is
 scanning a regular grid of values selected to be uniform in a
-logarithmic scale, i.e. in the same way as the wavelengths in SDSS. In
+logarithmic scale, that is, in the same way as the wavelengths in SDSS. In
 this way moving to the next value of the redshift grid is equivalent
 to shifting the spectrum by one pixel. In practice the improvement of
 the fitting can be estimated by measuring the $\chi^2$ difference
@@ -1083,7 +1116,7 @@ literature.
 This method was applied to spectra of 54586 and 3929 objects
 spectroscopically classified as QSOs and galaxies respectively in SDSS
 DR7, with 0.1$<$z$<$1.5 in order to detect more candidates of this
-type of object (\citealp{tsalmantza}). The search resulted to 32
+type of object (\citealt{tsalmantza}). The search resulted to 32
 objects with peculiar spectra, nine of which can be interpreted as BHB
 candidates.
 
@@ -1155,7 +1188,7 @@ An additional advantage of this method compared to the PCA is that it
 also provides an option for non-negative constrains in the resulting
 components and coefficients, based on the work of \cite{blanton}. This
 option can produce results that do not include unphysical features
-(e.g. negative emission lines). We should keep in mind though that
+(for example, negative emission lines). We should keep in mind though that
 since this is a very hard constraint, it has a big impact in the
 results by producing a poorer fit to the observed spectra.
 
@@ -1176,7 +1209,7 @@ we will perform an automatic search for objects of these types in all
 the SDSS spectroscopic data. For the case of gravitational lens
 candidates we are also planning to expand the search for cases that
 the secondary object is at lower redshift than the primary and that it
-could also be another type of source (e.g. QSO). Another application
+could also be another type of source (for example, a QSO). Another application
 of this method could be for the determination of more accurate
 redshifts for single objects. This application will be very
 interesting for the case of QSOs at high redshifts and for defining
