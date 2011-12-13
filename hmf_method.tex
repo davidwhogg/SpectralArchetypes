@@ -811,7 +811,7 @@ double-redshift objects in the \SDSS\ spectroscopic sample. More
 specifically, by using the method presented above, we define a small
 number of components that is sufficient for modeling \SDSS\ 
 spectra. Using these components we fit each observed spectrum at the
-redshift provided by the \SDSS. Then we repeat the fitting, but this time
+redshift provided by \SDSS. Then we repeat the fitting, but this time
 using one set of components at the \SDSS\ redshift and one set of
 components at values of redshift that lie on a nominal grid. If a
 second object is present we expect the fit to be significantly improved when we use
@@ -820,7 +820,7 @@ the second object. In the examples that follow we will demonstrate
 this using the SLACS sample of gravitational lenses \citep{bolton} and
 the four known candidates of massive Black Hole Binaries (BHBs)
 \citep{komossa,bogdanovic09,dotti09,boroson,shields,decarli}
-\footnote{A new candidate deiscovered by \cite{barrows11} appeared in the literature 
+\footnote{A new candidate discovered by \cite{barrows11} appeared in the literature 
 only after the completion of this work. In addition, recently two systematic searches 
 for black hole binary candidates in \SDSS\ spectroscopic sample were performed using HMF 
 \citep{tsalmantza} and PCA components \citep{eracleous}.}.
@@ -841,7 +841,7 @@ performed using PCA). The spectra were taken from the 7th Data Release
 be in the ranges of $0.01<z<0.06$, $0.20<z<0.50$ and $0.10<z<1.50$ for
 Main Galaxies, LRGs and QSOs respectively.
 
-For the selection of the LRG sample used in this study we followed the
+For the selection of the LRG spectra used in this study we followed the
 target selection of the LRG sample in \SDSS\ which is based on 2 cuts,
 defined using magnitudes, colors and surface brightness criteria
 \citep{eisenstein}. These criteria are suitable for
@@ -857,7 +857,8 @@ from 0.2 to 0.5 (95,833 sources).
 %by default set as GALAXY\_RED as well) and made sure that they meet the 
 %criteria of \cite{eisenstein}.
 
-The sample was used to determine the maximum wavelength coverage, that
+The selected samples were used to determine the maximum wavelength coverage 
+for each type of object, that
 is, a wavelength area for which at least 10 sources have valid data at
 the bluest and the reddest wavelengths. In this way we are able to
 fit the part of the spectrum that is produced by the second object for
@@ -987,7 +988,7 @@ By comparing those results with the ones obtained without the
 non-negative constraint we see that the fitting is now worse. This was
 expected since non-negativity is a very strict constraint. On the
 other hand even if the components now seem to have a better physical
-meaning, that is, they look more like spectra of particular types of
+meaning, that is, they look more like spectra of particular type of
 objects, in many cases there seems to be a problem at the edges of the
 spectra where they tend to start from exactly zero values (for
 example, the components for LRG objects). At this point we should
@@ -997,7 +998,7 @@ have not used an additional smoothing constraint.
 Based on the results presented here and an additional test, that is 
 defining the minimum number of components required to detect the 
 second redshifts in the SLACS and BHB candidate samples, we selected 
-the optimal number of components and value of $\epsilon$. More specificaly, 
+the optimal number of components and value of $\epsilon$. More specifically, 
 we decided to fit the \SDSS\ spectra using the 14, 7 and 14 components 
 that were produced by HMF when trained with Main Galaxy, LRG
 and QSO spectra for 16 iterations and for $\epsilon$=3, 30 and 10
@@ -1076,10 +1077,10 @@ spectra at the same redshifts as those found in the SLACS survey
 For the remaining 12 cases we applied the same procedure but this
 time using the LRG components to fit the foreground object and the
 Main Galaxy components to fit the background one. The results show that
-using our method we are extracting the same results as the SLACS
+using this approach we were able to extract the same results as the SLACS
 survey for 6 of those spectra (an example is shown in \figurename~\ref{fig:7}).
 
-For the 6 remaining spectra we detect a different second redshift than
+In the other 6 cases we detect a different second redshift than
 the one reported by \cite{bolton}. For those objects we applied once
 again our method but this time assuming the presence of three objects
 instead of two. More specifically, we fit the spectrum using a set of
@@ -1087,13 +1088,17 @@ components (LRG or Main Galaxy) at the \SDSS\ redshift, a set of components
 (Main Galaxy) at the second redshift to which was given the highest
 probability by our method, and a set of components (Main Galaxy)
 at a redshift scanning a regular grid of values. This time we managed
-to predict the SLACS second redshift for 4 additional objects
-(an example is shown in \figurename~\ref{fig:8}).
+to predict the SLACS second redshift for 4 additional objects (\SDSS\ J1155+6237, 
+\SDSS\ J1618+4353, \SDSS\ J1621+3931 and \SDSS\ J1718+6424),
+(an example is shown in \figurename~\ref{fig:8}). For at least two of these 
+sources (\SDSS\ J1618+4353 and \SDSS\ J1718+6424) the presence of three objects 
+was confirmed by high resolution \project{HST} imaging observations which showed that in these 
+two cases the lens consists of two foreground galaxies (\citealt{bolton06}; \citealt{bolton}).
 
-For only 2 out of the 131 spectra tested here we were not able to
-detect the second redshift. The results for these spectra as well as
+For only 2  (\SDSS\ J1039+0513 and \SDSS\ J1550+5258) out of the 131 spectra 
+tested here we were not able to detect the second redshift. The results for these spectra as well as
 the fitting at the second redshift given by SLACS are shown in
-\figurename~\ref{fig:9}. From this \figurename  it is clear that these are
+\figurename~\ref{fig:9}. From this \figurename\ it is clear that these are
 weak detections with no obvious signature of an additional object at
 the second redshift.
 
@@ -1119,9 +1124,9 @@ redshift differences below 0.1. The second redshift can be either
 smaller or larger than the \SDSS\ one, depending on the orbital phase 
 of the less massive black hole.
 
-The spectra were fitted using a set of components that were
-extracted in \sectionname~\ref{sec:training} for QSOs at the \SDSS\ 
-redshift and one set of the same components at a redshift scanning a
+The spectra were fitted using the set of QSO components that were
+extracted in \sectionname~\ref{sec:training} at the \SDSS\ 
+redshift and another set of the same components at a redshift scanning a
 narrow grid of regular values. The results for the four candidates are
 presented in \figurename~\ref{fig:6a} where we can see that we are
 able to reproduce all of the four spectra with shifted broad lines given 
@@ -1297,6 +1302,9 @@ Blanton,~M.~R. \& Roweis,~S. 2007, AJ, 133, 734
 \bibitem[Bolton \etal(2008)]{bolton}
 Bolton,~A.~S., Burles,~S., Koopmans,~L.~V.~E., Treu,~T., Gavazzi,~R.,
 Moustakas,~L.,~A., Wayth,~R., Schlegel,~D.~J. 2008, ApJ, 682, 964
+
+\bibitem[Bolton \etal(2006)]{bolton06}
+Bolton,~A.~S., Burles,~S., Koopmans,~L.~V.~E., Treu,~T., Moustakas,~L.,~A. 2006, ApJ, 638, 703
 
 \bibitem[Bogdanovic, Eracleous \& Sigurdsson(2009)]{bogdanovic09} 
 Bogdanovic,~T., Eracleous,~M., Sigurdsson,~S. 2009, ApJ, 697, 288
