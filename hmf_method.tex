@@ -6,18 +6,9 @@
 % - separate all discussion of objective from optimization
 % - separate all discussion of optimization from initialization
 
-% to-do
-% -----
-% - DO WE TALK ABOUT CHOOSING K ANYWHERE BUT THE DISCUSSION?
-% - intro needs to introduce SDSS, or it needs to be introduced somewhere.
-% - do we need to say that the specific components don't matter as much as the space they span?
-% - make sure we cite the relevant robusty-PCA methods (Wild, Budavari, others).
-% - we ought to say that there are other optimization methods possible that take the full gradient (ie, not ones that iterate least-squares).
-
 \documentclass[12pt,preprint]{aastex}
 \usepackage{amssymb,amsmath,mathrsfs}
 
-\slugcomment{\texttt{draft 2011-11-16 / not ready for distribution}}
 \shorttitle{\textsc{data-driven spectral modeling}}
 \shortauthors{\textsc{tsalmantza \& hogg}}
 \newcommand{\project}[1]{\textsl{#1}}
@@ -42,26 +33,28 @@
 \begin{abstract}
 We present a data-driven method---heteroscedastic matrix
 factorization, a kind of probabilistic factor analysis---for modeling
-or performing dimensionality reduction on observed spectra.  The
-method uses an iterative inverse-variance-weighted least-squares
-minimization procedure to generate a best set of basis functions.  The
-method is similar to principal components analysis, but with the
-substantial advantage that it uses measurement uncertainties in a
-responsible way and accounts naturally for poorly measured and missing
-data; it models the variance in the noise-deconvolved data space.  A
-regularization can be applied, in the form of a smoothness prior
-(inspired by Gaussian processes) or a non-negative constraint, without
-making the method prohibitively slow.  Because the method optimizes a
-justified scalar (related to the logarithm of the likelihood), the
-basis provides a better fit to the data in a probabilistic sense than
-any PCA basis.  We test the method on \SDSS\ spectra, concentrating on
-spectra known to contain two redshift components: These are spectra of
-gravitational lens candidates and super-massive black-hole
-binaries. We apply a hypothesis test to compare one-redshift and
-two-redshift models for these spectra, utilizing the data-driven model
-trained on a random subset of all \SDSS\ spectra.  This test confirms
-129 of the 131 lens candidates in our sample and all of the known
-binary candidates, and turns up very few false positives.
+or performing dimensionality reduction on observed spectra or other
+high-dimensional data with known but non-uniform observational
+uncertainties.  The method uses an iterative inverse-variance-weighted
+least-squares minimization procedure to generate a best set of basis
+functions.  The method is similar to principal components analysis,
+but with the substantial advantage that it uses measurement
+uncertainties in a responsible way and accounts naturally for poorly
+measured and missing data; it models the variance in the
+noise-deconvolved data space.  A regularization can be applied, in the
+form of a smoothness prior (inspired by Gaussian processes) or a
+non-negative constraint, without making the method prohibitively slow.
+Because the method optimizes a justified scalar (related to the
+likelihood), the basis provides a better fit to the data in a
+probabilistic sense than any PCA basis.  We test the method on
+\SDSS\ spectra, concentrating on spectra known to contain two redshift
+components: These are spectra of gravitational lens candidates and
+super-massive black-hole binaries. We apply a hypothesis test to
+compare one-redshift and two-redshift models for these spectra,
+utilizing the data-driven model trained on a random subset of all
+\SDSS\ spectra.  This test confirms 129 of the 131 lens candidates in
+our sample and all of the known binary candidates, and turns up very
+few false positives.
 \end{abstract}
 
 \keywords{
@@ -87,7 +80,7 @@ determination (\citealt{budavari}; \citealt{glazebrook}),
 emission-line measurements and properties of objects (\citealt{allen}; 
 \citealt{borosona}; \citealt{borosonc}; \citealt{wild}), 
 decomposition into different stellar populations (\citealt{chen}; 
-\citealt{ferreras}; \citealt{nolan}) and outlier indedification and
+\citealt{ferreras}; \citealt{nolan}) and
 classification of sources (\citealt{borosona}; \citealt{connolly};
 \citealt{francis}; \citealt{suzuki}; \citealt{yip}; \citealt{yipb}) can all in
 principle be performed with theory-based spectral models, but usually these 
@@ -106,7 +99,7 @@ Data-driven models like PCA are excellent for describing the range of
 the data---the subspace of the (usually enormous) data space in which
 real data examples live.  For this reason, data-driven models are
 excellent for finding \emph{outliers}, objects that are unusual in the
-data set.  This application is not as well explored in astrophysics,
+data set.  This application is not well explored in astrophysics,
 but one of the motiviations of the present investigation is to explore
 the use of probabilistically justified data-driven models for outlier
 detection.
@@ -115,15 +108,18 @@ Similarly, data-driven models are often used for classification.  When
 a data-driven model produces ``eigenspectra'' or clusters or
 equivalent, it is tempting to see these model properties as defining
 classes in the data.  This gets into the area of unsupervised
-classification, which is beyond the scope of the present work.  When a
+classification, which is beyond the scope of the present work.
+We will just comment here that when a
 generic data-driven model is being used without theoretical
 justification, it is often a mistake to interpret the internals of
 that model physically, however tempting that may be.
 
 The standard data-driven models used for spectroscopic astronomical
 data are the highest-ranked principal components (from PCA or
-equivalent). The PCA has one advantage and a number of drawbacks.  The
-advantage is that it is entirely data-driven: The construction of the
+equivalent). PCA has a few advantages and a number of drawbacks.  The
+advantages are that it is convex---there is only one optimum of the PCA
+objective function---and that it is
+entirely data-driven: The construction of the
 PCA requires no theoretical or external knowledge about the spectra
 being modeled; it is a dimensionality reduction in the space of the
 observed spectra.
@@ -136,8 +132,8 @@ contributions from observational noise.  That is, a direction in
 spectrum space can enter into the top principal components because it
 is a direction of great astrophysical variation, or because there is a
 lot of noise in the observations along that direction, or both.  PCA
-is agnostic about the source of the variance, while astronomers are
-not; astronomers want to know about the astrophysical processes that
+is \emph{agnostic} about the source of the variance, while astronomers are
+\emph{not}; astronomers want to know about the astrophysical processes that
 generate the data prior to the addition of observational noise.
 
 Other drawbacks to PCA include the following: It treats the data as
@@ -171,10 +167,11 @@ required to use HMF.
 
 For dimensionality reduction or data-driven modeling of spectra (or
 any other data), the investigator has an enormous number of options.
-There are PCA, K-means, ICA, and factor analysis to name just a few.
-HMF is an example of a probabilistic factor analysis (HOGG cite PFA
-paper); it is probabilistic because it optimizes an objective that
-(unlike the objective for PCA or K-means or ICA [HOGG CHECK]) is
+There are PCA, K-means, ICA, and factor analysis to name just a few
+(\citealt{rz}).
+HMF is an example of a probabilistic factor analysis;
+it is probabilistic because it optimizes an objective that
+(unlike the objective for PCA or K-means or standard ICA) is
 justified in terms of a likelihood; it is a factor analysis because it
 reduces the dimensionality of the data matrix to a product of two
 low-rank factors.  It is our view that if the output of a
@@ -184,9 +181,10 @@ justified method.
 
 Because these ideas are so wide-spread there is a lot of prior art;
 for a tour of the matrix factorization or dimensionality reduction
-methods and their relationships, excellent reviews exist (HOGG cite
-Roweis).  Very similar methods to the HMF presented here have been
-published in the computer vision literature (HOGG re-cite PFA) and in
+methods and their relationships, excellent reviews exist
+(\citealt{rz}).
+Very similar methods to the HMF presented here have been
+published in the computer vision literature and in
 the chemistry literature (as ``maximum-likelihood PCA'';
 \citealt{mlpca}), although without the particular regularizations we
 propose.  The internal model of the \texttt{kcorrect} software
@@ -198,18 +196,16 @@ While it is relatively novel (in astrophysics) to be replacing the PCA
 objective function with one that is probabilistically justified, it is
 not new to be concerned about the missing-data problems with PCA.
 Along these lines, various investigators have developed ``patching''
-techniques to sensibly replace missing data (for example, HOGG cite
-Eisenstein, Bovy, Wild, Budavari, others?); these methods are
+techniques to sensibly replace missing data (for example,
+\citealt{eishogg, wild, budavarirobust}); these methods are
 heuristic and bias the results relative to any probabilistic treatment
 in unknown ways.
 
-HMF does not directly address the linearity and prior problems with
-PCA.  However, because the objective function has a direct likelihood
-interpretation, it becomes possible to incorporate the output of HMF
-into a Bayesian inference with properly informative prior information.
-We give some very limited examples of this below (VIVI: DO WE?)
-(VVcom: No, in this paper we dont give examples of that, maybe we can 
-just remove the last sentence?).
+Though better than PCA for the reasons given above, HMF does not
+directly address its linearity and prior-PDF problems.  However,
+because the objective function has a direct likelihood interpretation,
+it becomes possible to incorporate the output of HMF into a Bayesian
+inference with properly informative prior information.
 
 At the beginning, we mentioned outlier identification.  Some of the
 most important outliers found in the \sdss\ data are double-redshift
@@ -377,12 +373,10 @@ non-negative:
 a_{ik} & \geq & 0 \quad\mbox{for all $i$, $k$} \nonumber\\
 g_{k}(\lambda) & \geq & 0 \quad\mbox{for all $k$, $\lambda$}
 \end{eqnarray}
-This can lead to solutions that are much more physically meaningful, 
-(VVcom: The following sentence is a little confusing to me. 
-I m not sure I understand it in order to change it.)
-especially when the objects of study are the spectra, particularly if
-they are the spectra of objects (like early-type galaxies) that are
-optically thin.
+This can lead to solutions that are much more physically meaningful,
+especially when the objects of study are astronomical spectra of
+galaxies (and particularly if the galaxies are composed of components
+that are themselves optically thin)!
 
 \paragraph{Model complexity:}
 The model has $[N\,K + M\,K]$ free parameters, where $N$ is the number
@@ -394,8 +388,7 @@ arbitrarily by the investigator, or else by a process of model
 selection.
 
 Standard frequentist model selection methods (for example, the AIC
-\citep{aic} (HOGG: here maybe you wanted to mention papers in 
-astronomy that use AIC/BIC like Conolly et al. 2000?) or the BIC \citep{bic}) 
+\citep{aic} or the BIC \citep{bic}) 
 compares the objective $\chi^2$ of
 \equationname~(\ref{eq:chi-squared}) to some re-scaling of the
 \emph{number of degrees of freedom}, which is the number of independent
@@ -462,14 +455,9 @@ purposes, there will be clear limits to what is possible from hardware
 and computer-time constraints, or ball-park estimates of what makes
 sense that are good enough.  Indeed, our cross-validation tests
 suggest that in most scientific situations, the quality of the model
-is a very slow function of $K$ and $\epsilon$.  Arbitrary setting of
-$K$ and $\epsilon$ is therefore legitimate in many or most situations.
-(VVcom: I m a little worried that the reader here may understand that
- one can put $K$ and $\epsilon$ equal to strange values (e.g. 2 and 100) 
-and that will not have any impact in the results. In addition, in figure 
-1 even though the change in the $\chi^2$ might not be drastic with K and 
-$\epsilon$, in some cases it changes significantly (e.g. in the case of 
-LRGs for $\epsilon$ values of 1 and 30).)
+is a very slow function of $K$ and $\epsilon$.  Heuristic (that is,
+by-eye or by-hand) setting of
+$K$ and $\epsilon$ is therefore legitimate in many or most situations, as long as there is not strong dependence of the results on these model-complexity parameters near the chosen settings.
 
 \section{Optimization}\label{sec:optimization}
 
@@ -764,7 +752,7 @@ each spectrum the best-fit (scaled) mean spectrum, and then
 \emph{project} the remaining residual into the orthogonal subspace
 before performing PCA (VVcom: I think this is not completely right 
 since the subtraction of the mean is done in the final step after we 
-have scaled the spectra).  The initialization we use is the mean spectrum
+have scaled the spectra; HOGG SAY: fix this description).  The initialization we use is the mean spectrum
 and the top $[K-1]$ eigenvectors from the PCA in the orthogonal
 subspace.  This methodology is rarely followed, but it is the only
 method that makes sense if \textsl{(a)}~the mean is permitted to be
@@ -774,10 +762,8 @@ eigenspectrum or component for subsequent fitting, and
 
 In detail, we did one more ``conditioning'' step before any of this,
 which was to re-scale the $M$-dimensional space (the space in which
-the $\vec{f}_i$ live) so that the median [VIVI: MEDIAN?] (VVcom: Here 
-we divided the flux in each pixel with the RMS of the error for all 
-the sources in that pixel) of the $N$
-inverse variances (across spectra $i$) in each coordinate $j$ was
+the $\vec{f}_i$ live) so that the mean of the $N$
+variances (across spectra $i$) in each coordinate $j$ was
 equal.  That is, we ``isotropized'' the space from the point of view
 of the observational uncertainties.  We \emph{only} performed this
 isotropization for the PCA, \emph{not} for the HMF, because the HMF
@@ -1155,7 +1141,7 @@ Since HMF is based on the minimization of a total $\chi^2$---unlike
 PCA, which is based on maximization of the observed data variance
 captured by the top components---it produces basis functions that fit
 the real data much better than the PCA results, for the same number
-$K$ of components, essentially by construction.  In contrast to PCA,
+$K$ of components, essentially \emph{by construction}.  In contrast to PCA,
 HMF is also able to extract more information from the training set
 because it uses many data points that could not be used with PCA, and
 more data dimensions or directions per data point. An example of this
@@ -1167,6 +1153,14 @@ speed. Even though the individual HMF $\chi^2$ minimization iterations
 steps are fast, the number of iterations make the method still much
 slower than PCA. This is the price of probabilistic righteousness.
 
+At this point it is responsible to note that the ``a-step, g-step''
+formalisms presented here represent only one choice among many for
+optimization: Specialists in optimization might point out that this
+iterative scheme is itself heuristic, and there might be far faster
+methods that could be found by good non-linear least-squares
+optimization systems.  Along these lines, all derivatives of the
+bilinear model are easy to compute analytically.
+
 Perhaps the biggest advantage of HMF over PCA is that, because it
 makes proper use of the errors, it does not require a high
 signal-to-noise data set for training.  Because PCA models
@@ -1174,7 +1168,7 @@ signal-to-noise data set for training.  Because PCA models
 rather than the signal.  HMF will not have this property, at least in
 the limit of large numbers.
 
-We apply the HMF method to spectra from the \SDSS, building a data-driven
+We applied the HMF method to spectra from the \SDSS, building a data-driven
 model of the spectra over a wide wavelength range.  This model does an
 excellent job of explaining the spectra even with a small number $K$
 of components.  In detail, to choose the optimal number $K$ of
@@ -1213,7 +1207,7 @@ by straight comparison between the components themselves; different
 solutions ought to be compared in the data space, or in the quality of
 the fit to a good test set of real data.
 
-An additional advantage of this method compared to the PCA is that it
+An additional advantage of HMF over PCA is that it
 also provides an option for non-negative and smoothness constraints in
 the resulting components and coefficients.  This option can help
 produce results that do not include unphysical features (for example,
@@ -1224,7 +1218,7 @@ the results and produce a poorer fit to the observed spectra.
 
 The model is excellent for anomaly detection:  We applied the HMF
 model produced with the \SDSS\ training set to the problem of
-confirming double redshift objects.  Of the 131 galaxy--galaxy
+confirming double-redshift objects.  Of the 131 galaxy--galaxy
 gravitational lenses in the SLACS survey we were able to automatically
 detect 129, using components trained on the \SDSS\ Main Galaxy and LRG
 spectra. The confirmation was made by fitting the spectra with a
@@ -1249,19 +1243,29 @@ Finally, it is worth noting that nothing in the method is specific to
 spectral data---it could be applied to any data for which a linear
 model makes sense---and nothing is specific to the delta-function
 basis of ``spectral pixels''.  The method produces a linear model;
-this can be passed through any linear basis functions.  Some such
+this can be passed through any linear basis functions (as it is
+in \citealt{blanton}).  Some such
 transformations could lead to faster or better regularized results at
 essentially no cost.
 
-\acknowledgments It is with great regret that we thank our deceased
+\acknowledgments It is with deep sadness that we thank our deceased
 colleague Sam Roweis (Toronto, NYU), who initiated this work by
 suggesting the model and all the optimization strategies.  We also
-thank Coryn Bailer-Jones (MPIA), Mike Blanton (NYU), Jo Bovy (NYU),
-Adam Bolton (Utah), Roberto Decarli (MPIA), Massimo Dotti (MPA),
-Dustin Lang (Princeton), Iain Murray (Edinburgh), Hans-Walter Rix
-(MPIA), Kester Smith (MPIA), and Ben Weaver (NYU) for valuable
+thank 
+ Coryn Bailer-Jones (MPIA),
+ Mike Blanton (NYU),
+ Jo Bovy (NYU),
+ Adam Bolton (Utah),
+ Roberto Decarli (MPIA),
+ Massimo Dotti (MPA),
+ Rob Fergus (NYU),
+ Dustin Lang (Princeton),
+ Iain Murray (Edinburgh),
+ Hans-Walter Rix (MPIA),
+ Kester Smith (MPIA), and
+ Ben Weaver (NYU) for valuable
 comments and discussions.  Partial funding for this project was
-provided by NASA (grant NNX08AJ48G), the NSF (grant AST-0908357), and
+provided by NASA (grant NNX08AJ48G), the NSF (grants AST-0908357 and IIS-1124794), and
 the Alexander von Humboldt Foundation.  This research made use of the
 SAO/NASA \project{Astrophysics Data System} and the \project{R}
 Project for Statistical Computing.  All the code used in this project
@@ -1321,6 +1325,9 @@ Boroson,~T.~A., Green,~R.~F. 1992, ApJS, 80, 109
 \bibitem[Budav\'ari \etal(2000)]{budavari} 
 Budav\'ari,~T., Szalay,~A.~S., Connolly,~A.~J., Csabai,~I., Dickinson,~M. 2000, AJ, 120, 1588
 
+\bibitem[Budav{\'a}ri \etal(2009)]{budavarirobust}
+Budav{\'a}ri, T., Wild, V., Szalay, A.~S., Dobos, L., \& Yip, C.-W.\ 2009, MNRAS, 394, 1496 
+
 \bibitem[Chen \etal(2009)]{chen}
 Chen,~Y.-M., Wild,~V., Kauffmann,~G., Blaizot,~J., Davis,~M., Noeske,~K., Wang, J.-M., Willmer,~C. 2009, MNRAS, 393, 406
 
@@ -1367,6 +1374,9 @@ Suzuki,~N. 2006, ApJS, 163, 110
 \bibitem[Rasmussen \& Williams(2006)]{Rasmussen06a}
 Rasmussen,~C.~E. \& Williams,~C., 2006, Gaussian Processes for Machine
 Learning (MIT Press)
+
+\bibitem[Roweis \& Zoubin(1999)]{rz}
+Roweis,~S. \& Zoubin,~G., 1999, Neural Computation, 11, 305
 
 \bibitem[Schwarz (1978)]{bic}
 Schwarz,~G.~E. 1978, Annals of Statistics, 6, 461
