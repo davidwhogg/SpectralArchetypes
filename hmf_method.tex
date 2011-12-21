@@ -49,7 +49,7 @@ likelihood), the basis provides a better fit to the data in a
 probabilistic sense than any PCA basis.  We test the method on
 \SDSS\ spectra, concentrating on spectra known to contain two redshift
 components: These are spectra of gravitational lens candidates and
-super-massive black-hole binaries. We apply a hypothesis test to
+massive black-hole binaries. We apply a hypothesis test to
 compare one-redshift and two-redshift models for these spectra,
 utilizing the data-driven model trained on a random subset of all
 \SDSS\ spectra.  This test confirms 129 of the 131 lens candidates in
@@ -167,8 +167,8 @@ required to use HMF.
 
 For dimensionality reduction or data-driven modeling of spectra (or
 any other data), the investigator has an enormous number of options.
-There are PCA, K-means, ICA, and factor analysis to name just a few
-(\citealt{rz}).
+There are PCA, K-means, Independent Component Analysis (ICA), 
+and factor analysis to name just a few (\citealt{rz}).
 HMF is an example of a probabilistic factor analysis;
 it is probabilistic because it optimizes an objective that
 (unlike the objective for PCA or K-means or standard ICA) is
@@ -215,7 +215,7 @@ significant fraction of all known gravitational lenses \citep{bolton}.
 Other valuable double-redshift sources include merging galaxies,
 binary stars, and binary quasars.  In the latter category, there are
 very few known examples where the best explanation for a spectrum is a
-bound pair of super-massive black holes (\citealt{komossa};
+bound pair of massive black holes (\citealt{komossa};
 \citealt{shields}: \citealt{boroson}; \citealt{decarli}; \citealt{barrows11}; 
 \citealt{eracleous}; \citealt{tsalmantza}).  In most of the cases, the best
 candidates  of gravitational lenses and binary black holes have been 
@@ -345,7 +345,7 @@ regularization to improve the performance or realism of the model.
 The first kind of regularization we can impose is a smoothness prior
 that improves performance at (rest-frame) wavelengths at which we have
 very few data. In practice, we implement this prior by constructing
-the basis functions $g_k(\lambda)$ on a grid of $M$ rest wavelengths
+the basis functions $g_k(\lambda)$ on a grid of $M$ rest-frame wavelengths
 $\lambda_j$ and penalizing quadratically large pixel-to-pixel
 variations. That is, we optimize not the pure $\chi^2$ above but a
 modified scalar $\chi_{\epsilon}^2$
@@ -376,7 +376,7 @@ g_{k}(\lambda) & \geq & 0 \quad\mbox{for all $k$, $\lambda$}
 This can lead to solutions that are much more physically meaningful,
 especially when the objects of study are astronomical spectra of
 galaxies (and particularly if the galaxies are composed of components
-that are themselves optically thin)!
+that are themselves optically thin).
 
 \paragraph{Model complexity:}
 The model has $[N\,K + M\,K]$ free parameters, where $N$ is the number
@@ -389,7 +389,7 @@ selection.
 
 Standard frequentist model selection methods (for example, the AIC
 \citep{aic} or the BIC \citep{bic}) 
-compares the objective $\chi^2$ of
+compare the objective $\chi^2$ of
 \equationname~(\ref{eq:chi-squared}) to some re-scaling of the
 \emph{number of degrees of freedom}, which is the number of independent
 data measurements ($[N\,M]$ in this case) minus the number of free
@@ -436,7 +436,7 @@ scientifically motivated utility.  Also, typically, running $L$ trials
 of leave-one-out usually takes less than or of order $L$ times as long
 as the original optimization of the model, so it is not expensive.
 Finally, we find in practice that the cross-validation-optimal model
-complexity seems reasonable intuitively.
+complexity seems intuitively reasonable.
 
 When the smoothness regularization of
 \equationname~(\ref{eq:smoothness}) is turned on, the smoothness
@@ -496,7 +496,7 @@ $g_{kj}$ at wavelengths $\lambda_j$ to the wavelength of interest
 $\lambda$.  In what follows, much of the fitting is in rest-frame
 wavelengths, given observations in observed-frame wavelengths.  The
 logarithmic wavelength grid and cubic spline interpolation makes
-redshift transformations simple and fast.  It is also the case the
+redshift transformations simple and fast.  It is also the case that the
 \sdss\ spectra used below are extracted on a logarithmic cubic-spline
 basis of this kind.  In detail, we will have to put all the input data
 and basis spectra on the same wavelength grid.
@@ -704,7 +704,7 @@ sensible way; at best they can be re-scaled to ensure
 \sum_{j=1}^{M}g_{kj}^2 = 1
 \quad ,
 \end{equation}
-and ordered in decreasing variance order such that
+and ordered by decreasing variance such that
 \begin{equation}\label{eq:nnordering}
 \sum_{i=1}^{N}a_{ik}^2>\sum_{i=1}^{N}a_{i(k+1)}^2
 \quad .
@@ -746,13 +746,11 @@ this reason we only consider PCA and K-means in what follows.
 \paragraph{PCA initialization}
 In what we describe as ``PCA initialization'' for $K$ basis spectra,
 we in fact generalize slightly the PCA to produce a mean spectrum and
-then the $[K-1]$ top eigenvectors \emph{orthogonal} to the mean
-spectrum.  That is, after we compute a mean spectrum, we subtract from
-each spectrum the best-fit (scaled) mean spectrum, and then
-\emph{project} the remaining residual into the orthogonal subspace
-before performing PCA (VVcom: I think this is not completely right 
-since the subtraction of the mean is done in the final step after we 
-have scaled the spectra; HOGG SAY: fix this description).  The initialization we use is the mean spectrum
+then the $[K-1]$ top eigenvectors \emph{orthogonal} to it. 
+That is, before performing PCA, we \emph{project} the spectra into a 
+subspace orthogonal to the mean spectrum, by scaling them 
+and subtracting the mean spectrum from each one of them.
+The initialization we use is the mean spectrum
 and the top $[K-1]$ eigenvectors from the PCA in the orthogonal
 subspace.  This methodology is rarely followed, but it is the only
 method that makes sense if \textsl{(a)}~the mean is permitted to be
@@ -880,14 +878,14 @@ straightforward as possible.
 Using a number of spectra equal to the number of pixels selected for
 each source, we performed PCA on those data. As described in 
 \sectionname~\ref{sec:initialization}, the training data were
-first projected into a hyperplane perpendicular to the mean
+first projected into a hyperplane orthogonal to the mean
 spectrum that is passing from the zero point. To do so each spectrum 
 was scaled appropriately and the mean spectrum was subtracted from it. 
 Additionally, the flux in each spectral bin was divided
 with the RMS of the error in that pixel for all the non-masked pixels in
 the training sample. The PCA results were used as an initialization to
 our method. HMF was trained with a subset of approximately 1000
-spectra of each type for a different number of components and for 16
+spectra of each type, for a different number of components and for 16
 iterations, which seems to be enough for the method to reach convergence. This
 can be seen in \figurename~\ref{fig:1} in which we present the results of
 the fitting (total $\chi^2$, that is, the sum of $\chi^2$ values over all
@@ -977,7 +975,7 @@ other hand even if the components now seem to have a better physical
 meaning, that is, they look more like spectra of particular type of
 objects, in many cases there seems to be a problem at the edges of the
 spectra where they tend to start from exactly zero values (for
-example, the components for LRG objects). At this point we should
+example, the components for LRG spectra). At this point we should
 mention that when applying the method for the non-negative case we
 have not used an additional smoothing constraint.
 
@@ -1107,10 +1105,9 @@ of gravitational lenses in order to test if we can detect the second
 redshift. However, since in this case the separation between the two
 sets of lines is expected to be small, we limited our search to
 redshift differences below 0.1. The second redshift can be either 
-smaller or larger than the \SDSS\ one, depending on the orbital phase 
-of the less massive black hole.
+smaller or larger than the \SDSS\ one.
 
-The spectra were fitted using the set of QSO components that were
+The spectra were fitted using a set of QSO components that were
 extracted in \sectionname~\ref{sec:training} at the \SDSS\ 
 redshift and another set of the same components at a redshift scanning a
 narrow grid of regular values. The results for the four candidates are
@@ -1118,7 +1115,7 @@ presented in \figurename~\ref{fig:6a} where we can see that we are
 able to reproduce all of the four spectra with shifted broad lines given 
 in the literature.
 
-This method was applied to spectra of 54586 and 3929 objects
+This method was applied to spectra of 54\,586 and 3929 objects
 spectroscopically classified as QSOs and galaxies respectively in \SDSS\ 
 DR7, with 0.1$<$z$<$1.5 in order to detect more candidates of this
 type of object (\citealt{tsalmantza}). The search resulted to 32
@@ -1227,7 +1224,7 @@ mixture of two sets of spectral model components, one at the
 compared to a single-redshift fits.  In a similar manner, we were able
 to recover a set of four previously known black-hole binary
 candidates.  In the future, we plan to perform comprehensive automatic
-searches for objects of these types the entire \SDSS\ spectroscopic
+searches for objects of these types in the entire \SDSS\ spectroscopic
 data set.
 
 Another application of the HMF method could be for the determination
@@ -1420,14 +1417,14 @@ Yip,~C.~W., Connolly,~A.~J., Szalay,~A.~S., Budavári,~T., SubbaRao,~M., Frieman
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig2}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig3}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig4}
-\caption{The first 7 components for each type of object (Main Galaxies, LRGS and QSOs) as estimated by the PCA (grey lines) and the method presented here (black lines).}
+\caption{The first 7 components for each type of object (Main Galaxies, LRGs and QSOs) as estimated by the PCA (grey lines) and the method presented here (black lines).}
 \label{fig:2}
 \end{figure}
 
 \clearpage
 \begin{figure}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/proposal1}
-\caption{The total $\chi^2$ value (sum over all spectra and all pixels) estimated by the fit of a test set of \SDSS\ galaxy spectra ($\approx$ 1000 objects) by the HMF (grey and black lines) and the PCA (dashed line) components vs. the number of components used in each case. From the top grey line to the bottom black one, the lines correspond to the results based on different successive iterations of the HMF (i.e. from iteration 1 to 16). It is clear that HMF components can achieve a better fitting of the observations even from the first iteration of the method.}
+\caption{The total $\chi^2$ value (sum over all spectra and all pixels) estimated by the fit of a test set of \SDSS\ galaxy spectra ($\approx$ 1000 objects) by the HMF (grey and black lines) and the PCA (dashed line) components vs. the number of components used in each case. From the top grey line to the bottom black one, the lines correspond to the results based on different successive iterations of the HMF (i.e. from iteration 1 to 16). It is clear that the HMF components can achieve a better fitting of the observations even from the first iteration of the method.}
 \label{fig:2b}
 \end{figure}
 
@@ -1435,7 +1432,7 @@ Yip,~C.~W., Connolly,~A.~J., Szalay,~A.~S., Budavári,~T., SubbaRao,~M., Frieman
 \begin{figure}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig5}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
-  of spectra by the components produced by the method vs. the number
+  of spectra by the components produced by HMF vs. the number
   of components for each type of object (rows: Main Galaxies, LRGs and QSOs
   respectively). The different types of lines represent the different
   values of $\epsilon$ used in each case.}
@@ -1446,7 +1443,7 @@ Yip,~C.~W., Connolly,~A.~J., Szalay,~A.~S., Budavári,~T., SubbaRao,~M., Frieman
 \begin{figure}
 \includegraphics[angle=-90,width=0.49\columnwidth]{paper_plots/fig6}
 \caption{The total $\chi^2$ value estimated by the fit of the test set
-  of Main Galaxy spectra by the components produced by the method vs. the
+  of Main Galaxy spectra by the components produced by HMF vs. the
   number of components. The different types of lines represent the
   different initializations used (PCA, K-means, random spectra and sin
   and cosin functions).}
@@ -1474,8 +1471,8 @@ Yip,~C.~W., Connolly,~A.~J., Szalay,~A.~S., Budavári,~T., SubbaRao,~M., Frieman
 \caption{The four known BHB candidates. \textsl{Top panel:} The
   $\chi^2$ difference between the fitting of the spectrum with 1 and 2
   sets of components. The green and blue lines represent the \SDSS\  
-  redshift and the one with the largest $\chi^2$
-  difference. \textsl{2nd panel:} The fitting of the spectrum (black)
+  redshift ($z_i$) and the one with the largest $\chi^2$
+  difference ($z_n$). \textsl{2nd panel:} The fitting of the spectrum (black)
   with both sets of components (red). \textsl{3rd panel:} The part of
   the spectrum (black) fitted by the one set of components at the
   redshift with the highest $\chi^2$ difference (red). \textsl{Bottom
