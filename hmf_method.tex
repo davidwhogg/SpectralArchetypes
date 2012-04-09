@@ -509,8 +509,10 @@ the parameters.  In this case, we optimize as follows: In each step,
 we fix the $g_{kj}$ and find the optimal $a_{ik}$ by weighted least
 squares, and then hold the $a_{ik}$ fixed and find the optimal
 $g_{kj}$ by weighted least squares. Each iteration step is guaranteed
-to reduce the total $\chi^2$ and converges (in practice in the tests
-below) in ten or so iterations.
+to reduce the total $\chi^2$ objective, the objective is non-negative,
+and therefore the algorithm is guaranteed to converge to some optimum.
+In practice in the tests below, convergence is reasonable in ten or so
+iterations.
 
 There are $[N\,K]$ coefficients $a_{ik}$ and $[K\,M]$ parameters
 $g_{kj}$ in the basis spectra.  For most data sets, least-square fits
@@ -752,11 +754,11 @@ subspace orthogonal to the mean spectrum, by scaling them
 and subtracting the mean spectrum from each one of them.
 The initialization we use is the mean spectrum
 and the top $[K-1]$ eigenvectors from the PCA in the orthogonal
-subspace.  This methodology is rarely followed, but it is the only
-method that makes sense if \textsl{(a)}~the mean is permitted to be
-non-zero, \textsl{(b)}~the mean spectrum is going to be considered an
+subspace.  This methodology ensures that \textsl{(a)}~the mean is permitted to be
+non-zero, \textsl{(b)}~the mean spectrum can be considered an
 eigenspectrum or component for subsequent fitting, and
-\textsl{(c)}~linear independence is important, which it always is.
+\textsl{(c)}~the initial eigenspectra are orthogonal (and therefore
+linearly independent).
 
 In detail, we did one more ``conditioning'' step before any of this,
 which was to re-scale the $M$-dimensional space (the space in which
@@ -954,30 +956,30 @@ initializations used here.
 As a last test of the method we checked how a non-negative constraint
 affects the results. Since negative values in the spectra are caused
 by observational errors, modeling the spectra of astronomical sources
-with components that include negative values has no physical
-meaning. This problem can be solved be applying a non-negative
-constraint to our basis. The way that this is achieved is by
+with components that include negative values has no (trivial) physical
+meaning. The negative-values problem can be solved by applying a non-negative
+constraint to our basis; that is,
 initializing with a non-negative set of components and coefficients
-and iterating according to the non-negative a-step of
+and optimizing according to the non-negative a-step of
 \equationname~(\ref{eq:astep_nonneg}) and the non-negative g-step of
-\equationname~(\ref{eq:gstep_nonneg}). One of the best ways to
-initialize this method with a set of non-negative components that
-include physical information is to use once again the K-means
+\equationname~(\ref{eq:gstep_nonneg}). A sensible non-negative 
+initialization  is by the K-means
 algorithm. The results of the fitting of the test set of spectra with
 the components extracted in this way after 2048 iterations are
 presented in \figurename~\ref{fig:4}, while in \figurename~\ref{fig:5}
 we present the resulting components for each type of object for $K=7$.
 
 By comparing those results with the ones obtained without the
-non-negative constraint we see that the fitting is now worse. This was
-expected since non-negativity is a very strict constraint. On the
-other hand even if the components now seem to have a better physical
-meaning, that is, they look more like spectra of particular type of
-objects, in many cases there seems to be a problem at the edges of the
-spectra where they tend to start from exactly zero values (for
-example, the components for LRG spectra). At this point we should
-mention that when applying the method for the non-negative case we
-have not used an additional smoothing constraint.
+non-negative constraint we see that the fitting is now worse in a likelihood sense. This was
+expected since non-negativity is a very strict constraint that
+conflicts with the likelihood.  On the other hand even if the
+components now seem to have some kind of physical interpretation---that
+is, they look more like spectra of particular type of objects---in many
+cases there seems to be a problem at the edges of the spectra where
+they tend to start from exactly zero values (for example, the
+components for LRG spectra). At this point we should mention that when
+applying the method for the non-negative case we have not used an
+additional smoothing constraint.
 
 Based on the results presented here and an additional test, that is 
 defining the minimum number of components required to detect the 

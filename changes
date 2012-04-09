@@ -2,11 +2,11 @@ We would like to thank the referee for his/her useful comments on our paper. We 
 
 REFEREE: My main concern lies in the comparison of HMF with the Principal Component Analysis (PCA), a popular technique for representing spectral subspaces in the community. In the Introduction (S1), the authors made a big effort to discuss the advantages and drawbacks of PCA, with the latter (1) being agnostic about the source of variance; (2) offering a linear subspace only; and (3) using no prior information (and potentially would lead to negative fluxes in a reconstructed spectrum). The HMF takes into account the observed flux uncertainties in modeling the spectral sample, but that does not qualify it as a way "to know the astrophysical processes that generate the data prior to the addition of observational noise" (S1, P5, last sentence). I urge the authors to make clearer the overall comparison.
 
-AUTHORS: We agree with the referee that this sentence was misleading. What we wanted to say here was that having a knowledge of the amount of the variance that is caused by the observational noise can put us one step closer to physically meaningful results. We rephrased this sentence. We are hoping that the rest of the text regarding HMF-PCA comparison is not confusing. It was a little difficult to be more detailed on this in the introduction since the HMF method has not been presented yet, but we are hoping that it is quite clear in the conclusions section.
+AUTHORS: We agree with the referee that this sentence was misleading. What we wanted to say here was that having knowledge of the amount of the variance that is caused by the observational noise can put us one step closer to physically meaningful results. We rephrased this sentence. We are hoping that the rest of the text regarding HMF-PCA comparison is not confusing. It was a little difficult to be more detailed on this in the introduction since the HMF method has not been presented yet, but we are hoping that it is clear in the conclusions section.
 
 REFEREE: In S1 P3, the authors commented that it's often a mistake to interpret physically the data-driven models without theoretical justification. Is the theoretical justification the probabilistic justification (in the objective function), if I understand correctly? Do all data-driven models (PCA, HMF, and others) suffer from this problem - i.e., does the probabilistic justification (as in HMF) guarantee a correct physical interpretation? Please clarify.
 
-AUTHORS:  This is a common problem for all the data-driven methods, i.e. one should be very careful when trying to physically interpret the output of data-driven methods. The output classes, eigenspectra etc that result from a data-driven method do not necessarily correspond to classes or components with physical meaning, since they usually result from the optimization of a probabilistic function that is not straightforward related to the underlying physical properties of the sources. We have added some comments in the text to make this point clearer.
+AUTHORS:  This is a common problem for all the data-driven methods, i.e. one should be very careful when trying to physically interpret the output of data-driven methods. The output classes, eigenspectra etc that result from a data-driven method do not necessarily correspond to classes or components with physical meaning, since they usually result from the optimization of a probabilistic function that is not straightforward related to the underlying physical properties of the sources. We have added some comments in the text to make this point clearer.  In general, because the information in the data does not correspond trivially to the information of importance in the theory, the components won't be trivially interpretable.
 
 REFEREE: In the Discussion (S6 P4), it was pointed out that perhaps the biggest advantage of HMF over PCA is its modeling of data uncertainties, which is instrumental for low S/N data. Certainly the innate PCA does not take data uncertainties into account, yet it will be useful to make the readers aware that there were PCA works (e.g., Boroson and Lauer, 2010) that addressed the issue on modeling low S/N spectra. BL10 successfully identified a BHB candidate, and other outliers, by using the PCA together with the estimated risk criterion. This result should be stated explicitly in S5.3.2.
 
@@ -36,7 +36,9 @@ AUTHORS: We added a sentence in this paragraph to make clear that the minimum nu
 
 REFEREE: Are the HMF basis spectra linearly independent, with and without the negativity constrain? Perhaps I miss it but I don't seem to find this information anywhere, which would be useful/interesting to readers.
 
-AUTHORS: HMF (equation 4) in principle does not lead to components that are linearly independent. In order to produce such components we have implemented equations (10) which orthogonalize the HMF basis functions. Therefore when the non-negativity constraint is not applied the HMF components are linearly independent. This is not the case for the HMF with the non-negativity constraint, where as it is mentioned in the text above equation (17) the HMF components cannot be orthogonalized and therefore linear independence cannot be guaranteed. We added a sentence at this part of the text to make this clearer.
+*** VIVI: NOTE THAT I REVERSED YOU IN THE RESPONSE HERE:  OUR COMPONENTS ARE *INDEPENDENT* BUT NOT *ORTHOGONAL.  CAN YOU CHECK THAT THE TEXT IS CONSISTENT WITH THIS??
+
+AUTHORS: HMF (equation 4) in principle does always lead to components that are linearly independent, in the strict sense that no component can be strictly constructed by any linear sum of the other components.  The reason is that if a component is in the linear subspace of the others, the optimization obtains more freedom by moving it out of the subspace.  As for orthogonality, HMF doesn't in general produce *orthogonal* components.  In order to produce such components we have implemented equations (10) which orthogonalize the HMF basis functions. Therefore when the non-negativity constraint is not applied the HMF components as we produce them are orthogonal. This is not the case for the HMF with the non-negativity constraint, where as it is mentioned in the text above equation (17) the HMF components cannot be orthogonalized. We added a sentence or two at this part of the text to make this clearer.
 
 REFEREE: Should each panel in Fig. 7 (and the later plots) use a different wavelength range?
 
@@ -46,18 +48,18 @@ REFEREE: The spectral bases (Fig. 2) are too small to be visualized clearly.
 
 AUTHORS: We enlarged the images in figure 2. We hope that now they are easier to be visualized.
 
----
+AUTHORS: We also made a few other changes not suggested by the referee:
 
-12. I corrected the reference Roweis & Ghahramani to Roweis & Zourbin
+*** VIVI: I THINK YOU RE-REVERTED MY CHANGE.  CAN YOU CHECK THE ORIGINAL REFERENCE?  I THINK IT IS R&G NOT R&Z.  We corrected the reference Roweis & Ghahramani to Roweis & Zourbin
 
-13. I added a reference to Boroson & Lauer also at S1 P10 where we refer to studies that used PCA and patching of the data to treat the problem of missing data.
+We added a reference to Boroson & Lauer also at S1 P10 where we refer to studies that used PCA and patching of the data to treat the problem of missing data.
 
-14. I added in the acknowledgments everyone that sent us an email after the paper was posted in the arXiv.
+We added a few people to the acknowledgments.
 
-15. I added references to the papers by Wilson and the one in bioinformatics (at the place we are referencing the chemistry paper, even though I m not completely sure that the Wilson papers are completely relevant here, maybe the one of them fits better).
+We added a couple of introductory references.
 
-16. I added one comment based on the Malyshev's email about what we mean by convergence of our algorithm (at the end of S3 P3). However, I didn't mention anything about the discussion in that email regarding convergence and degeneracies.
+We added one comment about what we mean by convergence of our algorithm (at the end of S3 P3).
 
-17. I added a comment regarding the performance of diffusion K-means compared to standard K-means that was mentioned in Richards et al. I didn't add the comment about the SFHs because we have included so far only things we are planning to do, but maybe it will be good to add one more paragraph with other applications.
+We added a comment regarding the performance of diffusion K-means compared to standard K-means.
 
-
+We tweaked some of the wording of the presentation of results, without changing any meanings.  Also in the initialization section.
