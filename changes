@@ -59,5 +59,3 @@ We added a couple of introductory references.
 We added one comment about what we mean by convergence of our algorithm (at the end of S3 P3).
 
 We added a comment regarding the performance of diffusion K-means compared to standard K-means (S4 P3).
-
-We tweaked some of the wording of the presentation of results, without changing any meanings.  Also in the initialization section.
