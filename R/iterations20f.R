@@ -10,7 +10,7 @@ load("lamda_tel.R")
 N<-nrow(spectra)
 M<-length(lamda_tel)
 
-source("/home/vivitsal/DAVID/method/galaxies/functions.R")
+source("functions.R")
 
 ## Check which spectra have the whole spectrum at the beggining and at the end
 all_blue<-which(mask[,1]==0)
