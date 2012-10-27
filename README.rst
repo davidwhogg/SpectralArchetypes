@@ -21,5 +21,9 @@ Notes
 Migrated from SVN at <http://Astrometry.net/> by the following::
 
     cd
-    git svn clone svn+ssh://astrometry.net/svn/trunk/projects/archetypes/ --no-minimize-url --authors-file ~/authors
-    # . . .
+    git svn clone svn+ssh://astrometry.net/svn/trunk/projects/archetypes/ \
+        --no-minimize-url --authors-file ~/authors
+    cd archetypes
+    git pull git@github.com:davidwhogg/SpectralArchetypes.git
+    git remote add origin git@github.com:davidwhogg/SpectralArchetypes.git
+    git push origin master
