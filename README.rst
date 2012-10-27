@@ -13,7 +13,7 @@ Authors
 License
 -------
 
-Copyright 2010, 2011, 2012 the authors.  **All rights reserved**
+Copyright 2009, 2010, 2011, 2012 the authors.  **All rights reserved**
 
 Notes
 -----
