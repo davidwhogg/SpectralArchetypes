@@ -18,7 +18,8 @@ Copyright 2010, 2011, 2012 the authors.  **All rights reserved**
 Notes
 -----
 
-Migrated from SVN at <http://Astrometry.net/> by the following:
+Migrated from SVN at <http://Astrometry.net/> by the following::
 
     cd
     git svn clone svn+ssh://astrometry.net/svn/trunk/projects/archetypes/ --no-minimize-url --authors-file ~/authors
+    # . . .
