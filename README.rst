@@ -1,7 +1,11 @@
 Spectral Archetypes
 ===================
 
-A partial repository of code related to spectral modeling.
+A partial repository of code related to spectral modeling.  Methods and code may include the following:
+
+* Heteroskedastic Matrix Factorization (Tsalmantza & Hogg)
+* Integer-programming-generated archetypes (Roweis & Hogg)
+* Platykurtic vector discovery (Hogg)
 
 Authors
 -------
