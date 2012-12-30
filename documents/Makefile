@@ -1,18 +1,11 @@
 LATEX       = pdflatex
 BASH        = bash -c
 ECHO        = echo
-RM          = rm -rf
-RM_TMP      = ${RM} $(foreach suff, ${TMP_SUFFS}, ${NAME}.${suff})
-
-TMP_SUFFS   = pdf aux bbl blg log dvi ps eps out
-SUFF        = pdf
-
+RM          = rm -rfv
+RM_TMP      = ${RM} *.aux *.log *.toc
 CHECK_RERUN = grep Rerun $*.log
 
-NAME    = tagging
-DOC_OUT = ${NAME}.${SUFF}
-
-all: ${DOC_OUT}
+all: tagging.pdf age.pdf
 
 %.pdf: %.tex
 	${LATEX} $<
