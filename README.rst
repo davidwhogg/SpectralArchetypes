@@ -31,3 +31,5 @@ Migrated from SVN at <http://Astrometry.net/> by the following::
     git pull git@github.com:davidwhogg/SpectralArchetypes.git
     git remote add origin git@github.com:davidwhogg/SpectralArchetypes.git
     git push origin master
+
+(and something similear for `svn+ssh://astrometry.net/svn/trunk/documents/papers/archetypes/`.)
