@@ -1,0 +1,138 @@
+\documentclass[12pt, preprint]{aastex}
+
+\newcommand{\sectionname}{Section}
+\newcommand{\project}[1]{\textsl{#1}}
+\newcommand{\age}{\mathrm{age}}
+\newcommand{\var}{\sigma^{2}}
+\newcommand{\invvar}{\sigma^{-2}}
+
+\begin{document}
+
+\title{Data-driven stellar age estimates}
+\author{
+  David~W.~Hogg,
+  Hans-Walter~Rix, others
+}
+
+\begin{abstract}
+We perform simple emission-line-based (activity-based) age
+determinations without the use of \emph{any} stellar models or model
+spectra from libraries.  The method is based on K-nearest-neighbor
+methods from machine learning.
+\end{abstract}
+
+\section{introduction}
+
+...Age is indicated by emission lines in main-sequence dwarfs...
+
+...Fitting of the emission lines is complicated by the non-trivial
+spectral shape near the lines.  Spectral models of stars aren't good
+enough to handle this.  But the large number of stars we have observed
+ought to be able to provide!
+
+...In what follows, we use novel machine-learning-like methods that
+have been designed to find structure in large, high dimensional data
+sets to perform flexible fitting tasks with stellar spectra.
+
+...Related prior work includes PCA, HMF, XD, SVM.  These all build
+data-driven models of non-trivial data sets, and all could be used
+here.  We are choosing KNN because of its \emph{capacity}...
+
+\section{method}
+
+There are $N$ stars $n$, for each of which we have a spectrum $F_n$
+(with dimensions of energy per time per area per wavelength).  Each
+spectrum $F_n$ is represented as $L$ values $F_{n\ell}$ on a standard set
+of rest-frame wavelengths $\lambda_\ell$.  These wavelengths are truly
+rest-frame, because the \project{SDSS} spectral extraction pipelines
+permit extraction of the spectrum shifted to the rest frame by the
+(presumably well-measured) redshift.
+
+Every measurement $F_{n\ell}$ comes with an uncertainty inverse
+variance $\invvar_{n\ell}$.  We manipulate inverse variance rather
+than ``sigma'' or variance because the inverse variance is the weight
+for weighted least squares, and because missing data get zeros (not
+infinities) in this well-behaved quantity.  In general, because of
+observing and data analysis realities, all the weights
+$\invvar_{n\ell}$ are different and not directly computable from the
+$F_{n\ell}$ or any trivial combination of meta-data.  The data are
+considered to be maximally heteroskedastic and arbitrarily censored,
+but all in a known way.
+
+In addition to these data requirements, we require that we have, in
+hand, an emission-line spectral template $F_\age$ that we believe is
+age-indicating.  In this instance, the template is the pair of
+emission lines...whatever...smoothed to the spectral resolution of the
+\project{SDSS} spectrograph.  It is shown in Figure~HOGG.
+
+In broad strokes, the KNN algorithm finds, for each target spectrum,
+$K$ nearest neighbors, and uses these to build a data-driven model of
+the target spectrum as the ``background'' on which the age indicator
+is fit.  In detail, the KNN algorithm is as follows:
+\begin{enumerate}
+\item For every pair $(m, n)$ of spectra, under the assumption that
+  the two stars are identical in every respect except for distance,
+  obtain the chi-squared minimum (squared) distance ratio
+  $[D_m/D_n]^2$ by weighted linear least-square fitting.  The weight
+  for each pixel $\ell$ in the fit is $[\var_{m\ell} +
+    \var_{n\ell}]^{-1}$ WRONG, but zeroed out in the $d$ spectral
+  pixels closest in wavelength to the age-indicator emission lines.
+  The fit is to $[L-d]$ spectral pixels (data points) with 1
+  parameter.  In addition to the best-fit distance ratio, save
+  $\chi^2_{mn}$, the chi-squared value at that optimum.  In principle
+  this step can be sped up by only computing the distance-ratio fit
+  for pairs of stars that have similar colors or something like that;
+  that is, the full $N^2$ tree can be trimmed in advance.  The width
+  $d$ of the excluded region near the age-indictor lines is a free
+  parameter of the method.
+\item For each spectrum $n$, find the $K$ nearest neighbors $k$ in a
+  chi-squared sense, using the minimum chi-squared values
+  $\chi^2_{kn}$ as the metric interval separating neighbors.  For our
+  purposes here and below, the $K$ nearest neighbors \emph{includes}
+  spectrum $n$.  $K$ is a free parameter of the method.
+\item Now model the \emph{entire} spectrum $F_n$ (all $L$ pixels) as a
+  linear combination of the $[K-1]$ nearest neighbors excluding
+  itself, plus a bit of age-indicating spectrum.  The model is
+  \begin{eqnarray}
+    F_n &=& \sum_{k=2}^K a_{nk}\,\left[\frac{D_k}{D_n}\right]^2\,F_k + b_n\,F_\age + e_n
+    \quad ,
+  \end{eqnarray}
+  where implicitly $k=1$ indicates self-match and is dropped, the
+  $a_{nk}$ are a set of $[K-1]$ coefficients, $b_n$ is an age
+  coefficient, and $e_n$ represents noise.  Perform the fit by
+  weighted linear least-square fitting.  The result of this step is
+  that each spectrum $n$ now has a set of coefficients $a_{nk}$ and
+  $b_n$.  If all is going well, we expect
+  \begin{eqnarray}
+    1 &\approx& \sum_{k=2}^K a_{nk}
+    \quad .
+  \end{eqnarray}
+  WRONG: Ought to re-scale to some standard brightness before doing
+  this to make the $b_n$ interpretable.
+\item A spectrum with a positive $b_n$ has a younger age than the
+  $a_{nk}$-weighted average of its $[K-1]$ nearest distance-rescaled
+  neighbors, and vice versa.  INSERT LINEAR ALGEBRA MAGIC HERE to get
+  properly ranked or scaled $B_n$ values.
+\item Convert $B_n$ values to something that stellar astronomers like.
+\end{enumerate}
+
+This version of the algorithm has only two free external (or hyper-)
+parameters: the integer width $d$ and the number of neighbors $K$.
+More sophisticated versions that do more conditioning, combine
+information from neighbors in a weighted way, or make shortcuts to
+reduce computation, would have more hyper-parameters.
+
+\section{data and results}
+
+...For data we take the \project{SEGUE-II} whatever... Rix?
+
+\section{discussion}
+
+\acknowledgements It is a pleasure to thank
+  Ross Fadely,
+  Rob Fergus,
+  Dan Foreman-Mackey, and
+  Dilip Krishnan
+for valuable discussions.
+
+\end{document}
