@@ -5,7 +5,7 @@ RM          = rm -rfv
 RM_TMP      = ${RM} *.aux *.log *.toc
 CHECK_RERUN = grep Rerun $*.log
 
-all: tagging.pdf age.pdf
+all: age.pdf
 
 %.pdf: %.tex
 	${LATEX} $<
