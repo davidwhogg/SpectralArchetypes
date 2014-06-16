@@ -13,11 +13,12 @@ Authors
 * **David W. Hogg** (NYU)
 * **Vivi Tsalmantza** (MPIA)
 * **Sam Roweis** (deceased)
+* **Jo Bovy** (IAS)
 
 License
 -------
 
-Copyright 2009, 2010, 2011, 2012 the authors.  **All rights reserved**
+Copyright 2009, 2010, 2011, 2012, 2013, 2014 the authors.  **All rights reserved**
 
 Notes
 -----
