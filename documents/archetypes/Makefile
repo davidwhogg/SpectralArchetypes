@@ -5,7 +5,7 @@ RM          = rm -rfv
 RM_TMP      = ${RM} *.aux *.log *.toc
 CHECK_RERUN = grep Rerun $*.log
 
-all: archetypes.pdf
+all: archetypes.pdf for_bolton.pdf
 
 %.pdf: %.tex
 	${LATEX} $<
